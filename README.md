@@ -35,6 +35,15 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Applying the uncertainty principle (why nuclei cannot contain electrons)
 - Energy–time uncertainty and the natural width of a spectral line
 
+## Chapter 4 — Atomic Structure
+- Rutherford scattering (numerically integrated trajectories, the 1/sin⁴(θ/2) law)
+- Why the classical atom collapses (the spiral, and the frequency smear it would emit)
+- The hydrogen spectral series (Lyman through Pfund, plus the Balmer lines in true colour)
+- Bohr orbits as standing de Broglie waves
+- Energy levels, transitions, and the correspondence principle
+- Reduced mass and the isotope shift (H, D, T, He⁺, positronium, muonic hydrogen)
+- The Franck–Hertz experiment
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -44,6 +53,7 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch01.js       one file per chapter, each self-registering its modules
     ch02.js
     ch03.js
+    ch04.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

@@ -200,7 +200,7 @@
       <button class="chap-btn" data-chapter="ch1" role="tab" aria-selected="false"><span class="n">1</span>Relativity</button>
       <button class="chap-btn" data-chapter="ch2" role="tab" aria-selected="false"><span class="n">2</span>Particle Properties</button>
       <button class="chap-btn" data-chapter="ch3" role="tab" aria-selected="false"><span class="n">3</span>Wave Properties</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">4</span>Atomic Structure</span>
+      <button class="chap-btn" data-chapter="ch4" role="tab" aria-selected="false"><span class="n">4</span>Atomic Structure</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">5</span>Quantum Mechanics</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">6</span>Hydrogen Atom</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">7</span>Many-Electron Atoms</span>
@@ -1027,6 +1027,251 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 4 ===================== -->
+  <section class="chapter" id="ch4">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Four</div>
+      <h1>Atomic Structure</h1>
+      <p>Two things classical physics cannot explain about atoms: that they are stable at all, and that each element emits its own fixed set of wavelengths. Bohr resolved both by importing quantization — and de Broglie later showed where that quantization came from.</p>
+    </div>
+
+    <!-- 1. Rutherford -->
+    <div class="card">
+      <h2>Rutherford Scattering <span class="eqtag">Sec. 4.1</span></h2>
+      <p class="desc">Fire alpha particles at gold foil and most sail through. A few come straight back — which, as Rutherford put it, was as incredible as a 15-inch shell rebounding off tissue paper.</p>
+      <div class="eq">tan(&theta;/2) = D/2b, &nbsp; D = Z&#8321;Z&#8322;e&sup2;/4&pi;&epsilon;&#8320;KE &nbsp;&nbsp;|&nbsp;&nbsp; N(&theta;) &prop; 1/sin&#8308;(&theta;/2)</div>
+      <div class="controls">
+        <div class="ctrl"><label>&alpha; energy (MeV) <span class="val" id="rs_ke_val">5.0</span></label>
+          <input type="range" id="rs_ke" min="1" max="10" step="0.1" value="5"></div>
+        <div class="ctrl"><label>Impact parameter b (fm) <span class="val" id="rs_b_val">22.8</span></label>
+          <input type="range" id="rs_b" min="0" max="200" step="0.1" value="22.8"></div>
+        <div class="ctrl"><label>Target nucleus</label>
+          <select id="rs_z">
+            <option value="79" selected>gold (Z = 79)</option>
+            <option value="47">silver (Z = 47)</option>
+            <option value="29">copper (Z = 29)</option>
+            <option value="13">aluminium (Z = 13)</option>
+          </select></div>
+      </div>
+      <canvas id="rs_canvas" height="300"></canvas>
+      <canvas id="rs_canvas_dist" height="250" style="margin-top:12px;"></canvas>
+      <div class="readout" id="rs_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is a single alpha particle's path, integrated numerically from the Coulomb force rather than sketched — the curve you see is the actual hyperbola the equations produce. The teal segment is the <b>impact parameter</b> b, how far off-centre the particle would have passed had there been no force. The lower panel is the angular distribution: how many particles scatter through each angle, on a logarithmic scale because the answer spans seven decades.</p>
+        <p>Drag b and watch the sensitivity. At 200 fm the alpha barely notices the nucleus. Bring b down to a few tens of femtometres and it swings through a large angle. Take it to zero and it comes straight back the way it came.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave the energy at <b>5 MeV</b> on <b>gold</b> and set <b>b = 22.8 fm</b> — that is exactly the impact parameter for a 90&deg; deflection, and the readout confirms it. Now set <b>b = 0</b> and read off the closest approach: about 45 fm, which is where the alpha runs out of kinetic energy climbing the Coulomb hill and turns around. That number is the crucial one, because it is still <em>larger</em> than the gold nucleus, so the alpha never touches it and pure Coulomb repulsion explains everything. Then switch to <b>aluminium</b> and watch the deflections shrink with Z.</p>
+
+        <h3>Why this killed the plum pudding</h3>
+        <p>Thomson's model spread the positive charge uniformly through the whole atom. An alpha crossing such an atom feels contributions from all sides that largely cancel, and the strongest field it ever meets is feeble — the predicted deflections are a degree at most, and a large-angle scatter would require an impossible run of small deflections all pointing the same way. Geiger and Marsden found that about one alpha in 8000 came back through more than 90&deg;.</p>
+        <p>The only way to get a field strong enough is to pack the positive charge into something tiny. Rutherford worked out the distribution that a point charge would produce, the 1/sin&#8308;(&theta;/2) law in the lower panel, and it matched the counts across the full angular range. The atom's positive charge and essentially all of its mass sit in a nucleus some ten thousand times smaller than the atom itself — which is why the readout's atom-to-nucleus ratio is worth staring at. Matter is overwhelmingly empty space.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This whole analysis is classical: Newton's laws plus Coulomb's law, with no quantum mechanics anywhere. It works because the alpha never gets close enough for anything else to matter — and Beiser flags exactly this, noting that the agreement would break down if the alpha reached the nucleus, where the strong nuclear force takes over. Higher-energy alphas do eventually breach it, and the departure from the Rutherford formula is itself how nuclear radii were first measured. The irony is worth noting: the experiment that revealed the nucleus needed no quantum theory at all, while explaining what the electrons outside it are doing needed nothing else.</p>
+      </div>
+    </div>
+
+    <!-- 2. classical collapse -->
+    <div class="card">
+      <h2>Why the Classical Atom Collapses <span class="eqtag">Sec. 4.2</span></h2>
+      <p class="desc">Rutherford's nucleus creates a worse problem than it solves. An electron in orbit is accelerating, an accelerating charge radiates, and a radiating electron must spiral in. Classical physics predicts that no atom survives a nanosecond.</p>
+      <div class="eq">F<sub>c</sub> = m&upsilon;&sup2;/r = e&sup2;/4&pi;&epsilon;&#8320;r&sup2; &nbsp;&nbsp;|&nbsp;&nbsp; E = &minus;e&sup2;/8&pi;&epsilon;&#8320;r &nbsp;&nbsp;|&nbsp;&nbsp; radiated power &prop; a&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Starting radius <span class="val" id="cc_r0_val">53.0 pm</span></label>
+          <input type="range" id="cc_r0" min="-10.7" max="-9.7" step="0.005" value="-10.2757"></div>
+      </div>
+      <canvas id="cc_canvas" height="300"></canvas>
+      <canvas id="cc_canvas_freq" height="250" style="margin-top:12px;"></canvas>
+      <div class="readout" id="cc_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the death spiral: an electron starting in a stable circular orbit, losing energy to radiation, and falling into the nucleus. The lower panel is the frequency of the radiation it emits along the way, which climbs without limit as the orbit tightens.</p>
+        <p>Both panels are damning, and for different reasons. The first says atoms should not exist. The second says that even during the brief moment one did, it would emit a continuous smear of frequencies rising to infinity — never the sharp, fixed, repeatable lines that every element actually produces.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the starting radius to <b>53 pm</b>, the measured size of a hydrogen atom, which is Beiser's Example 4.1: the orbital speed comes out at 2.2 &times; 10&#8310; m/s and the total energy at &minus;13.6 eV, both matching experiment exactly. Then read the collapse time. It is around ten picoseconds. Hydrogen has been stable for thirteen billion years.</p>
+
+        <h3>The size of the contradiction</h3>
+        <p>What makes this so sharp is that every step is orthodox. Setting the Coulomb attraction equal to the centripetal force is Newton plus Coulomb, and it gives the right radius and the right binding energy — the classical calculation is not merely close, it is numerically correct where it can be checked. The trouble comes from a third pillar, electromagnetism, which insists that accelerated charges radiate. That is not a fringe prediction either; it is how every radio antenna works.</p>
+        <p>So three well-tested theories, applied to the simplest atom, produce something that disagrees with the most basic observation about matter: that it is here. Beiser's conclusion is the one that runs through the whole book — the laws that govern the macroworld do not simply extend down to the atom.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The number of orbits completed before collapse is large — of order 10&#8309; — so the spiral drawn here compresses the winding drastically; at true scale it would be a solid disc. What is honest in the picture is the shape of the decay and the timescale in the readout. Note also what Bohr's fix does and does not do. Postulating that certain orbits simply do not radiate stops the collapse, but it offers no reason why, and Bohr knew it. The reason arrives in the next card, where those orbits turn out to be exactly the ones a standing electron wave can occupy.</p>
+      </div>
+    </div>
+
+    <!-- 3. spectral series -->
+    <div class="card">
+      <h2>The Hydrogen Spectral Series <span class="eqtag">Eq. 4.6&ndash;4.9</span></h2>
+      <p class="desc">Before anyone knew why, Balmer found that hydrogen's visible wavelengths obeyed a simple formula containing nothing but small integers. That formula is the clue Bohr needed.</p>
+      <div class="eq">1/&lambda; = R (1/n<sub>f</sub>&sup2; &minus; 1/n<sub>i</sub>&sup2;), &nbsp; R = 1.097 &times; 10&#8311; m&#8315;&sup1;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Lower level n<sub>f</sub> (series) <span class="val" id="hs_nf_val">2</span></label>
+          <input type="range" id="hs_nf" min="1" max="5" step="1" value="2"></div>
+        <div class="ctrl"><label>Upper level n<sub>i</sub> <span class="val" id="hs_ni_val">3</span></label>
+          <input type="range" id="hs_ni" min="2" max="15" step="1" value="3"></div>
+      </div>
+      <canvas id="hs_canvas" height="290"></canvas>
+      <canvas id="hs_canvas_vis" height="150" style="margin-top:12px;"></canvas>
+      <div class="readout" id="hs_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel lays out every hydrogen line on a logarithmic wavelength axis, one row per series, with the selected series picked out in colour and the chosen line in black. Each series crowds together toward its short-wavelength <b>limit</b>, the dashed tick, which is the line you would get from n<sub>i</sub> = &infin; — an electron falling in from complete freedom. The lower panel renders the Balmer series as the eye actually sees it: this is what a hydrogen discharge tube looks like through a prism.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Stay in the <b>Balmer</b> series (n<sub>f</sub> = 2) and step n<sub>i</sub> up from 3. You get 656.3 nm (H&alpha;, the red line that gives hydrogen nebulae their colour), then 486.1 (H&beta;, blue-green), 434.0, 410.2 — converging on the 364.6 nm limit, exactly the pattern Balmer wrote down in 1885. Now switch to <b>Lyman</b> (n<sub>f</sub> = 1) and notice that the entire series is in the ultraviolet, and to <b>Paschen</b> and beyond, which are entirely infrared. Only Balmer happens to land in the visible — which is the sole reason it was found first, and why hydrogen's spectrum looked like four lonely lines for decades rather than the infinite ladder it is.</p>
+
+        <h3>What the integers were telling everyone</h3>
+        <p>Balmer's formula was pure numerology when he wrote it: a fit, with no physical content, containing two integers and a constant. Its accuracy was uncanny and nobody could say why. Rydberg then generalised it to the form above, so that every hydrogen series is the same formula with a different n<sub>f</sub>, and still nobody could say why.</p>
+        <p>The shape of the formula is the giveaway. A wavelength that depends on the <em>difference</em> of two terms, each fixed by an integer, is exactly what you get if the atom has a ladder of allowed energies and emits the difference between two rungs. Bohr said later that as soon as he saw Balmer's formula the whole thing was immediately clear to him — and the next two cards are what he saw.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The constant R is not fundamental in the way h or c are; it is built from the electron's mass and charge, and it therefore shifts slightly for other systems — which is the subject of the reduced-mass card below. Note also that emission and absorption are the same set of wavelengths seen from opposite directions. Sunlight crosses cooler gas above the photosphere, which removes exactly the wavelengths it would emit, so the solar spectrum is crossed by dark lines at these positions. Reading those lines is how we know what stars are made of.</p>
+      </div>
+    </div>
+
+    <!-- 4. Bohr orbits as standing waves -->
+    <div class="card">
+      <h2>Bohr Orbits as Standing Electron Waves <span class="eqtag">Sec. 4.4, Eq. 4.12</span></h2>
+      <p class="desc">Bohr's allowed orbits were a postulate with no justification for a decade. Then de Broglie supplied one, and it is almost embarrassingly simple: an orbit is allowed when a whole number of electron wavelengths fits around it.</p>
+      <div class="eq">n&lambda; = 2&pi;r<sub>n</sub> &nbsp;&nbsp;&rarr;&nbsp;&nbsp; m&upsilon;r<sub>n</sub> = n&#8463; &nbsp;&nbsp;&rarr;&nbsp;&nbsp; r<sub>n</sub> = n&sup2;a&#8320;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Wavelengths around the orbit <span class="val" id="bw_m_val">3.00</span></label>
+          <input type="range" id="bw_m" min="1" max="6" step="0.01" value="3"></div>
+      </div>
+      <canvas id="bw_canvas" height="330"></canvas>
+      <div class="readout" id="bw_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>An electron wave wrapped around its own orbit, with the radial wiggle standing in for the wave's amplitude. Slide to a whole number and the wave joins smoothly onto itself: a standing wave that can persist indefinitely, drawn in teal. Slide anywhere in between and the two ends do not meet — the dashed black segment marks the mismatch — and on each successive circuit the wave interferes with itself until it dies away.</p>
+        <p>That is the entire quantization condition. There is no extra postulate, no new constant, nothing imported. An orbit is allowed if a wave can stand on it, exactly as a guitar string supports only those frequencies whose half-wavelengths fit its length.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the slider to exactly <b>1.00</b> and read off the ground state: radius 52.9 pm, energy &minus;13.6 eV, one wavelength around the circumference. Now go to <b>2.00</b> and watch the radius jump by a factor of four, since r<sub>n</sub> = n&sup2;a&#8320;. Then park somewhere awkward like <b>3.47</b> and look at the join: the wave arrives back out of step with itself, which is precisely why no such orbit exists. Sweeping slowly through 3.0 and watching the mismatch close and reopen is the clearest way to feel what "quantized" means.</p>
+
+        <h3>What this buys, and what it does not</h3>
+        <p>Setting n&lambda; = 2&pi;r with &lambda; = h/m&upsilon; gives m&upsilon;r = n&#8463; directly — Bohr's angular-momentum condition, which he had reached ten years earlier by an entirely different route and could not justify. Combined with the force balance from the collapse card, it fixes the radii as r<sub>n</sub> = n&sup2;a&#8320; and the energies as E<sub>n</sub> = &minus;13.6 eV / n&sup2;, and those energies reproduce the Balmer formula exactly, with the Rydberg constant coming out in terms of m, e, h and &epsilon;&#8320;. A numerological fit from 1885 becomes a derivation.</p>
+        <p>What it does not do is explain why a standing wave should fail to radiate, and it keeps a definite orbit for the electron, which the uncertainty principle of Chapter 3 has already ruled out. Beiser is careful on this point: the wire-loop analogy is an illuminating step along the path, not the last word. Chapter 5 replaces the orbit with a three-dimensional wave function, and the sharp circles here dissolve into probability clouds — but the energies survive unchanged.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The radial wiggle drawn here is a visual device, not the shape of anything. The real electron wave does not oscillate in and out from the orbit; what the picture is encoding is phase, and the thing that matters is only whether the phase comes back to where it started after one circuit. Note too how small the orbit speeds are — about 0.7% of c in the ground state — which is why relativity can be safely ignored throughout this chapter, though not in heavier atoms, where inner electrons move fast enough for relativistic corrections to change the chemistry.</p>
+      </div>
+    </div>
+
+    <!-- 5. energy levels -->
+    <div class="card">
+      <h2>Energy Levels, Transitions, and the Correspondence Principle <span class="eqtag">Eq. 4.15, Sec. 4.6</span></h2>
+      <p class="desc">Every hydrogen line is the gap between two rungs of one ladder. And at the top of that ladder, where the rungs crowd together, quantum physics quietly turns back into classical physics.</p>
+      <div class="eq">E<sub>n</sub> = &minus;13.6 eV / n&sup2; &nbsp;&nbsp;|&nbsp;&nbsp; h&nu; = E<sub>i</sub> &minus; E<sub>f</sub></div>
+      <div class="controls">
+        <div class="ctrl"><label>Initial level n<sub>i</sub> <span class="val" id="el_ni_val">3</span></label>
+          <input type="range" id="el_ni" min="1" max="8" step="1" value="3"></div>
+        <div class="ctrl"><label>Final level n<sub>f</sub> <span class="val" id="el_nf_val">2</span></label>
+          <input type="range" id="el_nf" min="1" max="8" step="1" value="2"></div>
+      </div>
+      <canvas id="el_canvas" height="330"></canvas>
+      <canvas id="el_canvas_corr" height="250" style="margin-top:12px;"></canvas>
+      <div class="readout" id="el_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the energy ladder, drawn on a true linear energy scale so you can see the levels bunching toward zero rather than spreading out. The teal arrow is the transition you have selected; pointing down it emits a photon, pointing up it absorbs one. The lower panel tests the correspondence principle by comparing, at each n, the frequency of the photon emitted in an n &rarr; n&minus;1 jump against the frequency at which the electron is classically orbiting.</p>
+        <p>The levels being negative is not a formality. It says the electron is bound — it would need energy supplied to escape — and the amount needed from the ground state, 13.6 eV, is hydrogen's ionization energy.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>n<sub>i</sub> = 3, n<sub>f</sub> = 2</b> for H&alpha; at 656 nm, the red line from the previous card. Then <b>2 &rarr; 1</b> gives 121.6 nm, deep ultraviolet — and Beiser notes that a hydrogen atom in the ground state will absorb exactly this wavelength to climb back up, which is where absorption spectra come from. Now run the arrow the other way, <b>1 &rarr; 3</b>, and read 12.1 eV: that is Example 4.2, the energy an electron must deliver in a collision to kick a ground-state atom up to n = 3. Notice how little energy the high transitions involve — 7 &rarr; 8 is worth only 0.065 eV — because the ladder is crowding toward its top.</p>
+
+        <h3>Where quantum physics rejoins classical physics</h3>
+        <p>Classically, an orbiting electron radiates at the frequency at which it orbits. Quantum-mechanically it radiates at whatever frequency corresponds to the energy gap it jumps. These are completely different statements, and at small n they give completely different answers — which they must, since the classical account is the one that predicts collapse.</p>
+        <p>But follow the red curve rightward. As n grows, the ratio climbs to one: the photon from an n &rarr; n&minus;1 jump has very nearly the frequency of the classical orbit. This is Bohr's <b>correspondence principle</b>, and he used it as a design constraint — the quantization condition had to be the one that made quantum and classical predictions merge at large quantum numbers. Beiser's Example 4.3 makes the scale vivid: a Rydberg atom with an orbit radius of 0.0100 mm, big enough to see with a decent microscope, has n = 435. At that n the two descriptions agree to a fraction of a percent, and such atoms genuinely do behave almost classically.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This diagram gets hydrogen's energies right and stops there. It says nothing about which transitions actually occur and how brightly — real spectra obey selection rules, and some transitions between these levels are forbidden or extremely slow. It also shows one level per n, whereas each n conceals a set of substates that split apart in a magnetic field and differ slightly even without one. Those refinements need the quantum mechanics of Chapters 5 to 7. What is remarkable is how much this single formula already explains with one integer.</p>
+      </div>
+    </div>
+
+    <!-- 6. reduced mass -->
+    <div class="card">
+      <h2>Reduced Mass and the Isotope Shift <span class="eqtag">Eq. 4.22, 4.23</span></h2>
+      <p class="desc">The nucleus does not sit still — it and the electron both orbit their common centre of mass. The correction is five parts in ten thousand, and it was enough to discover a new isotope.</p>
+      <div class="eq">m&prime; = mM/(m+M) &nbsp;&nbsp;&rarr;&nbsp;&nbsp; E<sub>n</sub> = (m&prime;/m) &times; (&minus;13.6 eV Z&sup2;/n&sup2;)</div>
+      <div class="controls">
+        <div class="ctrl"><label>System</label>
+          <select id="rm_sys">
+            <option value="H" selected>hydrogen (¹H)</option>
+            <option value="D">deuterium (²H)</option>
+            <option value="T">tritium (³H)</option>
+            <option value="He">singly ionised helium (He⁺)</option>
+            <option value="Ps">positronium (e⁺e⁻)</option>
+            <option value="muH">muonic hydrogen</option>
+          </select></div>
+        <div class="ctrl"><label>Upper level n<sub>i</sub> (line n<sub>i</sub> &rarr; 2) <span class="val" id="rm_ni_val">3</span></label>
+          <input type="range" id="rm_ni" min="3" max="8" step="1" value="3"></div>
+      </div>
+      <canvas id="rm_canvas" height="290"></canvas>
+      <div class="readout" id="rm_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The same spectral line — the n &rarr; 2 transition — computed for six different two-body systems and laid out on a common wavelength ruler. The axis auto-scales to the spread, so what you are seeing is the <em>differences</em> between systems, magnified.</p>
+        <p>All six obey identical physics. The only thing that changes is the reduced mass m&prime; = mM/(m+M), the effective mass of the orbiting particle once you account for the nucleus recoiling about the shared centre of mass. Heavier nucleus, less recoil, reduced mass closer to the electron mass, and the energies closer to the textbook values.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Compare <b>hydrogen</b> and <b>deuterium</b> at n<sub>i</sub> = 3. Hydrogen's H&alpha; sits at 656.3 nm and deuterium's at 656.1 — a shift of about 0.2 nm, three parts in ten thousand. That difference is how Harold Urey discovered deuterium in 1932: he found a faint companion line beside each hydrogen line, exactly where a doubled nuclear mass predicts. Then try <b>positronium</b>, where an electron orbits a positron of equal mass, so the reduced mass is exactly half the electron mass and every energy is halved. And <b>muonic hydrogen</b>, where a muon 207 times heavier than an electron orbits a proton, pulls the orbit down by a factor of nearly 200 and the energies up by the same — the atom becomes small enough that the size of the proton itself starts to matter.</p>
+
+        <h3>Why such a small correction is worth making</h3>
+        <p>Without it, the Rydberg constant comes out as 1.0973731 &times; 10&#8311; m&#8315;&sup1;; with it, 1.0967758 &times; 10&#8311;. That is a difference in the fourth significant figure, and by the 1920s spectroscopy was already far more precise than that. A theory that fails in the fourth figure when the measurement is good to the eighth is a theory with something missing.</p>
+        <p>What makes the reduced mass satisfying is that it is not a fudge. It is the exact classical result for any two-body system orbiting a common centre of mass — the same correction you would apply to a binary star — imported without modification. The Bohr model was right; it had simply been solved for the wrong idealisation, and fixing the idealisation fixed the fourth digit.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Reduced mass explains the isotope shift but not the <b>fine structure</b>: look closely enough at any of these lines and it splits into components separated by far less than the H&ndash;D shift, from electron spin and relativistic effects that this chapter has no machinery for. Note also that positronium is a genuine two-body system where the "nucleus" is as light as the orbiting particle, so calling m&prime; a correction understates things — and it annihilates within nanoseconds, which by the energy&ndash;time relation of Chapter 3 gives its lines a measurable natural width.</p>
+      </div>
+    </div>
+
+    <!-- 7. Franck-Hertz -->
+    <div class="card">
+      <h2>The Franck&ndash;Hertz Experiment <span class="eqtag">Sec. 4.8</span></h2>
+      <p class="desc">Bohr's energy levels were inferred from light. Franck and Hertz confirmed them without using light at all — by firing electrons at atoms and watching a current drop whenever the electrons had just enough energy to excite one.</p>
+      <div class="eq">the plate current falls at every V = k &times; E<sub>excitation</sub> / e, &nbsp; k = 1, 2, 3, &hellip;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Vapour</label>
+          <select id="fh_gas">
+            <option value="hg" selected>mercury (4.9 eV)</option>
+            <option value="na">sodium (2.1 eV)</option>
+            <option value="ne">neon (18.7 eV)</option>
+          </select></div>
+        <div class="ctrl"><label>Accelerating voltage <span class="val" id="fh_v_val">14.0</span></label>
+          <input type="range" id="fh_v" min="0" max="30" step="0.1" value="14"></div>
+      </div>
+      <canvas id="fh_canvas" height="290"></canvas>
+      <div class="readout" id="fh_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Electrons are accelerated through a vapour and collected at a plate; the curve is the collected current against accelerating voltage. It climbs, then collapses, then climbs again — and the collapses are evenly spaced, marked by the dashed lines at multiples of the excitation energy.</p>
+        <p>The mechanism is a sorting of collisions into two kinds. Below the critical energy, an electron striking an atom can only bounce elastically, and since the atom is tens of thousands of times heavier it loses essentially no energy and sails on to the plate. The moment it carries just enough energy to lift the atom to its first excited state, an inelastic collision becomes possible; the electron surrenders that entire amount at once and no longer has enough left to reach the plate against the small retarding voltage. The current falls off a cliff.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Keep <b>mercury</b> and sweep the voltage. The dips land at 4.9 V, 9.8 V, 14.7 V — evenly spaced, because at twice the voltage an electron has enough for two inelastic collisions on the way, at three times enough for three. The spacing, not the position, is the measurement. Then check the readout's emitted line: 4.9 eV corresponds to 253 nm, and mercury's ultraviolet resonance line is observed at 253.6 nm. Franck and Hertz looked for exactly that line during bombardment and found it, closing the loop between a current measurement and a spectroscopic one. Switching to <b>sodium</b> packs the dips closer; <b>neon</b> spreads them out.</p>
+
+        <h3>Why this settled the matter</h3>
+        <p>Spectroscopy shows that atoms emit certain energies. It does not directly show that atoms can only <em>accept</em> certain energies, and a determined sceptic could have argued that the sharp lines came from something about the emission process rather than from a ladder of internal states.</p>
+        <p>Franck and Hertz closed that gap from the other side. An atom bombarded with electrons of steadily increasing energy ignores them completely — accepting nothing at all — until a precise threshold, then takes exactly that quantum and no less. The atom is not just fussy about what it emits; it is equally fussy about what it will take. Coming within months of Bohr's paper, this was independent confirmation that the energy levels were real physical states rather than a bookkeeping device for spectral lines.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The curve drawn here is schematic in its detailed shape — real Franck&ndash;Hertz traces have dips that vary in depth and get broader at higher voltages, since electrons arrive with a spread of energies and can excite higher states once the voltage allows. What is exact and what the experiment rests on is the <em>spacing</em> of the dips and their identification with the first excitation energy. A subtlety worth knowing: the absolute position of the first dip is shifted by the contact potential between the electrodes, so no one reads the excitation energy off a single dip — you read it off the interval between successive ones, which is immune to that offset.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -1036,5 +1281,6 @@
 <script src="ch01.js"></script>
 <script src="ch02.js"></script>
 <script src="ch03.js"></script>
+<script src="ch04.js"></script>
 </body>
 </html>
