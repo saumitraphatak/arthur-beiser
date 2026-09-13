@@ -201,7 +201,7 @@
       <button class="chap-btn" data-chapter="ch2" role="tab" aria-selected="false"><span class="n">2</span>Particle Properties</button>
       <button class="chap-btn" data-chapter="ch3" role="tab" aria-selected="false"><span class="n">3</span>Wave Properties</button>
       <button class="chap-btn" data-chapter="ch4" role="tab" aria-selected="false"><span class="n">4</span>Atomic Structure</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">5</span>Quantum Mechanics</span>
+      <button class="chap-btn" data-chapter="ch5" role="tab" aria-selected="false"><span class="n">5</span>Quantum Mechanics</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">6</span>Hydrogen Atom</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">7</span>Many-Electron Atoms</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">8</span>Molecules</span>
@@ -1272,6 +1272,215 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 5 ===================== -->
+  <section class="chapter" id="ch5">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Five</div>
+      <h1>Quantum Mechanics</h1>
+      <p>Bohr's model works for hydrogen and fails for almost everything else, because it grafts quantization onto classical orbits instead of deriving it. Quantum mechanics starts over: a wave equation whose solutions are probabilities, from which quantization falls out as a boundary condition.</p>
+    </div>
+
+    <!-- 1. wave function -->
+    <div class="card">
+      <h2>The Wave Function and What It Means <span class="eqtag">Sec. 5.1&ndash;5.5</span></h2>
+      <p class="desc">&psi; itself is not measurable and has no direct physical meaning. |&psi;|&sup2; is a probability density — and once you accept that, everything else in this chapter is bookkeeping.</p>
+      <div class="eq">P(x&#8321; &rarr; x&#8322;) = &int;|&psi;|&sup2;dx, &nbsp; &int;<sub>&minus;&infin;</sub><sup>&infin;</sup>|&psi;|&sup2;dx = 1, &nbsp; &lang;x&rang; = &int;x|&psi;|&sup2;dx</div>
+      <div class="controls">
+        <div class="ctrl"><label>Wave function</label>
+          <select id="wf_form">
+            <option value="linear" selected>ψ = ax on [0,1] (Example 5.2)</option>
+            <option value="box">ψ = sin πx (box ground state)</option>
+            <option value="box2">ψ = sin 2πx (first excited)</option>
+            <option value="gauss">ψ = Gaussian at the centre</option>
+          </select></div>
+        <div class="ctrl"><label>Region from x&#8321; <span class="val" id="wf_x1_val">0.45</span></label>
+          <input type="range" id="wf_x1" min="0" max="1" step="0.01" value="0.45"></div>
+        <div class="ctrl"><label>to x&#8322; <span class="val" id="wf_x2_val">0.55</span></label>
+          <input type="range" id="wf_x2" min="0" max="1" step="0.01" value="0.55"></div>
+      </div>
+      <canvas id="wf_canvas" height="300"></canvas>
+      <div class="readout" id="wf_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The red curve is &psi;, the wave function. The teal curve beneath is |&psi;|&sup2;, and the shaded area under it between your two markers is the probability of finding the particle there. Every integral in the readout is computed numerically from the curve on screen, including the normalisation constant — nothing is assumed to be normalised in advance.</p>
+        <p>Notice that &psi; goes negative for some choices while |&psi;|&sup2; never does. That is the first clue that &psi; is not the physical object. A negative probability would be meaningless, but a negative amplitude is essential, because amplitudes are what interfere — and interference is the whole reason quantum mechanics needs a wave in the first place.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Keep <b>&psi; = ax</b> and the default window from <b>0.45 to 0.55</b> — this is Beiser's Example 5.2. Normalising gives a = &radic;3, the probability of finding the particle in that tenth of the range is 7.5% rather than the 10% a uniform distribution would give, and &lang;x&rang; = 0.75: the particle sits well to the right, because &psi; grows with x. Then switch to <b>&psi; = sin 2&pi;x</b> and put the window right at the centre. The probability collapses to nearly nothing, since there is a node at x = 0.5 — yet &lang;x&rang; is still exactly 0.5. An expectation value is an average, not a prediction; here it names a place the particle is never found.</p>
+
+        <h3>What ψ has to obey</h3>
+        <p>Not every function can be a wave function. It must be normalisable, so that the total probability is exactly one — which means |&psi;|&sup2; has to fall off fast enough at infinity to have finite area. It must be single-valued, since the probability of being somewhere cannot take two values at once. And it and its first derivative must be continuous, which is what makes the boundary conditions in the following cards so restrictive: it is precisely these requirements, not any new postulate, that force the energy to be quantized.</p>
+        <p>The expectation value is defined as it is for a plain reason: it is the average position you would get by preparing this state many times and measuring x each time. Beiser is careful to note that this cannot be done for momentum in the same way, because the uncertainty principle forbids a function p(x) from existing at all. Momentum needs an operator, which is why Section 5.6 introduces them.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The Born interpretation — |&psi;|&sup2; as a probability density — is an interpretation, not a derivation, and it was contested for years. What settled it in practice is that nothing else works: &psi; cannot be a physical wave in space because it is generally complex, and for a system of N particles it lives in 3N dimensions rather than 3. Note also the wave functions here are real for simplicity; in general &psi; is complex and the density is &psi;*&psi;, which is what makes the time-dependent phases in the superposition card at the end of this chapter matter.</p>
+      </div>
+    </div>
+
+    <!-- 2. particle in a box -->
+    <div class="card">
+      <h2>Particle in a Box, Solved Properly <span class="eqtag">Sec. 5.8, Eq. 5.46</span></h2>
+      <p class="desc">Chapter 3 got the energies of a trapped particle from a standing-wave argument. Here the same answer comes out of Schr&ouml;dinger's equation, together with something the earlier treatment could not give: where the particle actually is.</p>
+      <div class="eq">&psi;<sub>n</sub> = &radic;(2/L) sin(n&pi;x/L), &nbsp; E<sub>n</sub> = n&sup2;&pi;&sup2;&#8463;&sup2;/2mL&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Quantum number n <span class="val" id="qb_n_val">1</span></label>
+          <input type="range" id="qb_n" min="1" max="10" step="1" value="1"></div>
+        <div class="ctrl"><label>Box width L (nm) <span class="val" id="qb_L_val">0.50</span></label>
+          <input type="range" id="qb_L" min="0.1" max="2" step="0.01" value="0.5"></div>
+      </div>
+      <canvas id="qb_canvas" height="280"></canvas>
+      <canvas id="qb_canvas_prob" height="250" style="margin-top:12px;"></canvas>
+      <div class="readout" id="qb_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the box, with &psi;<sub>n</sub> in red and |&psi;<sub>n</sub>|&sup2; in teal, plus the dashed grey line showing what classical mechanics predicts: a particle bouncing between walls is equally likely to be found anywhere, so its density is flat. The shaded stripe is the narrow window from 0.45L to 0.55L that Beiser uses in Example 5.4. The lower panel tracks the probability of finding the particle in that window as a function of n, against the classical answer of 10%.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">At <b>n = 1</b> the particle is found in that central tenth of the box 19.8% of the time — twice what classical mechanics says, because the ground state piles up in the middle. At <b>n = 2</b> it drops to 0.65%, roughly one-fifteenth of the classical answer, because there is a node at the centre and the particle is almost never there. Two adjacent states, differing by a factor of thirty in where the particle is likely to be found. Then walk n up the lower panel and watch the values oscillate about 10% with a shrinking swing — by n = 10 the quantum answer is closing on the classical one, which is the correspondence principle turning up again.</p>
+
+        <h3>Where the quantization comes from now</h3>
+        <p>This is the payoff of the chapter. In Chapter 3 the allowed energies came from requiring a whole number of de Broglie wavelengths to fit the box — a physical picture, but one you had to supply. Here nothing is supplied. You solve the differential equation, and demand only that &psi; be continuous and vanish where the walls are infinitely high. Those boundary conditions have solutions only for particular values of E, and out drops E<sub>n</sub> = n&sup2;&pi;&sup2;&#8463;&sup2;/2mL&sup2;.</p>
+        <p>Quantization stops being a postulate and becomes what always happens when you impose boundary conditions on a wave equation. Organ pipes and drumheads have discrete modes for the same mathematical reason. What is peculiar to quantum mechanics is not the discreteness — it is that the wave in question is a probability amplitude.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">&lang;x&rang; = L/2 in every state, including those where the centre is a node. That is not a contradiction: the average of a symmetric distribution sits at the centre whether or not any probability is there. It is a standing reminder that an expectation value is a statistical summary, not a location. Note too that the infinitely hard wall is a fiction — it is what makes &psi; vanish exactly at the boundary and lets the energies come out so cleanly. Soften the wall and the answers shift, which is precisely the next card.</p>
+      </div>
+    </div>
+
+    <!-- 3. finite well -->
+    <div class="card">
+      <h2>The Finite Potential Well <span class="eqtag">Sec. 5.9</span></h2>
+      <p class="desc">Make the walls high but not infinite and something classically impossible happens: the wave function does not stop at the wall. It leaks into a region the particle does not have the energy to enter.</p>
+      <div class="eq">inside: &psi; oscillates &nbsp;|&nbsp; outside: &psi; &prop; e<sup>&minus;&kappa;x</sup>, &nbsp; &kappa; = &radic;(2m(U&#8320;&minus;E))/&#8463;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Well depth U&#8320; (eV) <span class="val" id="fw_U_val">10.0</span></label>
+          <input type="range" id="fw_U" min="1" max="40" step="0.5" value="10"></div>
+        <div class="ctrl"><label>Well width L (nm) <span class="val" id="fw_L_val">0.50</span></label>
+          <input type="range" id="fw_L" min="0.15" max="1.5" step="0.01" value="0.5"></div>
+        <div class="ctrl"><label>Level <span class="val" id="fw_n_val">1</span></label>
+          <input type="range" id="fw_n" min="1" max="8" step="1" value="1"></div>
+      </div>
+      <canvas id="fw_canvas" height="320"></canvas>
+      <div class="readout" id="fw_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A well of finite depth, with every bound level drawn as a horizontal line and the selected one carrying its wave function. The shaded tails outside the well are the part of &psi; in the <b>classically forbidden region</b> — where the particle's total energy is less than the potential, so a classical particle would need negative kinetic energy to be there. The energies are found by solving the transcendental matching conditions numerically, so the levels shown are the real solutions, not sketches.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start at <b>U&#8320; = 10 eV, L = 0.50 nm</b>: the well holds a handful of bound states, and the ground state sits noticeably below where the infinite well would put it — the readout gives the percentage. The reason is visible in the picture: the wave extends past the walls, so it behaves like a wave in a slightly <em>wider</em> box, and wider boxes mean lower energies. Now drag the depth down toward 1 eV and watch levels fall out of the well one by one, until only a single bound state is left. A one-dimensional well always holds at least one, however shallow — a result with no classical counterpart at all.</p>
+
+        <h3>Penetration into forbidden territory</h3>
+        <p>Inside the well, E &gt; U and the wave function oscillates. Outside, E &lt; U and the equation changes character: instead of a sinusoid it gives a real exponential, decaying with distance at a rate &kappa; = &radic;(2m(U&#8320;&minus;E))/&#8463;. The depth to which the particle penetrates is roughly 1/&kappa;, which the readout reports — and note what makes that depth large: a shallow well, or a level near the top of it.</p>
+        <p>There is no way to catch the particle out there. Localising it well enough to say it is in the forbidden region requires, by the uncertainty principle, a momentum spread large enough to supply the missing energy. The penetrating tail is real and has measurable consequences, but it never produces an observable violation of energy conservation.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This tail is the whole of the next card. If the forbidden region has a far side — if the wall is a barrier of finite thickness rather than an infinite expanse — then the exponentially decaying wave arrives at that far side with a small but nonzero amplitude, and the particle can appear on the other side. Tunnelling is not a separate phenomenon; it is this leakage, given somewhere to leak to. Note also that this is the simplest possible well shape, chosen because it can be solved; real wells have rounded bottoms and the levels shift, but the leakage and the finite count of bound states survive.</p>
+      </div>
+    </div>
+
+    <!-- 4. tunnelling -->
+    <div class="card">
+      <h2>The Tunnel Effect <span class="eqtag">Sec. 5.10, Eq. 5.60</span></h2>
+      <p class="desc">A particle without the energy to climb a barrier can still be found on the other side. Not sometimes, not by accident — with a probability you can calculate, and that technology now depends on.</p>
+      <div class="eq">T = [1 + U&sup2;sinh&sup2;(k&#8322;L) / 4E(U&minus;E)]<sup>&minus;1</sup> &nbsp;&asymp;&nbsp; e<sup>&minus;2k&#8322;L</sup>, &nbsp; k&#8322; = &radic;(2m(U&minus;E))/&#8463;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Particle energy E (eV) <span class="val" id="tn_E_val">1.00</span></label>
+          <input type="range" id="tn_E" min="0.1" max="9.5" step="0.05" value="1"></div>
+        <div class="ctrl"><label>Barrier height U (eV) <span class="val" id="tn_U_val">10.0</span></label>
+          <input type="range" id="tn_U" min="2" max="20" step="0.5" value="10"></div>
+        <div class="ctrl"><label>Barrier width L (nm) <span class="val" id="tn_L_val">0.50</span></label>
+          <input type="range" id="tn_L" min="0.05" max="2" step="0.01" value="0.5"></div>
+      </div>
+      <canvas id="tn_canvas" height="280"></canvas>
+      <canvas id="tn_canvas_t" height="280" style="margin-top:12px;"></canvas>
+      <div class="readout" id="tn_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel shows the barrier and the wave function crossing it: oscillating on the way in, decaying exponentially inside, then oscillating again on the far side with a much smaller amplitude. That surviving amplitude is the whole effect. The lower panel plots transmission probability against barrier width for three energies, on a logarithmic scale — where the curves come out as straight lines, which is what exponential decay looks like.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set up Beiser's Example 5.6: <b>E = 1.0 eV</b> against a <b>10 eV</b> barrier <b>0.50 nm</b> wide. The exponential estimate e<sup>&minus;2k&#8322;L</sup> gives about 2 &times; 10&#8315;&#8311;, and the exact formula about 3 &times; 10&#8315;&#8311; — roughly one electron in three million gets through. (Beiser quotes 1.1 &times; 10&#8315;&#8311;, having rounded k&#8322;; the order of magnitude is what the argument needs.) Now raise the energy to <b>2.0 eV</b> and the exact probability jumps by about a factor of four (Beiser's exponential estimate gives a factor of two — the two forms diverge here because k&#8322;L is not large enough for the approximation to be tight). Then put the energy back and <b>double the width to 1.0 nm</b> instead: transmission collapses by about seven orders of magnitude. That asymmetry is the practical lesson — T depends far more sharply on how thick the barrier is than on how energetic the particle is.</p>
+
+        <h3>Why this is not a loophole in energy conservation</h3>
+        <p>The particle is never observed inside the barrier with negative kinetic energy. What the mathematics says is that the wave function has a nonzero amplitude on the far side, so a measurement there sometimes finds the particle — with its full original energy, undiminished. Nothing was borrowed and nothing needs repaying. The barrier does not lower the energy of the particles that cross; it only reduces how many of them do.</p>
+        <p>Tunnelling is also not exotic. Alpha decay is a tunnelling process, and its ferocious sensitivity to barrier width is why nuclear half-lives span twenty-four orders of magnitude for a decay-energy range of a factor of two. Fusion in the Sun proceeds by tunnelling, since at solar-core temperatures nuclei simply do not have the energy to surmount their mutual repulsion. And the scanning tunnelling microscope images individual atoms by exploiting exactly the sensitivity you just measured: since T varies exponentially with gap width, a change of 0.01 nm — a twentieth of an atom's diameter — produces a detectable change in current.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The exponential form is an approximation valid when k&#8322;L is comfortably greater than one, which is why the readout shows both it and the exact expression; at thin barriers or energies close to the top they part company noticeably. Something stranger lurks just above the barrier, too: when E exceeds U, transmission is still not 1 — the wave partially reflects off a downward step, exactly as light reflects off a pane of glass it is perfectly able to pass through. Classically a particle with more than enough energy always crosses. Quantum-mechanically it sometimes bounces.</p>
+      </div>
+    </div>
+
+    <!-- 5. harmonic oscillator -->
+    <div class="card">
+      <h2>The Harmonic Oscillator <span class="eqtag">Sec. 5.11</span></h2>
+      <p class="desc">Any system disturbed slightly from equilibrium oscillates harmonically — molecules, atoms in a crystal, fields. It is the most reusable problem in physics, and quantum mechanics changes two things about it: the energies are evenly spaced, and the lowest one is not zero.</p>
+      <div class="eq">E<sub>n</sub> = (n + &frac12;)&#8463;&omega;, &nbsp; n = 0, 1, 2, &hellip;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Quantum number n <span class="val" id="ho_n_val">0</span></label>
+          <input type="range" id="ho_n" min="0" max="10" step="1" value="0"></div>
+        <div class="ctrl"><label><input type="checkbox" id="ho_classical" checked style="width:auto; margin-right:6px;">show the classical oscillator</label></div>
+      </div>
+      <canvas id="ho_canvas" height="300"></canvas>
+      <canvas id="ho_canvas_lev" height="280" style="margin-top:12px;"></canvas>
+      <div class="readout" id="ho_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel gives &psi;<sub>n</sub> and |&psi;<sub>n</sub>|&sup2; for the state you select, with the classically forbidden regions shaded and the turning points marked — a classical oscillator with this energy would never go past them. The dashed grey curve is the classical probability density, which piles up at the turning points because that is where the oscillator moves slowest. Both densities are normalised to unit area, so the comparison is fair. The lower panel is the parabolic potential with its ladder of levels drawn inside it.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start at <b>n = 0</b>. The quantum ground state is a single hump at the centre — exactly where a classical oscillator spends the <em>least</em> time — so the two curves are not merely different, they are opposites. The readout also shows that about 16% of the probability lies beyond the turning points, in territory a classical oscillator cannot reach. Now run n up to <b>10</b>, which is Beiser's Fig. 5.13. The quantum density develops peaks that climb toward the edges, and its average shape tracks the classical curve closely, while the forbidden-region probability shrinks toward nothing. This is the correspondence principle in its most visual form: not that the wiggles disappear, but that they average out to the classical answer.</p>
+
+        <h3>Zero-point energy</h3>
+        <p>The lowest level is &frac12;&#8463;&omega;, not zero, and the teal line in the lower panel marks the energy a classical oscillator would happily sit at — perfectly still at the bottom of the well. Quantum mechanics forbids it, for the reason the particle in a box could not be at rest: being motionless at a definite point means definite position <em>and</em> definite momentum, which the uncertainty principle does not permit. The ground state is the best available compromise between the two.</p>
+        <p>This is not a technicality. Helium stays liquid down to absolute zero at ordinary pressure because zero-point motion is enough to keep it from crystallising. The evenly spaced ladder matters too: a molecule's vibrational spectrum consists of lines at multiples of one frequency, which is why infrared spectroscopy identifies chemical bonds so reliably, and why the spacing between rungs never changes no matter how high you climb.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">A real bond is only harmonic near the bottom. Stretch it far enough and the potential flattens out toward dissociation rather than continuing upward as a parabola, so the true levels crowd together at the top instead of staying evenly spaced — and eventually stop, because the molecule comes apart. The evenly spaced ladder is an excellent approximation for the lowest few states and an increasingly bad one after that. Note too that these wave functions extend forever, decaying but never quite vanishing, so strictly there is some probability of finding an oscillator arbitrarily far from equilibrium.</p>
+      </div>
+    </div>
+
+    <!-- 6. superposition -->
+    <div class="card">
+      <h2>Superposition: Why Stationary States Are Stationary <span class="eqtag">Sec. 5.4</span></h2>
+      <p class="desc">Schr&ouml;dinger's equation is linear, so any sum of solutions is a solution. That innocuous fact is what makes an atom able to radiate at all.</p>
+      <div class="eq">&Psi; = a&#8321;&psi;&#8321;e<sup>&minus;iE&#8321;t/&#8463;</sup> + a&#8322;&psi;&#8322;e<sup>&minus;iE&#8322;t/&#8463;</sup> &nbsp;&rarr;&nbsp; |&Psi;|&sup2; carries a cross term beating at (E&#8322;&minus;E&#8321;)/h</div>
+      <div class="controls">
+        <div class="ctrl"><label>First state n&#8321; <span class="val" id="su_n1_val">1</span></label>
+          <input type="range" id="su_n1" min="1" max="5" step="1" value="1"></div>
+        <div class="ctrl"><label>Second state n&#8322; <span class="val" id="su_n2_val">2</span></label>
+          <input type="range" id="su_n2" min="1" max="6" step="1" value="2"></div>
+        <div class="ctrl"><label>Mix toward n&#8322; <span class="val" id="su_mix_val">50%</span></label>
+          <input type="range" id="su_mix" min="0" max="1" step="0.01" value="0.5"></div>
+        <div class="ctrl"><label><input type="checkbox" id="su_run" checked style="width:auto; margin-right:6px;">animate</label></div>
+      </div>
+      <canvas id="su_canvas" height="290"></canvas>
+      <div class="readout" id="su_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The probability density of a particle in a box that is in a <em>mixture</em> of two energy states, evolving in time. The red line tracks &lang;x&rang;, the average position, which sloshes back and forth across the box.</p>
+        <p>Drag the mix slider to either end and the motion stops dead. A single energy eigenstate is called a <b>stationary state</b> for exactly this reason: its time dependence is a phase factor e<sup>&minus;iEt/&#8463;</sup>, and taking |&Psi;|&sup2; multiplies it by its own conjugate, so the phase cancels completely and nothing observable changes. Put any weight on a second state and the two phases run at different rates; their difference survives into |&Psi;|&sup2; as a cross term, and the density comes alive.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>n&#8321; = 1, n&#8322; = 2</b> at a <b>50%</b> mix — the strongest possible beat — and watch the charge cloud swing from one side of the box to the other. Now change n&#8322; to <b>3</b> and notice the oscillation gets faster, because the energy gap is larger: the frequency is exactly (E&#8322;&minus;E&#8321;)/h. Then slide the mix to <b>0%</b> or <b>100%</b> and watch everything freeze, however high the energy of the state you land on. A highly excited atom, left strictly alone in one energy eigenstate, does nothing at all.</p>
+
+        <h3>Why an atom radiates</h3>
+        <p>This is the missing piece of Bohr's model. Bohr postulated that atoms jump between levels and emit the difference, but a stationary state has a motionless charge distribution, and a motionless charge distribution does not radiate — which was the original reason for assuming the orbits were stable.</p>
+        <p>An atom mid-transition is in a superposition of the two states, and that superposition has a charge distribution oscillating at precisely (E&#8322;&minus;E&#8321;)/h. An oscillating charge radiates, at its oscillation frequency, and that frequency gives a photon of energy E&#8322;&minus;E&#8321;. Bohr's frequency condition stops being a postulate and becomes a consequence: the atom radiates for the ordinary classical reason, and the only quantum ingredient is which frequencies are available. This is also why selection rules exist — if the cross term happens to integrate to zero, the charge distribution does not oscillate and the transition does not occur.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The animation runs at an arbitrary speed; for a real atom the beat frequency is around 10&#8321;&#8309; Hz. Note also that the mixture here is a genuine superposition, not a statistical mixture of atoms some of which are in one state and some in the other — those are different things, and only the superposition sloshes. That distinction is what the cross term encodes, and it is where interference, entanglement and most of the conceptual difficulty of quantum mechanics eventually live.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -1282,5 +1491,6 @@
 <script src="ch02.js"></script>
 <script src="ch03.js"></script>
 <script src="ch04.js"></script>
+<script src="ch05.js"></script>
 </body>
 </html>

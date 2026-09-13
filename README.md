@@ -44,6 +44,14 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Reduced mass and the isotope shift (H, D, T, He⁺, positronium, muonic hydrogen)
 - The Franck–Hertz experiment
 
+## Chapter 5 — Quantum Mechanics
+- The wave function and what it means (normalisation, probability, expectation values)
+- Particle in a box, solved properly (quantization from boundary conditions)
+- The finite potential well (leakage into the classically forbidden region)
+- The tunnel effect (exact and approximate transmission, the STM's sensitivity)
+- The harmonic oscillator (zero-point energy, quantum vs classical density)
+- Superposition — why stationary states are stationary, and why atoms radiate
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -54,6 +62,7 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch02.js
     ch03.js
     ch04.js
+    ch05.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
