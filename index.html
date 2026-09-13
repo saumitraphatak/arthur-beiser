@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concepts of Modern Physics — Interactive Companion</title>
+<style>
+  :root{
+    --bg:#f7f5f0; --panel:#ffffff; --ink:#1c1d20; --sub:#5a5d63;
+    --accent:#a4342c; --accent2:#1f6f78; --line:#e1ddd3; --grid:#e7e4dc;
+    --code:#f1efe8; --plot-bg:#fffdf8; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    line-height:1.5;
+  }
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:var(--panel); border-bottom:1px solid var(--line);
+    padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+  }
+  .brand{font-size:1.15rem; font-weight:700; letter-spacing:.2px;}
+  .brand small{display:block; font-family:'Helvetica Neue',Arial,sans-serif; font-weight:400; font-size:.72rem; color:var(--sub); letter-spacing:.5px; text-transform:uppercase; margin-top:2px;}
+  .tabs{display:flex; gap:8px; font-family:'Helvetica Neue',Arial,sans-serif;}
+  .tab-btn{
+    padding:9px 18px; border-radius:999px; border:1px solid var(--line); background:var(--panel);
+    color:var(--sub); font-size:.9rem; cursor:pointer; font-weight:600; transition:.15s;
+  }
+  .tab-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .tab-btn:not(.active):hover{ border-color:var(--accent); color:var(--accent); }
+
+  main{max-width:980px; margin:0 auto; padding:28px 20px 80px;}
+  .chapter{display:none;}
+  .chapter.active{display:block;}
+  .chapter-head{margin-bottom:28px;}
+  .chapter-head h1{font-size:1.9rem; margin:0 0 6px;}
+  .chapter-head p{color:var(--sub); font-family:'Helvetica Neue',Arial,sans-serif; font-size:.95rem; max-width:680px;}
+
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:22px 24px; margin-bottom:26px; box-shadow:var(--shadow);
+  }
+  .card h2{
+    font-size:1.15rem; margin:0 0 4px; display:flex; align-items:baseline; gap:10px;
+  }
+  .card h2 .eqtag{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:.68rem; font-weight:700;
+    color:var(--accent2); background:#e9f2f2; padding:2px 8px; border-radius:6px; letter-spacing:.3px;
+  }
+  .card p.desc{ color:var(--sub); font-size:.92rem; margin:4px 0 16px; font-family:'Helvetica Neue',Arial,sans-serif;}
+  .eq{ font-family:'Cambria Math','Georgia',serif; font-style:italic; background:var(--code); padding:10px 14px; border-radius:8px; font-size:.95rem; margin:8px 0 16px; overflow-x:auto;}
+
+  .controls{
+    display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end; margin-bottom:14px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .ctrl{display:flex; flex-direction:column; gap:5px; min-width:160px;}
+  .ctrl label{font-size:.76rem; color:var(--sub); font-weight:600; text-transform:uppercase; letter-spacing:.3px; display:flex; justify-content:space-between;}
+  .ctrl label .val{color:var(--accent); font-weight:700;}
+  .ctrl input[type=range]{ width:100%; accent-color:var(--accent); }
+  .ctrl select, .ctrl input[type=number]{
+    padding:7px 9px; border:1px solid var(--line); border-radius:8px; font-size:.88rem; background:#fff; font-family:inherit;
+  }
+  .rowflex{display:flex; gap:24px; flex-wrap:wrap;}
+  .colgrow{flex:1; min-width:280px;}
+
+  canvas{ width:100%; display:block; background:var(--plot-bg); border:1px solid var(--grid); border-radius:10px; touch-action:none;}
+  .readout{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:.86rem; background:var(--code);
+    border-radius:8px; padding:10px 14px; margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px 18px;
+  }
+  .readout div b{ color:var(--accent2); }
+  .note{ font-family:'Helvetica Neue',Arial,sans-serif; font-size:.8rem; color:var(--sub); margin-top:10px; border-top:1px dashed var(--line); padding-top:8px;}
+  .swatch{display:inline-block; width:16px; height:16px; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid rgba(0,0,0,.15);}
+  .badge{ display:inline-block; font-family:'Helvetica Neue',Arial,sans-serif; font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:6px; }
+  .badge.ok{background:#e5f4ea; color:#1e7a3d;}
+  .badge.no{background:#fbe7e5; color:var(--accent);}
+  footer{ text-align:center; color:var(--sub); font-family:'Helvetica Neue',Arial,sans-serif; font-size:.78rem; padding:20px; }
+  @media (max-width:600px){
+    .topbar{padding:12px 14px;} main{padding:18px 12px 60px;}
+    .card{padding:16px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Concepts of Modern Physics<small>Interactive companion &middot; Beiser, 6th ed.</small></div>
+  <div class="tabs">
+    <button class="tab-btn active" data-chapter="ch1">Ch.1 Relativity</button>
+    <button class="tab-btn" data-chapter="ch2">Ch.2 Particle Properties of Waves</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- ===================== CHAPTER 1 ===================== -->
+  <section class="chapter active" id="ch1">
+    <div class="chapter-head">
+      <h1>Chapter 1 &mdash; Relativity</h1>
+      <p>Seven small labs built from the equations in this chapter. Drag the sliders — nothing here is decorative, every number on screen comes straight out of the formula shown above it.</p>
+    </div>
+
+    <!-- 1. Light clock / time dilation -->
+    <div class="card">
+      <h2>Light-Clock Time Dilation <span class="eqtag">Eq. 1.3</span></h2>
+      <p class="desc">A photon bounces between two mirrors L&#8320; apart. Watch the same clock tick at rest, and again as seen from the ground while it flies past at speed v.</p>
+      <div class="eq">&Delta;t = &Delta;t&#8320; / &radic;(1&minus;&beta;&sup2;) = &gamma;&Delta;t&#8320;, &nbsp; &beta;=v/c, &nbsp; &gamma;=1/&radic;(1&minus;&beta;&sup2;)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Speed &beta;=v/c <span class="val" id="td_beta_val">0.60</span></label>
+          <input type="range" id="td_beta" min="0" max="0.995" step="0.001" value="0.6"></div>
+        <div class="ctrl"><label>Animation speed</label>
+          <input type="range" id="td_speed" min="0.2" max="3" step="0.1" value="1"></div>
+      </div>
+      <canvas id="td_canvas" height="260"></canvas>
+      <div class="readout" id="td_readout"></div>
+      <p class="note">Top lane: clock at rest — one tick every &Delta;t&#8320;. Bottom lane: the same clock moving at &beta;c as judged from the ground — the light has to travel a longer zig-zag path each tick, so the clock reads slow by &gamma;.</p>
+    </div>
+
+    <!-- 2. Length contraction -->
+    <div class="card">
+      <h2>Length Contraction <span class="eqtag">Eq. 1.9</span></h2>
+      <p class="desc">A rod of proper length L&#8320; is laid along the direction of motion. Only the along-motion dimension shrinks.</p>
+      <div class="eq">L = L&#8320;&radic;(1&minus;&beta;&sup2;)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Speed &beta;=v/c <span class="val" id="lc_beta_val">0.60</span></label>
+          <input type="range" id="lc_beta" min="0" max="0.999" step="0.001" value="0.6"></div>
+        <div class="ctrl"><label>Proper length L&#8320; (m) <span class="val" id="lc_len_val">10</span></label>
+          <input type="range" id="lc_len" min="1" max="50" step="1" value="10"></div>
+      </div>
+      <canvas id="lc_canvas" height="230"></canvas>
+      <div class="readout" id="lc_readout"></div>
+    </div>
+
+    <!-- 3. Velocity addition -->
+    <div class="card">
+      <h2>Relativistic Velocity Addition <span class="eqtag">Appendix I, Eq. 1.49</span></h2>
+      <p class="desc">A spacecraft S&prime; moves at speed v relative to the earth S. Something moves at u&prime; inside S&prime;, in the same direction. What speed does earth measure?</p>
+      <div class="eq">u = (u&prime; + v) / (1 + u&prime;v/c&sup2;) &nbsp;&nbsp;&mdash;&nbsp;&nbsp; classically u = u&prime; + v</div>
+      <div class="controls">
+        <div class="ctrl"><label>Frame speed v/c <span class="val" id="va_v_val">0.90</span></label>
+          <input type="range" id="va_v" min="-0.99" max="0.99" step="0.01" value="0.9"></div>
+        <div class="ctrl"><label>Object speed u&prime;/c (in S&prime;) <span class="val" id="va_u_val">0.50</span></label>
+          <input type="range" id="va_u" min="-0.99" max="0.99" step="0.01" value="0.5"></div>
+      </div>
+      <canvas id="va_canvas" height="170"></canvas>
+      <div class="readout" id="va_readout"></div>
+      <p class="note">Example 1.11 from the book: v = 0.90c, u&prime; = 0.50c gives u &asymp; 0.97c &mdash; try it.</p>
+    </div>
+
+    <!-- 4. Doppler / redshift -->
+    <div class="card">
+      <h2>Relativistic Doppler Effect &amp; Cosmological Redshift <span class="eqtag">Eq. 1.8, Hubble's law</span></h2>
+      <p class="desc">Purely radial motion (source and observer on the same line). Positive &beta; = receding (redshift); negative = approaching (blueshift).</p>
+      <div class="eq">&nu; = &nu;&#8320; &radic;[(1&minus;&beta;)/(1+&beta;)] &nbsp;&nbsp;|&nbsp;&nbsp; Hubble: &beta; = v/c = H&#8320;d/c, &nbsp;H&#8320;&asymp;21 km/s per 10&#8310; ly</div>
+      <div class="rowflex">
+        <div class="colgrow">
+          <div class="controls">
+            <div class="ctrl"><label>&beta; (&minus; approach / + recede) <span class="val" id="dp_beta_val">0.00</span></label>
+              <input type="range" id="dp_beta" min="-0.9" max="0.9" step="0.005" value="0"></div>
+            <div class="ctrl"><label>Rest wavelength &lambda;&#8320; (nm) <span class="val" id="dp_lam_val">550</span></label>
+              <input type="range" id="dp_lam" min="400" max="700" step="1" value="550"></div>
+          </div>
+          <div class="controls">
+            <div class="ctrl"><label>or set by Hubble distance (10&#8310; ly) <span class="val" id="dp_dist_val">0</span></label>
+              <input type="range" id="dp_dist" min="0" max="500" step="1" value="0"></div>
+          </div>
+        </div>
+        <div class="colgrow" style="max-width:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;">
+          <div id="dp_swatch_src" style="width:90%; height:34px; border-radius:8px; border:1px solid var(--grid);"></div>
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:.72rem; color:var(--sub);">source colour &rarr; observed colour</div>
+          <div id="dp_swatch_obs" style="width:90%; height:34px; border-radius:8px; border:1px solid var(--grid);"></div>
+        </div>
+      </div>
+      <canvas id="dp_canvas" height="120"></canvas>
+      <div class="readout" id="dp_readout"></div>
+    </div>
+
+    <!-- 5. Twin paradox -->
+    <div class="card">
+      <h2>Twin Paradox <span class="eqtag">Sec. 1.5</span></h2>
+      <p class="desc">Dick flies at &beta;c to a star D light-years away and back; Jane stays on Earth. The spacetime diagram is drawn in the Earth frame (x in ly, ct in years).</p>
+      <div class="eq">T&#8320;(traveler) = (2D/&beta;)&radic;(1&minus;&beta;&sup2;) &nbsp;&nbsp;&nbsp; T(earth) = 2D/&beta;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Speed &beta;=v/c <span class="val" id="tw_beta_val">0.80</span></label>
+          <input type="range" id="tw_beta" min="0.1" max="0.99" step="0.01" value="0.8"></div>
+        <div class="ctrl"><label>Distance to star D (ly) <span class="val" id="tw_dist_val">20</span></label>
+          <input type="range" id="tw_dist" min="1" max="50" step="1" value="20"></div>
+        <div class="ctrl"><label>Starting age (both) <span class="val" id="tw_age_val">20</span></label>
+          <input type="range" id="tw_age" min="0" max="60" step="1" value="20"></div>
+      </div>
+      <canvas id="tw_canvas" height="320"></canvas>
+      <div class="readout" id="tw_readout"></div>
+    </div>
+
+    <!-- 6. KE / momentum -->
+    <div class="card">
+      <h2>Relativistic vs Classical Kinetic Energy &amp; Momentum <span class="eqtag">Eq. 1.17, 1.20</span></h2>
+      <p class="desc">Classical mechanics is the &beta;&rarr;0 limit — watch where it quietly stops being a safe approximation.</p>
+      <div class="eq">KE = (&gamma;&minus;1)mc&sup2; &nbsp;vs&nbsp; &frac12;m&upsilon;&sup2; &nbsp;&nbsp;|&nbsp;&nbsp; p = &gamma;m&upsilon; &nbsp;vs&nbsp; m&upsilon;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Marker &beta;=v/c <span class="val" id="ke_beta_val">0.60</span></label>
+          <input type="range" id="ke_beta" min="0.01" max="0.999" step="0.001" value="0.6"></div>
+        <div class="ctrl"><label>Particle</label>
+          <select id="ke_particle">
+            <option value="0.511">electron (0.511 MeV/c&sup2;)</option>
+            <option value="105.66">muon (105.66 MeV/c&sup2;)</option>
+            <option value="938.27" selected>proton (938.27 MeV/c&sup2;)</option>
+            <option value="1000">1 GeV/c&sup2; particle</option>
+          </select></div>
+      </div>
+      <div class="rowflex">
+        <div class="colgrow"><canvas id="ke_canvas_ke" height="230"></canvas></div>
+        <div class="colgrow"><canvas id="ke_canvas_p" height="230"></canvas></div>
+      </div>
+      <div class="readout" id="ke_readout"></div>
+    </div>
+
+    <!-- 7. Minkowski diagram -->
+    <div class="card">
+      <h2>Minkowski Spacetime Diagram <span class="eqtag">Appendix II</span></h2>
+      <p class="desc">The x&prime;, ct&prime; axes of a boosted frame S&prime; are not perpendicular to each other in the S diagram &mdash; that skew <em>is</em> the relativity of simultaneity. Dashed lines are lines of constant t&prime; (simultaneous events in S&prime;).</p>
+      <div class="eq">ct&prime; axis: x = &beta;(ct) &nbsp;&nbsp; x&prime; axis: ct = &beta;x &nbsp;&nbsp; light cone: x = &plusmn;ct</div>
+      <div class="controls">
+        <div class="ctrl"><label>Boost &beta;=v/c <span class="val" id="mk_beta_val">0.50</span></label>
+          <input type="range" id="mk_beta" min="-0.95" max="0.95" step="0.01" value="0.5"></div>
+      </div>
+      <canvas id="mk_canvas" height="380"></canvas>
+      <div class="readout" id="mk_readout"></div>
+    </div>
+
+  </section>
+
+  <!-- ===================== CHAPTER 2 ===================== -->
+  <section class="chapter" id="ch2">
+    <div class="chapter-head">
+      <h1>Chapter 2 &mdash; Particle Properties of Waves</h1>
+      <p>Five labs on light behaving like particles: blackbody radiation, the photoelectric effect, Compton scattering, Bragg diffraction, and beam attenuation.</p>
+    </div>
+
+    <!-- 1. Blackbody radiation -->
+    <div class="card">
+      <h2>Blackbody Radiation: Planck vs. Rayleigh&ndash;Jeans <span class="eqtag">Eq. 2.3, 2.4</span></h2>
+      <p class="desc">Classical physics (equipartition) predicts the energy density keeps climbing at short wavelengths &mdash; the ultraviolet catastrophe. Planck's quantization formula turns it over.</p>
+      <div class="eq">u(&lambda;)d&lambda; = (8&pi;hc/&lambda;&#8309;) &middot; 1/(e<sup>hc/&lambda;kT</sup>&minus;1) d&lambda; &nbsp;&nbsp;|&nbsp;&nbsp; RJ: u(&lambda;)d&lambda; = 8&pi;kT/&lambda;&#8308; d&lambda;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Temperature T (K) <span class="val" id="bb_T_val">5500</span></label>
+          <input type="range" id="bb_T" min="500" max="10000" step="50" value="5500"></div>
+        <div class="ctrl"><label><input type="checkbox" id="bb_rj" checked style="width:auto; margin-right:6px;">show Rayleigh&ndash;Jeans overlay</label></div>
+      </div>
+      <canvas id="bb_canvas" height="300"></canvas>
+      <div class="readout" id="bb_readout"></div>
+    </div>
+
+    <!-- 2. Photoelectric effect -->
+    <div class="card">
+      <h2>Photoelectric Effect <span class="eqtag">Eq. 2.8, 2.9</span></h2>
+      <p class="desc">Einstein's equation: increasing intensity makes more photoelectrons, not faster ones. Only frequency sets the maximum kinetic energy.</p>
+      <div class="eq">KE<sub>max</sub> = h&nu; &minus; &phi; = h(&nu;&minus;&nu;&#8320;) &nbsp;&nbsp;&nbsp; stopping voltage V&#8320; = KE<sub>max</sub>/e</div>
+      <div class="controls">
+        <div class="ctrl"><label>Metal (work function &phi;)</label>
+          <select id="pe_metal">
+            <option value="1.9">Cesium (1.9 eV)</option>
+            <option value="2.2">Potassium (2.2 eV)</option>
+            <option value="2.3" selected>Sodium (2.3 eV)</option>
+            <option value="2.5">Lithium (2.5 eV)</option>
+            <option value="3.2">Calcium (3.2 eV)</option>
+            <option value="4.7">Copper (4.7 eV)</option>
+            <option value="6.4">Platinum (6.4 eV)</option>
+          </select></div>
+        <div class="ctrl"><label>Incident wavelength &lambda; (nm) <span class="val" id="pe_lam_val">300</span></label>
+          <input type="range" id="pe_lam" min="100" max="700" step="1" value="300"></div>
+      </div>
+      <div class="rowflex">
+        <div class="colgrow"><canvas id="pe_canvas_iv" height="230"></canvas></div>
+        <div class="colgrow"><canvas id="pe_canvas_slope" height="230"></canvas></div>
+      </div>
+      <div class="readout" id="pe_readout"></div>
+    </div>
+
+    <!-- 3. Compton scattering -->
+    <div class="card">
+      <h2>Compton Scattering <span class="eqtag">Eq. 2.21&ndash;2.23</span></h2>
+      <p class="desc">A photon scatters off a free electron and comes out with a longer wavelength; the electron carries off the rest as kinetic energy.</p>
+      <div class="eq">&Delta;&lambda; = &lambda;<sub>C</sub>(1&minus;cos&theta;), &nbsp; &lambda;<sub>C</sub>=h/m<sub>e</sub>c = 2.426 pm</div>
+      <div class="controls">
+        <div class="ctrl"><label>Incident wavelength &lambda;&#8320; (pm) <span class="val" id="cp_lam_val">10.0</span></label>
+          <input type="range" id="cp_lam" min="1" max="100" step="0.5" value="10"></div>
+        <div class="ctrl"><label>Scattering angle &theta; <span class="val" id="cp_theta_val">90&deg;</span></label>
+          <input type="range" id="cp_theta" min="0" max="180" step="1" value="90"></div>
+      </div>
+      <canvas id="cp_canvas" height="300"></canvas>
+      <div class="readout" id="cp_readout"></div>
+    </div>
+
+    <!-- 4. Bragg diffraction -->
+    <div class="card">
+      <h2>Bragg Diffraction <span class="eqtag">Eq. 2.13</span></h2>
+      <p class="desc">Rays reflected from successive crystal planes interfere constructively only at angles satisfying Bragg's law. Sweep &theta; and watch the path-difference counter lock onto integers.</p>
+      <div class="eq">2d sin&theta; = n&lambda;, &nbsp; n = 1, 2, 3, &hellip;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Plane spacing d (nm) <span class="val" id="bg_d_val">0.28</span></label>
+          <input type="range" id="bg_d" min="0.10" max="0.50" step="0.005" value="0.28"></div>
+        <div class="ctrl"><label>Wavelength &lambda; (nm) <span class="val" id="bg_lam_val">0.15</span></label>
+          <input type="range" id="bg_lam" min="0.03" max="0.30" step="0.005" value="0.15"></div>
+        <div class="ctrl"><label>Glancing angle &theta; <span class="val" id="bg_theta_val">30&deg;</span></label>
+          <input type="range" id="bg_theta" min="1" max="89" step="0.5" value="30"></div>
+      </div>
+      <canvas id="bg_canvas" height="260"></canvas>
+      <div class="readout" id="bg_readout"></div>
+    </div>
+
+    <!-- 5. Attenuation -->
+    <div class="card">
+      <h2>Exponential Attenuation of a Photon Beam <span class="eqtag">Eq. 2.25, 2.26</span></h2>
+      <p class="desc">Whatever the mix of photoelectric, Compton, and pair-production losses, the beam intensity falls off exponentially with a single coefficient &mu;.</p>
+      <div class="eq">I = I&#8320;e<sup>&minus;&mu;x</sup> &nbsp;&nbsp;&nbsp; x<sub>1/2</sub> = ln2/&mu; = 0.693/&mu;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Attenuation coeff. &mu; (cm&#8315;&sup1;) <span class="val" id="at_mu_val">0.20</span></label>
+          <input type="range" id="at_mu" min="0.01" max="2" step="0.01" value="0.2"></div>
+        <div class="ctrl"><label>Absorber thickness x (cm) <span class="val" id="at_x_val">10</span></label>
+          <input type="range" id="at_x" min="0" max="60" step="0.5" value="10"></div>
+      </div>
+      <canvas id="at_canvas" height="260"></canvas>
+      <div class="readout" id="at_readout"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>Built from Beiser, <em>Concepts of Modern Physics</em>, 6th ed., Chapters 1&ndash;2. All plots computed live from the equations shown &mdash; nothing here is pre-baked data.</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
