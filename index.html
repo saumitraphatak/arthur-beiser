@@ -203,7 +203,7 @@
       <button class="chap-btn" data-chapter="ch4" role="tab" aria-selected="false"><span class="n">4</span>Atomic Structure</button>
       <button class="chap-btn" data-chapter="ch5" role="tab" aria-selected="false"><span class="n">5</span>Quantum Mechanics</button>
       <button class="chap-btn" data-chapter="ch6" role="tab" aria-selected="false"><span class="n">6</span>Hydrogen Atom</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">7</span>Many-Electron Atoms</span>
+      <button class="chap-btn" data-chapter="ch7" role="tab" aria-selected="false"><span class="n">7</span>Many-Electron Atoms</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">8</span>Molecules</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">9</span>Statistical Mechanics</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">10</span>The Solid State</span>
@@ -1677,6 +1677,194 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 7 ===================== -->
+  <section class="chapter" id="ch7">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Seven</div>
+      <h1>Many-Electron Atoms</h1>
+      <p>Hydrogen has one electron and the equation can be solved exactly. Add a second and it cannot — yet the periodic table, the whole of chemistry, follows from two additions to the theory: the electron has spin, and no two electrons may share a state.</p>
+    </div>
+
+    <!-- 1. spin -->
+    <div class="card">
+      <h2>Electron Spin <span class="eqtag">Sec. 7.1, Example 7.1</span></h2>
+      <p class="desc">Two orientations, not three, not five. An even number of orientations is impossible for orbital motion, which is the first sign that this is something genuinely new.</p>
+      <div class="eq">|S| = &radic;(s(s+1))&#8463; = (&radic;3/2)&#8463;, &nbsp; S<sub>z</sub> = m<sub>s</sub>&#8463; = &plusmn;&frac12;&#8463;, &nbsp; s = &frac12; always</div>
+      <div class="controls">
+        <div class="ctrl"><label>Assumed electron radius <span class="val" id="es_r_val">5.0e-17 m</span></label>
+          <input type="range" id="es_r" min="-18" max="-14" step="0.01" value="-16.301"></div>
+      </div>
+      <canvas id="es_canvas" height="280"></canvas>
+      <div class="readout" id="es_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>On the left, the two orientations the spin vector is permitted, drawn like the orbital angular momentum of the previous chapter — same geometry, with |S| = 0.866&#8463; but S<sub>z</sub> only ever &plusmn;0.5&#8463;, so the vector again cannot lie along the axis. On the right, the Stern&ndash;Gerlach experiment: a beam of atoms crossing an inhomogeneous magnetic field splits into exactly two, with nothing in between.</p>
+        <p>That two is the crucial number. Orbital angular momentum always gives 2&ell; + 1 orientations, which is odd for every integer &ell;. Getting an even number requires a half-integer quantum number, and half-integers do not come out of the orbital equation at all.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">The slider asks how fast the electron would have to spin if it really were a little rotating ball — Beiser's Example 7.1. At a radius of <b>5 &times; 10&#8315;&sup1;&#8311; m</b> the equator would need to move at about <b>5 &times; 10&sup1;&sup2; m/s</b>, roughly seventeen thousand times the speed of light. Drag the radius up and down: you cannot rescue it. To get the equator below c the electron would have to be larger than about 10&#8315;&sup1;&sup3; m, which experiment has long since ruled out — scattering shows the electron behaves as a point down to far smaller distances.</p>
+
+        <h3>What spin actually is</h3>
+        <p>It is an intrinsic angular momentum with no internal motion behind it, in the same way that charge is an intrinsic property with no internal structure behind it. The name is a historical accident and the mental picture of a spinning ball is wrong, but the angular momentum is entirely real: it adds to orbital angular momentum, it is conserved, and it responds to magnetic fields.</p>
+        <p>The magnetic moment that goes with it is the strange part. A classical charge with angular momentum S would have a moment proportional to S with a factor of e/2m — but the electron's is twice that, a g-factor of very nearly 2. That doubling has no classical explanation at all. It comes out of Dirac's relativistic equation automatically, which is one of the reasons that equation was taken so seriously so quickly.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Spin was not proposed on theoretical grounds; it was forced by experiments the existing theory could not explain — the anomalous Zeeman patterns, alkali doublets, and the Stern&ndash;Gerlach result. Uhlenbeck and Goudsmit, who proposed it in 1925, were young enough not to be deterred by the faster-than-light problem, and Pauli had earlier dismissed exactly this idea for exactly that reason. The lesson is that the objection was sound and the conclusion was still right: the flaw was in the mechanical picture, not the angular momentum.</p>
+      </div>
+    </div>
+
+    <!-- 2. exclusion -->
+    <div class="card">
+      <h2>The Exclusion Principle as a Symmetry <span class="eqtag">Sec. 7.2&ndash;7.3</span></h2>
+      <p class="desc">Pauli's rule is usually stated as a prohibition. It is better understood as a consequence of something deeper: identical particles are genuinely indistinguishable, and that forces the wave function to be either symmetric or antisymmetric under swapping them.</p>
+      <div class="eq">&psi;(1,2) = &plusmn;&psi;(2,1) &nbsp;&mdash;&nbsp; fermions take the minus sign, and then &psi; vanishes whenever the two states coincide</div>
+      <div class="controls">
+        <div class="ctrl"><label>Particle 1 in state n&#8321; <span class="val" id="ep_n1_val">1</span></label>
+          <input type="range" id="ep_n1" min="1" max="4" step="1" value="1"></div>
+        <div class="ctrl"><label>Particle 2 in state n&#8322; <span class="val" id="ep_n2_val">2</span></label>
+          <input type="range" id="ep_n2" min="1" max="4" step="1" value="2"></div>
+      </div>
+      <canvas id="ep_canvas" height="300"></canvas>
+      <div class="readout" id="ep_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Two particles in a box, each in one of the box's states, plotted as |&psi;(x&#8321;, x&#8322;)|&sup2; over the square of both positions at once. Darkness shows how likely it is to find particle 1 at x&#8321; <em>and</em> particle 2 at x&#8322;. The dashed diagonal is where the two coincide.</p>
+        <p>The left panel is the symmetric combination, which bosons use; the right is the antisymmetric one, which electrons must. Look along the diagonal: the antisymmetric map is white there, dead, whatever states you choose. Two electrons are never found at the same place, and no force between them is responsible — it is the shape of the wave function alone.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set both particles to the <b>same state</b>, n&#8321; = n&#8322;. The symmetric map is unaffected; the antisymmetric one vanishes <em>completely</em>, not just on the diagonal. That is the exclusion principle, and notice what form it takes: not a rule forbidding something, but the fact that the only wave function describing it is identically zero. A state whose wave function is zero everywhere is not a state that is hard to reach. It does not exist.</p>
+        <p class="tryit">Now separate them again and compare the two panels away from the diagonal. Bosons bunch toward it and fermions avoid it, from symmetry alone. That tendency is called the exchange interaction, and although it is not a force, it has the consequences of one — it is a major part of why solids resist being compressed.</p>
+
+        <h3>Why antisymmetric</h3>
+        <p>If two particles are truly identical, swapping them cannot change any measurable quantity, so |&psi;(1,2)|&sup2; must equal |&psi;(2,1)|&sup2;. That leaves &psi;(1,2) = +&psi;(2,1) or &psi;(1,2) = &minus;&psi;(2,1), and nature uses both: particles with integer spin take the plus sign and are bosons, particles with half-integer spin take the minus sign and are fermions. Which particles get which is settled by the spin&ndash;statistics theorem in relativistic quantum field theory, well beyond this chapter, but the connection is exact and has no known exceptions.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The picture uses one spatial coordinate each and ignores spin, so "the same state" here means the same spatial state. Two electrons can share a spatial orbital provided their spins are opposite, because the <em>total</em> wave function, spin included, is then still antisymmetric. That is precisely why each orbital holds two electrons rather than one, and it is where the factor of 2 in the 2n&sup2; capacity of a shell comes from.</p>
+      </div>
+    </div>
+
+    <!-- 3. periodic table -->
+    <div class="card">
+      <h2>Building Up the Elements <span class="eqtag">Sec. 7.4&ndash;7.6</span></h2>
+      <p class="desc">Add electrons one at a time, each going into the lowest subshell with room left. That single rule, plus the exclusion principle, generates the periodic table.</p>
+      <div class="eq">subshell capacity 2(2&ell;+1) &nbsp;&nbsp;|&nbsp;&nbsp; filled in order of increasing n + &ell;, and for ties, increasing n</div>
+      <div class="controls">
+        <div class="ctrl"><label>Element <span class="val" id="pt_z_val">11  (Na)</span></label>
+          <input type="range" id="pt_z" min="1" max="54" step="1" value="11"></div>
+      </div>
+      <canvas id="pt_canvas" height="330"></canvas>
+      <div class="readout" id="pt_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Every subshell the atom uses, in the order they fill, with one dot per available slot and the occupied ones coloured by &ell;. Closed subshells are labelled as such. The configuration in the readout is generated by the filling rule, not looked up.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Walk from <b>Ne (10)</b> to <b>Na (11)</b> to <b>Mg (12)</b>. Neon closes the 2p subshell completely. Sodium's eleventh electron has nowhere to go but 3s, where it sits alone, far outside a closed core — and its ionization energy collapses from neon's 21.6 eV to 5.1 eV. Everything chemistry says about sodium follows from that one loosely held electron. Then jump to <b>K (19)</b> and notice something that looks wrong: the electron goes into 4s rather than 3d, even though n = 3 is the lower shell. The n + &ell; rule predicts it — 4s has n + &ell; = 4 while 3d has 5 — and this is why the transition metals appear where they do. Finally try <b>Cr (24)</b> and <b>Cu (29)</b>, flagged as exceptions: a half-filled or completely filled d subshell is stable enough to be worth borrowing an s electron for.</p>
+
+        <h3>Why shells close where they do</h3>
+        <p>A closed subshell is spherically symmetric and tightly bound, and it shields the nuclear charge from anything outside it very effectively. So the next electron added sees a nearly neutral core and is held weakly — which is the definition of an alkali metal. Conversely, an atom one electron short of closing a subshell binds an extra electron eagerly, which is a halogen.</p>
+        <p>The periodic table's rows are therefore just the capacities of the subshells in filling order: 2, then 8, then 8, then 18. The reason chemistry repeats is that the outer configuration repeats, and the reason it repeats is the exclusion principle forcing each subshell to fill and close.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The n + &ell; rule is an empirical regularity, not a theorem — it summarises the outcome of a complicated competition between nuclear attraction and electron&ndash;electron repulsion, and it fails for a handful of elements even below Z = 54. Those exceptions are marked here. More fundamentally, none of this comes from solving Schr&ouml;dinger's equation for a many-electron atom, which cannot be done exactly for even two electrons; it comes from treating each electron as moving in an averaged field of the others. That approximation is the subject of much of modern computational chemistry.</p>
+      </div>
+    </div>
+
+    <!-- 4. ionization energy -->
+    <div class="card">
+      <h2>The Periodic Trend Made Visible <span class="eqtag">Sec. 7.6, Fig. 7.10</span></h2>
+      <p class="desc">Plot the energy needed to remove one electron against atomic number and the periodic table draws itself — sharp peaks where shells close, deep troughs one element later.</p>
+      <div class="eq">measured first ionization energies, Z = 1 to 54</div>
+      <div class="controls">
+        <div class="ctrl"><label>Element <span class="val" id="ie_z_val">18  (Ar)</span></label>
+          <input type="range" id="ie_z" min="1" max="54" step="1" value="18"></div>
+      </div>
+      <canvas id="ie_canvas" height="300"></canvas>
+      <div class="readout" id="ie_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Measured ionization energies, not calculated ones — this is experimental data, and the structure in it is what the theory has to explain. The teal points are the noble gases, which sit on every peak; the grey points are the alkali metals, which sit in every trough. The alternating shaded bands are the periods.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Follow the curve from <b>He</b> (24.6 eV, the highest here) to <b>Li</b> (5.4 eV) — a collapse by a factor of nearly five, from adding a single proton and a single electron. Every period does the same thing. Then look within a period, say Li through Ne: the trend rises but not smoothly, with dips at <b>B</b> and at <b>O</b>. Boron's dip is the 2p subshell starting, which lies above 2s; oxygen's is the first time two electrons are forced to share a p orbital and repel each other. Both wrinkles are visible in the data and both are explained by the structure in the previous card.</p>
+
+        <h3>What the shape proves</h3>
+        <p>If electrons simply stacked up in a hydrogen-like way with no exclusion principle, every one of them would fall into the 1s state and the ionization energy would climb smoothly with Z, since the nuclear charge grows. There would be no periods, no repeating chemistry, and no periodic table. The peaks and troughs here are direct experimental evidence for shell structure, and by extension for the exclusion principle that forces it.</p>
+        <p>Mendeleev arranged the elements by their chemical behaviour half a century before any of this theory existed, and the arrangement he arrived at is this curve. That the periodicity he inferred from reactions turns out to be periodicity in a quantity as basic as the energy to remove an electron is a striking piece of independent confirmation.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This is the <em>first</em> ionization energy. Removing the second, third and fourth electrons gives its own pattern, with enormous jumps whenever you start breaking into a closed shell — which is often a clearer fingerprint of shell structure than the first ionization energy is. Note too that the transition metals between Ca and Zn are remarkably flat, because the 3d electrons being added lie inside the 4s electrons that get removed, so the outermost electron barely notices the growing nuclear charge. That flatness is why the transition metals resemble one another chemically far more than, say, C and N do.</p>
+      </div>
+    </div>
+
+    <!-- 5. spin-orbit -->
+    <div class="card">
+      <h2>Spin&ndash;Orbit Coupling and Total Angular Momentum <span class="eqtag">Sec. 7.7&ndash;7.8, Example 7.3</span></h2>
+      <p class="desc">From the electron's point of view the nucleus orbits it, and a circulating charge is a current loop. The electron therefore sits in a magnetic field of its own making, and its spin has two energies in that field.</p>
+      <div class="eq">J = L + S, &nbsp; j = &ell; &plusmn; &frac12;, &nbsp; |J| = &radic;(j(j+1))&#8463;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Upper-state &ell; <span class="val" id="so_l_val">1 (p)</span></label>
+          <input type="range" id="so_l" min="0" max="3" step="1" value="1"></div>
+        <div class="ctrl"><label>Splitting &Delta;E (&times;10&#8315;&#8309; eV) <span class="val" id="so_split_val">4.6e0</span></label>
+          <input type="range" id="so_split" min="0.5" max="250" step="0.5" value="4.6"></div>
+        <div class="ctrl"><label>Line &lambda; (nm) <span class="val" id="so_lam_val">656.3</span></label>
+          <input type="range" id="so_lam" min="300" max="700" step="0.1" value="656.3"></div>
+      </div>
+      <canvas id="so_canvas" height="270"></canvas>
+      <canvas id="so_canvas_vec" height="270" style="margin-top:12px;"></canvas>
+      <div class="readout" id="so_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel shows a level splitting in two because the electron's spin can align with or against the magnetic field produced by its own orbital motion, so one transition becomes two and one spectral line becomes a doublet. The lower panel shows the vector addition: L and S combine into a total J whose magnitude is &radic;(j(j+1))&#8463;, and only j = &ell; + &frac12; and j = &ell; &minus; &frac12; are permitted.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Beiser's Example 7.3 estimates the field an electron in hydrogen's 2p state experiences at about <b>0.40 T</b> — a substantial laboratory magnet, generated by the atom itself — giving a splitting of <b>4.6 &times; 10&#8315;&#8309; eV</b>. Leave the splitting there and set the wavelength to <b>656.3 nm</b>, the H&alpha; line: the doublet separation comes out at about <b>0.016 nm</b>, which sits nicely alongside the measured H&alpha; fine structure of roughly 0.014 nm. It was exactly this splitting — a line that should have been single arriving as two — that Chapter 6's theory could not account for, and that opened this chapter. Now set <b>&ell; = 0</b>. The splitting disappears entirely, because an s electron has no orbital motion and therefore no field for its spin to sit in. That is why alkali spectra show doublets in their p lines and singlets in their s lines.</p>
+
+        <h3>Why only two values of j</h3>
+        <p>Adding two quantized angular momenta does not give a continuum of possible totals — it gives a discrete set, and for spin one-half the set has just two members, &ell; + &frac12; and &ell; &minus; &frac12;. The vector diagram shows the two ways L and S can arrange themselves, and the magnitudes work out exactly right in each case. Counting confirms it: the two levels hold 2j + 1 states each, and (2&ell; + 2) + 2&ell; = 2(2&ell; + 1), the same total as before the splitting. Nothing was created or destroyed; the states were merely sorted into two energies.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Spin&ndash;orbit coupling scales steeply with nuclear charge, roughly as Z&#8308;, because the inner field grows so fast. In hydrogen it is a 10&#8315;&#8309; eV effect and takes careful spectroscopy to see; in sodium it splits the yellow D line into the famous pair at 589.0 and 589.6 nm, visible with a cheap spectroscope; in heavy elements it is large enough to reorganise the level structure entirely, which is why the simple scheme used here breaks down at the bottom of the periodic table. This also finally explains the anomalous Zeeman effect of the last chapter: the total moment depends on how spin and orbital angular momentum combine, and spin's g-factor of 2 makes that combination anything but simple. One bookkeeping note: Beiser's text gives the H&alpha; fine structure as 0.14 nm, but his own Example 7.3 estimate leads to 0.016 nm and the accepted measured value is about 0.014 nm — so the 0.14 appears to be in &aring;ngstr&ouml;ms rather than nanometres. The figures computed here are the ones his physics actually gives.</p>
+      </div>
+    </div>
+
+    <!-- 6. Moseley -->
+    <div class="card">
+      <h2>X-ray Spectra and Moseley's Law <span class="eqtag">Sec. 7.9, Example 7.8</span></h2>
+      <p class="desc">Knock out an inner electron and an outer one falls in to fill the hole, emitting an x-ray photon whose wavelength depends on the element in a beautifully simple way — simple enough to have fixed the order of the periodic table.</p>
+      <div class="eq">&nu;(K&alpha;) = (3cR/4)(Z &minus; 1)&sup2; &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &radic;&nu; is a straight line in Z</div>
+      <div class="controls">
+        <div class="ctrl"><label>Atomic number Z <span class="val" id="mo_z_val">27  (Co)</span></label>
+          <input type="range" id="mo_z" min="10" max="60" step="1" value="27"></div>
+      </div>
+      <canvas id="mo_canvas" height="260"></canvas>
+      <canvas id="mo_canvas_root" height="260" style="margin-top:12px;"></canvas>
+      <div class="readout" id="mo_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel gives the K&alpha; and K&beta; wavelengths as functions of atomic number, falling steeply as Z rises. The lower panel plots &radic;&nu; against Z and gets a straight line — the form in which Moseley discovered the relation in 1913, and the reason it was so persuasive.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Work Beiser's Example 7.8 backwards: find the Z whose K&alpha; wavelength is <b>0.180 nm</b>. It is <b>Z = 27</b>, cobalt. Notice how sharply the wavelength depends on Z — a single step in atomic number moves the line by several percent, which makes an x-ray measurement an unambiguous determination of Z. Then look at the dashed line in the lower panel: it extrapolates to zero not at Z = 0 but at <b>Z = 1</b>, and that offset is real physics, not a fitting artefact.</p>
+
+        <h3>Why Z minus one</h3>
+        <p>The K&alpha; photon comes from an electron dropping into a hole in the 1s shell. That shell normally holds two electrons, so with one knocked out there is exactly one left, and the infalling electron sees the nuclear charge Z reduced by the single remaining 1s electron's screening. The effective charge is Z &minus; 1, and the Bohr formula with that charge gives the observed wavelengths. It is a rare case where a crude screening argument gets the answer essentially right.</p>
+        <p>The historical consequence was large. Before Moseley, the elements were ordered by atomic weight, which put a few pairs in the wrong sequence and left it unclear how many elements were missing. Moseley's law gave a direct measurement of Z — a count of the protons — and settled the order definitively. It also showed exactly how many gaps remained to be filled, and every one of those predicted elements was subsequently found.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The Z &minus; 1 screening works well for K&alpha; and much less well for the L and M series, where many more electrons lie inside and the screening constant is larger and less clean. Note also what makes these lines so useful analytically: they come from the deepest, most tightly bound electrons, which are barely affected by chemical bonding — so an element's K&alpha; wavelength is essentially the same whether it sits in a metal, an oxide or a protein. That is why x-ray fluorescence identifies elements in a sample regardless of what compounds they are in. Moseley himself was killed at Gallipoli in 1915, at twenty-seven, two years after this work.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -1689,5 +1877,6 @@
 <script src="ch04.js"></script>
 <script src="ch05.js"></script>
 <script src="ch06.js"></script>
+<script src="ch07.js"></script>
 </body>
 </html>

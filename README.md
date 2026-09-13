@@ -60,6 +60,14 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Selection rules (Δℓ = ±1 and why it is angular-momentum conservation)
 - The Zeeman effect (normal splitting, Example 6.4)
 
+## Chapter 7 — Many-Electron Atoms
+- Electron spin (two orientations, and why it cannot be literal rotation)
+- The exclusion principle as a symmetry (antisymmetric wave functions vanish when states coincide)
+- Building up the elements (Madelung filling, generated not looked up)
+- The periodic trend made visible (measured ionization energies, Z = 1–54)
+- Spin–orbit coupling and total angular momentum (j = ℓ ± ½, fine-structure doublets)
+- X-ray spectra and Moseley's law (√ν linear in Z, and why it is Z − 1)
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -72,6 +80,7 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch04.js
     ch05.js
     ch06.js
+    ch07.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
