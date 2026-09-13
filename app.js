@@ -19,7 +19,16 @@ function registerCanvas(id, fn){ drawFns[id] = fn; }
 function redrawVisible(){
   const active = document.querySelector('.chapter.active');
   if(!active) return;
-  active.querySelectorAll('canvas').forEach(cv=>{ if(drawFns[cv.id]) drawFns[cv.id](); });
+  // Each canvas is drawn in its own try/catch: one module throwing must never
+  // stop the rest of the page from rendering (previously a single error here
+  // aborted the whole forEach, so everything after the failing canvas in DOM
+  // order stayed blank).
+  active.querySelectorAll('canvas').forEach(cv=>{
+    const fn = drawFns[cv.id];
+    if(!fn) return;
+    try{ fn(); }
+    catch(err){ console.error(`[arthur-beiser] draw failed for #${cv.id}:`, err); }
+  });
 }
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -34,17 +43,37 @@ let resizeT;
 window.addEventListener('resize', ()=>{ clearTimeout(resizeT); resizeT=setTimeout(redrawVisible,80); });
 
 // ---------- canvas fitting ----------
+// Resizing a canvas's backing buffer (canvas.width = ...) forces the browser
+// to reallocate and re-scale its whole pixel buffer, which is expensive —
+// especially at devicePixelRatio > 1. Every module used to call fitCanvas()
+// on *every* slider "input" event (many times per second while dragging),
+// which is what made the page feel laggy. Since the on-screen CSS size of a
+// canvas doesn't change while dragging a slider — only its content needs to
+// be repainted — we cache the last-fit size per canvas and skip the
+// expensive reallocation whenever nothing has actually changed. A real
+// resize (window resize, tab switch revealing a previously-hidden canvas)
+// still gets a full refit because clientWidth/height will differ.
+const _canvasFitCache = new WeakMap();
 function fitCanvas(canvas){
   const dpr = window.devicePixelRatio || 1;
   const cssH = parseFloat(canvas.getAttribute('height')) || 260;
-  canvas.style.height = cssH + 'px';
   const cssW = canvas.clientWidth || (canvas.parentElement && canvas.parentElement.clientWidth) || 600;
+
+  const cached = _canvasFitCache.get(canvas);
+  if(cached && cached.cssW===cssW && cached.cssH===cssH && cached.dpr===dpr){
+    cached.ctx.clearRect(0,0,cssW,cssH); // cheap: just repaint, no buffer reallocation
+    return cached.dims;
+  }
+
+  canvas.style.height = cssH + 'px';
   canvas.width  = Math.max(1, Math.round(cssW*dpr));
   canvas.height = Math.max(1, Math.round(cssH*dpr));
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,cssW,cssH);
-  return {ctx, w:cssW, h:cssH};
+  const dims = {ctx, w:cssW, h:cssH};
+  _canvasFitCache.set(canvas, {cssW, cssH, dpr, ctx, dims});
+  return dims;
 }
 
 // ---------- generic xy-plot axes helper ----------
@@ -111,18 +140,29 @@ function wavelengthToColor(nm){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  setupTimeDilation();
-  setupLengthContraction();
-  setupVelocityAddition();
-  setupDoppler();
-  setupTwinParadox();
-  setupKEMomentum();
-  setupMinkowski();
-  setupBlackbody();
-  setupPhotoelectric();
-  setupCompton();
-  setupBragg();
-  setupAttenuation();
+  // Each module's setup runs in its own try/catch. Previously these ran as one
+  // unguarded sequence, so if any single setupX() threw, every module after it
+  // in this list never got its event listeners wired up at all. Isolating them
+  // means one broken module can only ever take itself down, never the rest of
+  // the page.
+  const modules = [
+    ['setupTimeDilation', setupTimeDilation],
+    ['setupLengthContraction', setupLengthContraction],
+    ['setupVelocityAddition', setupVelocityAddition],
+    ['setupDoppler', setupDoppler],
+    ['setupTwinParadox', setupTwinParadox],
+    ['setupKEMomentum', setupKEMomentum],
+    ['setupMinkowski', setupMinkowski],
+    ['setupBlackbody', setupBlackbody],
+    ['setupPhotoelectric', setupPhotoelectric],
+    ['setupCompton', setupCompton],
+    ['setupBragg', setupBragg],
+    ['setupAttenuation', setupAttenuation],
+  ];
+  modules.forEach(([name, fn])=>{
+    try{ fn(); }
+    catch(err){ console.error(`[arthur-beiser] ${name}() failed to initialize:`, err); }
+  });
   redrawVisible();
 });
 
