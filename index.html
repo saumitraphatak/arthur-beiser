@@ -205,7 +205,7 @@
       <button class="chap-btn" data-chapter="ch6" role="tab" aria-selected="false"><span class="n">6</span>Hydrogen Atom</button>
       <button class="chap-btn" data-chapter="ch7" role="tab" aria-selected="false"><span class="n">7</span>Many-Electron Atoms</button>
       <button class="chap-btn" data-chapter="ch8" role="tab" aria-selected="false"><span class="n">8</span>Molecules</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">9</span>Statistical Mechanics</span>
+      <button class="chap-btn" data-chapter="ch9" role="tab" aria-selected="false"><span class="n">9</span>Statistical Mechanics</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">10</span>The Solid State</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">11</span>Nuclear Structure</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">12</span>Nuclear Transf.</span>
@@ -2097,6 +2097,206 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 9 ===================== -->
+  <section class="chapter" id="ch9">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Nine</div>
+      <h1>Statistical Mechanics</h1>
+      <p>A mole of gas has more molecules than you could track if you devoted the age of the universe to it. Statistical mechanics gives up on tracking them and asks only how they are distributed — and that turns out to be enough to derive Planck's law, the heat capacity of solids, and why metals conduct.</p>
+    </div>
+
+    <!-- 1. Maxwell-Boltzmann -->
+    <div class="card">
+      <h2>The Maxwell&ndash;Boltzmann Speed Distribution <span class="eqtag">Sec. 9.3, Examples 9.3&ndash;9.4</span></h2>
+      <p class="desc">Molecules in a gas do not share the energy equally. They have a characteristic spread of speeds, and the shape of that spread explains everything from evaporation to why the Moon has no atmosphere.</p>
+      <div class="eq">n(&upsilon;) d&upsilon; &prop; &upsilon;&sup2; e<sup>&minus;m&upsilon;&sup2;/2kT</sup> d&upsilon;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Gas</label>
+          <select id="mw_gas">
+            <option value="N2" selected>N₂</option><option value="H2">H₂</option>
+            <option value="He">He</option><option value="O2">O₂</option>
+            <option value="CO2">CO₂</option><option value="Xe">Xe</option>
+          </select></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="mw_t_val">300</span></label>
+          <input type="range" id="mw_t" min="50" max="2000" step="10" value="300"></div>
+      </div>
+      <canvas id="mw_canvas" height="300"></canvas>
+      <div class="readout" id="mw_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The distribution of molecular speeds, with the other gases drawn faintly at the same temperature for comparison. Three speeds are marked and they are genuinely different numbers: the most probable speed at the peak, the average, and the root-mean-square. The distribution is asymmetric — it has a long tail to the right and none to the left, since no molecule can move slower than rest — so the mean sits to the right of the peak and the rms further right still.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>O&#8322; at 273 K</b>, Beiser's Example 9.4: the rms speed is about <b>461 m/s</b>, a little over 1000 mph, and every molecule in the air around you is moving at roughly that rate between collisions. Then check the ratio of rms to average in the readout — it is <b>1.0854</b>, and it stays exactly that whatever the gas and whatever the temperature, because both speeds scale identically with &radic;(T/m). That is Example 9.3's "about 9 percent greater", and the constant is &radic;(3&pi;/8).</p>
+        <p class="tryit">Now switch to <b>H&#8322;</b> and look at the last two readout lines. Its rms speed is a substantial fraction of the Moon's escape speed, and not a negligible fraction of Earth's. A distribution with a tail means that even when the average molecule is bound, the fastest few percent are not — and over geological time a planet leaks its light gases away. That is why the Moon has no atmosphere at all, why Earth has almost no free hydrogen or helium despite hydrogen being the commonest element in the universe, and why Jupiter kept both.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This distribution assumes the molecules are distinguishable and that any number can share a state — Maxwell&ndash;Boltzmann statistics. For an ordinary gas at ordinary density that is an excellent approximation, because the states available vastly outnumber the molecules and the chance of two wanting the same one is negligible. It fails when the gas is cold and dense enough for the de Broglie wavelengths to overlap, which is where the quantum statistics of the third card take over.</p>
+      </div>
+    </div>
+
+    <!-- 2. energy distribution -->
+    <div class="card">
+      <h2>The Energy Distribution and the Tail That Does the Work <span class="eqtag">Sec. 9.3</span></h2>
+      <p class="desc">Chemistry happens in the tail. The average molecule almost never has enough energy to react — what matters is the tiny fraction that does, and how violently that fraction changes with temperature.</p>
+      <div class="eq">n(&epsilon;) d&epsilon; &prop; &radic;&epsilon; e<sup>&minus;&epsilon;/kT</sup> d&epsilon;, &nbsp; &lang;&epsilon;&rang; = 3kT/2</div>
+      <div class="controls">
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="me_t_val">300</span></label>
+          <input type="range" id="me_t" min="200" max="1200" step="5" value="300"></div>
+        <div class="ctrl"><label>Activation energy (eV) <span class="val" id="me_ea_val">0.50</span></label>
+          <input type="range" id="me_ea" min="0.05" max="1.5" step="0.01" value="0.5"></div>
+      </div>
+      <canvas id="me_canvas" height="300"></canvas>
+      <div class="readout" id="me_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The distribution of molecular energies, with the average marked at 3kT/2 and a threshold you can set. The shaded area beyond the threshold is the fraction of molecules energetic enough to cross it — to react, to escape a liquid, to surmount a barrier.</p>
+        <p>Note where the average sits relative to a typical activation energy. At room temperature kT is about 0.026 eV while chemical barriers are tenths of an eV or more, so the average molecule is nowhere near able to react. Reactions proceed entirely on the strength of the exponential tail.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the activation energy to <b>0.5 eV</b> at <b>300 K</b> and read the fraction above it — a few parts in 10&#8313;. Now look at the last readout line, which recomputes that fraction 10 K warmer. The rate roughly <b>doubles for a 10 degree rise</b>, which is an old rule of thumb in chemistry and comes straight out of this curve: raising T barely moves the peak but fattens the tail exponentially. Then raise the activation energy to 1.0 eV and watch the temperature sensitivity get even fiercer.</p>
+
+        <h3>Why the exponential rules everything</h3>
+        <p>The fraction above a threshold goes essentially as e<sup>&minus;E<sub>a</sub>/kT</sup>, which is the Arrhenius factor that governs reaction rates, diffusion in solids, semiconductor conductivity, and the rate at which a protein unfolds. Each of those processes has a barrier, and in every case the number of attempts is roughly constant while the probability of success is exponentially sensitive to temperature. It is the single most useful formula in applied physical chemistry, and here it is simply the area under a tail.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The fraction above a threshold is not the same as a reaction rate — molecules must also collide in the right orientation, and the barrier itself may be surmounted by tunnelling rather than climbed, which matters greatly for hydrogen transfers at low temperature. What this curve gives is the dominant temperature dependence, not the absolute rate.</p>
+      </div>
+    </div>
+
+    <!-- 3. three statistics -->
+    <div class="card">
+      <h2>Three Statistics, One Classical Limit <span class="eqtag">Sec. 9.4</span></h2>
+      <p class="desc">Identical particles cannot be labelled, and whether they are fermions or bosons changes how they distribute themselves. Both quantum answers collapse onto the classical one as soon as states are plentiful.</p>
+      <div class="eq">MB: e<sup>&minus;(&epsilon;&minus;&mu;)/kT</sup> &nbsp;|&nbsp; BE: 1/(e<sup>(&epsilon;&minus;&mu;)/kT</sup>&minus;1) &nbsp;|&nbsp; FD: 1/(e<sup>(&epsilon;&minus;&mu;)/kT</sup>+1)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="st_t_val">300</span></label>
+          <input type="range" id="st_t" min="20" max="1500" step="10" value="300"></div>
+        <div class="ctrl"><label>Chemical potential &mu; (eV) <span class="val" id="st_alpha_val">0.10</span></label>
+          <input type="range" id="st_alpha" min="0" max="0.5" step="0.005" value="0.1"></div>
+      </div>
+      <canvas id="st_canvas" height="300"></canvas>
+      <div class="readout" id="st_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The average number of particles occupying a state of energy &epsilon;, for all three statistics at once. The only difference between the three formulas is a sign in the denominator — plus one for fermions, minus one for bosons, absent altogether for the classical case — and yet that sign produces completely different physics at low energy.</p>
+        <p>Fermi&ndash;Dirac never exceeds 1, because the exclusion principle forbids it. Bose&ndash;Einstein diverges as &epsilon; approaches &mu;, because bosons positively prefer states that are already occupied. Maxwell&ndash;Boltzmann sails past 1 without noticing, which is its tell-tale failure.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Look at the right-hand side of the plot, a few kT above &mu;. All three curves lie on top of each other — the readout shows BE and FD within about 2% of the classical value there. That is the crucial observation: <b>quantum statistics only matter where occupancy approaches 1</b>. When states are plentiful and occupancies are tiny, nobody is competing for anything and the bookkeeping does not matter. Now drag the temperature down and watch the three separate dramatically near &epsilon; = &mu;.</p>
+
+        <h3>What each one is for</h3>
+        <p>Bose&ndash;Einstein applies to photons, phonons and helium-4 atoms. Its divergence at low energy is not a defect but a physical effect: it is why a laser can put astronomically many photons into a single mode, and why helium becomes a superfluid. Fermi&ndash;Dirac applies to electrons, protons and neutrons, and its ceiling of one particle per state is what gives matter volume, holds up white dwarfs, and determines how metals conduct — which is the last card of this chapter.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The chemical potential &mu; is treated as an adjustable parameter here, but it is not free: it is fixed by requiring the total number of particles to come out right, so it shifts with temperature and density. For photons, whose number is not conserved, &mu; is zero — which is exactly why Planck's law has no &mu; in it, as the next card shows.</p>
+      </div>
+    </div>
+
+    <!-- 4. Planck derivation -->
+    <div class="card">
+      <h2>Where Planck's Law Comes From <span class="eqtag">Sec. 9.5&ndash;9.6</span></h2>
+      <p class="desc">Chapter 2 presented Planck's formula as a fit that worked. Here it is a consequence: count the modes, then ask Bose&ndash;Einstein statistics how much energy each one actually holds.</p>
+      <div class="eq">&lang;&epsilon;&rang; = h&nu;/(e<sup>h&nu;/kT</sup> &minus; 1) &nbsp;&nbsp;instead of the classical&nbsp;&nbsp; &lang;&epsilon;&rang; = kT</div>
+      <div class="controls">
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="pd_t_val">5800</span></label>
+          <input type="range" id="pd_t" min="300" max="12000" step="50" value="5800"></div>
+      </div>
+      <canvas id="pd_canvas" height="290"></canvas>
+      <div class="readout" id="pd_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The average energy held by a single cavity mode, plotted against how big that mode's quantum is compared with kT. Classical equipartition says every mode gets kT regardless — the flat dashed line — and since the number of modes grows as &nu;&sup2; without limit, the total energy diverges. That is the ultraviolet catastrophe, and you can see it here as a line that never comes down.</p>
+        <p>The Bose&ndash;Einstein result starts at kT for small quanta, agreeing with the classical answer exactly where the classical answer was tested, then falls away exponentially once h&nu; exceeds kT. Multiply this curve by the &nu;&sup2; density of modes and you have Planck's law.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>T = 5800 K</b>, the Sun's surface. The marked point shows where 550 nm light sits: h&nu;/kT is about 4.5, so such a mode holds well under a tenth of kT and contains on average only a fraction of a photon. Now drop the temperature to <b>300 K</b> and watch that point run off the right of the plot entirely — at room temperature visible modes are essentially empty, which is why objects around you do not glow. The readout's occupancy number is the direct statement of that: the average number of photons in a 550 nm mode.</p>
+
+        <h3>What Planck actually changed</h3>
+        <p>Nothing in the mode counting. Rayleigh and Jeans had that part right, and it is a straightforward exercise in fitting standing waves into a box. What changed is the average energy per mode, and the reason it changes is that energy comes in lumps of h&nu;. A mode whose quantum is large compared with kT cannot be excited a little; it must take a whole quantum or nothing, and the Boltzmann factor makes that unlikely. The cutoff is not imposed, it emerges.</p>
+        <p>Beiser makes the point that this is also derivable from Einstein's treatment of emission and absorption coefficients, which arrives at the same formula by an entirely different route and additionally predicts stimulated emission — the basis of the laser.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Photons are bosons with &mu; = 0, because they are not conserved: a cavity wall can create or destroy them freely, so the number adjusts until the free energy is minimised. That is why the Bose&ndash;Einstein expression here has no chemical potential in it, and it is also why a photon gas cannot Bose&ndash;condense the way a gas of atoms can — there is no fixed particle number to force into the ground state.</p>
+      </div>
+    </div>
+
+    <!-- 5. specific heats -->
+    <div class="card">
+      <h2>The Specific Heats of Solids <span class="eqtag">Sec. 9.8</span></h2>
+      <p class="desc">Classical physics predicts every solid has the same molar heat capacity at every temperature. It is right at room temperature and catastrophically wrong in the cold, and fixing it was one of the first triumphs of quantum theory.</p>
+      <div class="eq">Dulong&ndash;Petit: c<sub>V</sub> = 3R &nbsp;&nbsp;|&nbsp;&nbsp; Debye: c<sub>V</sub> &rarr; T&sup3; as T &rarr; 0</div>
+      <div class="controls">
+        <div class="ctrl"><label>Solid</label>
+          <select id="cv_sol">
+            <option value="Cu" selected>copper</option><option value="Pb">lead</option>
+            <option value="Ag">silver</option><option value="Al">aluminium</option>
+            <option value="Fe">iron</option><option value="C">diamond</option>
+          </select></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="cv_t_val">300</span></label>
+          <input type="range" id="cv_t" min="5" max="600" step="1" value="300"></div>
+      </div>
+      <canvas id="cv_canvas" height="300"></canvas>
+      <div class="readout" id="cv_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Molar heat capacity against temperature. The dashed grey line is the classical Dulong&ndash;Petit value of 3R, which every solid was supposed to have. The curves are Einstein's model, which treats every atom as an independent oscillator of one frequency, and Debye's, which treats the vibrations as sound waves in the solid as a whole.</p>
+        <p>Both go to zero at low temperature, which is the essential quantum result: when kT falls below the vibrational quantum, the modes cannot be excited at all and the solid simply stops absorbing heat into them. Einstein's version falls too fast; Debye's gives the T&sup3; behaviour that is actually measured.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start with <b>copper</b> at <b>300 K</b>: the heat capacity is already within a few percent of 3R, which is why Dulong and Petit found their law working for most metals at room temperature. Now switch to <b>diamond</b>, whose Debye temperature is 2230 K — at room temperature it sits at a small fraction of 3R, and diamond was one of the conspicuous exceptions that made the classical law look broken. Beiser lists boron and beryllium alongside it for the same reason. Then take copper down to <b>20 K</b> and watch the capacity collapse toward zero as T&sup3;.</p>
+
+        <h3>Why the classical answer fails</h3>
+        <p>Equipartition gives each atom kT of kinetic and kT of potential energy per dimension, hence 3R per mole, independent of everything. That assumes each oscillator can absorb an arbitrarily small amount of energy. When the available thermal energy kT drops below the vibrational quantum h&nu;, the mode is frozen: it can take a whole quantum or nothing, and mostly takes nothing. Exactly the same argument that turned over the blackbody curve in the previous card turns over this one, with lattice vibrations in place of cavity modes.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Debye's model treats the vibrational spectrum as that of an elastic continuum cut off at a maximum frequency, which is an approximation to a real phonon spectrum that has structure in it. It works remarkably well anyway, and the T&sup3; law at low temperature is exact for any solid. Note also that metals have a small additional electronic contribution, linear in T, which dominates at very low temperature where the T&sup3; lattice term has died away — and why that contribution is so small is the subject of the final card.</p>
+      </div>
+    </div>
+
+    <!-- 6. free electrons -->
+    <div class="card">
+      <h2>Free Electrons in a Metal <span class="eqtag">Sec. 9.9&ndash;9.10</span></h2>
+      <p class="desc">A metal contains a mole of nearly free electrons. Classically each should carry 3kT/2 of thermal energy and add hugely to the heat capacity. They do not, and the exclusion principle is why.</p>
+      <div class="eq">f(&epsilon;) = 1/(e<sup>(&epsilon;&minus;&epsilon;<sub>F</sub>)/kT</sup> + 1), &nbsp; &epsilon;<sub>F</sub> = (h&sup2;/2m)(3n/8&pi;)<sup>2/3</sup></div>
+      <div class="controls">
+        <div class="ctrl"><label>Metal</label>
+          <select id="fe_metal">
+            <option value="Cu" selected>copper</option><option value="Na">sodium</option>
+            <option value="Ag">silver</option><option value="Au">gold</option>
+            <option value="Al">aluminium</option><option value="Zn">zinc</option>
+          </select></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="fe_t_val">300</span></label>
+          <input type="range" id="fe_t" min="10" max="3000" step="10" value="300"></div>
+      </div>
+      <canvas id="fe_canvas" height="280"></canvas>
+      <canvas id="fe_canvas_occ" height="270" style="margin-top:12px;"></canvas>
+      <div class="readout" id="fe_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is how the electrons are distributed in energy — the density of available states, which grows as &radic;&epsilon;, multiplied by the Fermi&ndash;Dirac occupancy. It is filled up to the Fermi energy and empty above, with a small blur at the top. The lower panel is the occupancy alone, with the perfect step it would have at absolute zero drawn dashed behind it and the smeared region of width a few kT shaded.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>copper</b> at <b>300 K</b>. The Fermi energy comes out near <b>7 eV</b> and kT is 0.026 eV, so the smearing is a fraction of a percent of the way down the distribution. The readout puts a number on it: only about <b>0.4%</b> of the electrons are close enough to the top to absorb thermal energy at all. Every other electron is locked in place, because the states just above it are already occupied and the exclusion principle forbids it from moving there. That is why the electronic contribution to a metal's heat capacity is roughly a hundred times smaller than classical physics predicts.</p>
+        <p class="tryit">Now look at the Fermi temperature — some 80,000 K for copper. Melting the metal does not come close to it. In thermodynamic terms the electron gas in a metal at room temperature is not hot at all; it is a <em>degenerate</em> gas, essentially at absolute zero, and heating it barely disturbs it. Then check the Fermi speed: over 10&#8310; m/s, and that is the speed of the fastest electrons at T = 0, with no thermal energy involved whatsoever.</p>
+
+        <h3>Why this matters beyond metals</h3>
+        <p>The same physics operates wherever fermions are packed densely. The electrons in a white dwarf are degenerate, and the pressure of that degenerate gas — a pressure that exists at zero temperature, purely from the exclusion principle — is what holds the star up against gravity. When the star is too massive for even that, electrons and protons combine into neutrons and degenerate neutrons hold up a neutron star instead. Beiser closes this chapter with exactly that application, and it is a remarkable reach: a rule about two electrons in an atom, scaled up to the fate of stars.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The free-electron model ignores the lattice entirely, treating the metal as a box with a uniform potential inside. That it predicts Fermi energies of the right size is already impressive, but it cannot explain why some materials are insulators — for that the periodic potential of the lattice must be put back in, opening gaps in the energy spectrum. That is the subject of the next chapter.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -2111,5 +2311,6 @@
 <script src="ch06.js"></script>
 <script src="ch07.js"></script>
 <script src="ch08.js"></script>
+<script src="ch09.js"></script>
 </body>
 </html>

@@ -76,6 +76,14 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - The vibration–rotation band (P and R branches, the missing centre line)
 - Three energy scales, four decades apart
 
+## Chapter 9 — Statistical Mechanics
+- The Maxwell–Boltzmann speed distribution (v_p, v̄, v_rms, and which gases a planet keeps)
+- The energy distribution and the activation tail (why 10 K can double a reaction rate)
+- Three statistics on one plot (Maxwell–Boltzmann, Bose–Einstein, Fermi–Dirac, and where they merge)
+- Where Planck's law comes from (⟨ε⟩ per mode, and how equipartition fails)
+- Specific heats of solids (Dulong–Petit, Einstein, Debye — with the Debye integral done numerically)
+- The free-electron gas in a metal (Fermi energy from the electron density, and why electrons carry so little heat)
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -90,6 +98,7 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch06.js
     ch07.js
     ch08.js
+    ch09.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
