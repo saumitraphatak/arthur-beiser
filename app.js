@@ -54,10 +54,30 @@ window.addEventListener('resize', ()=>{ clearTimeout(resizeT); resizeT=setTimeou
 // resize (window resize, tab switch revealing a previously-hidden canvas)
 // still gets a full refit because clientWidth/height will differ.
 const _canvasFitCache = new WeakMap();
+
+// The canvas .width/.height IDL properties REFLECT the HTML content attributes:
+// writing `canvas.height = 600` literally rewrites height="600" in the markup.
+// So the intended CSS height must be captured exactly once, before we ever
+// touch the attribute — reading it back afterwards would return the already-
+// scaled buffer height and multiply it by dpr all over again on every redraw
+// (300 -> 600 -> 1200 -> 2400 ... on any dpr>1 display, until the browser can
+// no longer allocate the backing buffer and paints a broken-image icon).
+function intendedCssHeight(canvas){
+  if(canvas.dataset.cssHeight === undefined){
+    canvas.dataset.cssHeight = String(parseFloat(canvas.getAttribute('height')) || 260);
+  }
+  return parseFloat(canvas.dataset.cssHeight);
+}
+
+// Hard ceiling so a bad measurement can never ask the browser for a buffer it
+// cannot allocate. Chrome's practical per-canvas limits are well above this.
+const MAX_CANVAS_PX = 8192;
+
 function fitCanvas(canvas){
-  const dpr = window.devicePixelRatio || 1;
-  const cssH = parseFloat(canvas.getAttribute('height')) || 260;
-  const cssW = canvas.clientWidth || (canvas.parentElement && canvas.parentElement.clientWidth) || 600;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const cssH = intendedCssHeight(canvas);
+  const cssWraw = canvas.clientWidth || (canvas.parentElement && canvas.parentElement.clientWidth) || 600;
+  const cssW = Math.max(1, Math.min(cssWraw, MAX_CANVAS_PX/dpr));
 
   const cached = _canvasFitCache.get(canvas);
   if(cached && cached.cssW===cssW && cached.cssH===cssH && cached.dpr===dpr){
@@ -66,8 +86,8 @@ function fitCanvas(canvas){
   }
 
   canvas.style.height = cssH + 'px';
-  canvas.width  = Math.max(1, Math.round(cssW*dpr));
-  canvas.height = Math.max(1, Math.round(cssH*dpr));
+  canvas.width  = Math.max(1, Math.min(MAX_CANVAS_PX, Math.round(cssW*dpr)));
+  canvas.height = Math.max(1, Math.min(MAX_CANVAS_PX, Math.round(cssH*dpr)));
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,cssW,cssH);
