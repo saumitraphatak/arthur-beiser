@@ -84,6 +84,16 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Specific heats of solids (Dulong–Petit, Einstein, Debye — with the Debye integral done numerically)
 - The free-electron gas in a metal (Fermi energy from the electron density, and why electrons carry so little heat)
 
+## Chapter 10 — The Solid State
+- What holds an ionic crystal together (Madelung sums, the exclusion-principle repulsion, cohesive energy against measurement)
+- The van der Waals bond (Lennard-Jones, the fcc lattice sums, and all five bond types compared against their melting points)
+- Free electrons, drift and Ohm's law (animated; drift velocity, Fermi velocity, mean free path in ion spacings)
+- How a level becomes a band (a chain of N atoms solved exactly, and what happens as N grows)
+- Conductor, semiconductor, insulator (Fermi–Dirac tails on a log scale, intrinsic carriers, the Arrhenius plot)
+- Doping and the p–n junction (band bending under bias, np = n_i², the diode equation, 60 mV per decade)
+- Brillouin zones (bands from diagonalising the nearly-free-electron Hamiltonian, and the two standing waves that make the gap)
+- Superconductivity (critical field, the BCS gap equation solved numerically, Cooper pairs, the flux quantum)
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -99,18 +109,21 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch07.js
     ch08.js
     ch09.js
+    ch10.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
 never changes.
 
-Two conventions worth knowing before editing:
+Three conventions worth knowing before editing:
 
 - `canvas.width`/`.height` **reflect the HTML attributes**, so never read an intended CSS
   size back out of the `height` attribute after writing it. `fitCanvas()` handles this and
   memoizes the fit; never resize a canvas on a slider `input` event.
 - Every module setup and every per-canvas draw runs inside its own `try`/`catch`, so one
   broken module can never blank the others.
+- Chapter files share one global scope, so top-level `const` names and DOM `id`s must be
+  unique across the whole site. The test harness fails the build on duplicate element ids.
 
 Verified at devicePixelRatio 1, 2 and 3 — bugs have hidden at dpr 1.
 

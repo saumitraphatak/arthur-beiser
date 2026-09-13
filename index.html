@@ -206,7 +206,7 @@
       <button class="chap-btn" data-chapter="ch7" role="tab" aria-selected="false"><span class="n">7</span>Many-Electron Atoms</button>
       <button class="chap-btn" data-chapter="ch8" role="tab" aria-selected="false"><span class="n">8</span>Molecules</button>
       <button class="chap-btn" data-chapter="ch9" role="tab" aria-selected="false"><span class="n">9</span>Statistical Mechanics</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">10</span>The Solid State</span>
+      <button class="chap-btn" data-chapter="ch10" role="tab" aria-selected="false"><span class="n">10</span>The Solid State</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">11</span>Nuclear Structure</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">12</span>Nuclear Transf.</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">13</span>Elementary Particles</span>
@@ -2297,10 +2297,337 @@
 
   </section>
 
+  <section class="chapter" id="ch10">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Ten</div>
+      <h1>The Solid State</h1>
+      <p>Everything so far has been about one atom, or two. Put 10<sup>23</sup> of them in a regular array and the sharp energy levels smear into bands, the gaps between those bands decide whether the material is a wire or a window, and a lattice that can be made to vibrate just right will carry a current forever. This is where quantum mechanics stops being a curiosity about spectra and starts being the semiconductor industry.</p>
+    </div>
+
+    <!-- 1. ionic crystal -->
+    <div class="card">
+      <h2>What Holds an Ionic Crystal Together <span class="eqtag">Sec. 10.2, Example 10.1</span></h2>
+      <p class="desc">Two competing terms, one attractive and long-ranged, one repulsive and brutally short-ranged. Their sum has a minimum, and the depth of that minimum is the energy you must pay to take the crystal apart.</p>
+      <div class="eq">U = &minus;&alpha;e&sup2;/4&pi;&epsilon;<sub>0</sub>r + B/r<sup>n</sup> &nbsp;&rarr;&nbsp; U<sub>0</sub> = &minus;(&alpha;e&sup2;/4&pi;&epsilon;<sub>0</sub>r<sub>0</sub>)(1 &minus; 1/n)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Crystal</label>
+          <select id="ic_xtal">
+            <option value="NaCl" selected>NaCl</option><option value="LiF">LiF</option>
+            <option value="KCl">KCl</option><option value="NaBr">NaBr</option>
+            <option value="CsCl">CsCl</option><option value="RbI">RbI</option>
+          </select></div>
+        <div class="ctrl"><label>Repulsion exponent n <span class="val" id="ic_n_val">9</span></label>
+          <input type="range" id="ic_n" min="5" max="14" step="1" value="9"></div>
+      </div>
+      <canvas id="ic_canvas" height="320"></canvas>
+      <div class="readout" id="ic_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Three curves. The dashed teal one is the Coulomb energy of one ion in the field of <em>every</em> other ion in the crystal &mdash; not just its neighbour. Summing that over an infinite alternating lattice is not obvious (the terms alternate in sign and the series converges only conditionally), and the answer is a pure number depending only on the geometry: the <b>Madelung constant</b> &alpha;. It is 1.748 for the rock-salt arrangement and 1.763 for the CsCl arrangement. Notice how close those are &mdash; the lattice geometry barely matters compared with how close the ions get.</p>
+        <p>The dashed gold curve is the repulsion that appears when the closed electron shells of two ions start to overlap. It is not electrostatic; it is the exclusion principle, which forbids the overlapping electrons from occupying the same states and so forces some of them into higher ones. Modelled as B/r<sup>n</sup> with n &asymp; 9, it is almost a hard wall: halving r multiplies it by 512.</p>
+        <p>The solid red curve is their sum, and the marked point is the equilibrium. B is not a free parameter &mdash; it is fixed by requiring the minimum to fall exactly at the observed r<sub>0</sub>, which is why the curve always bottoms out on the dashed vertical line.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave it at <b>NaCl with n = 9</b>, which is Beiser's Example 10.1. The readout gives U<sub>0</sub> = <b>&minus;7.96 eV</b> per ion pair, so <b>3.98 eV</b> per ion. But that is the energy to pull the crystal apart into <em>ions</em>, and cohesive energy is conventionally measured against free <em>atoms</em> &mdash; so you must hand back the 5.14 eV it took to ionize sodium, minus the 3.61 eV you got for attaching that electron to chlorine. That is 1.53 eV per pair, 0.77 eV per atom, and the cohesive energy comes out at <b>3.21 eV</b> against a measured 3.28. A two-term model with one adjustable exponent, right to 2 percent.</p>
+        <p class="tryit">Now sweep n from 5 to 14 and watch how little happens. Going from n = 9 to n = 10 changes U<sub>0</sub> by <b>1.25 percent</b>, because n enters only through the factor (1 &minus; 1/n). This is the useful kind of insensitivity: we do not know the repulsion law well, and it turns out we do not have to.</p>
+        <p class="tryit">Then compare <b>LiF</b> with <b>RbI</b>. Same structure, same Madelung constant, same exponent &mdash; and LiF binds nearly twice as hard, purely because its ions are small enough to sit 0.201 nm apart instead of 0.366 nm. Ionic bond strength is very nearly a story about ionic radii and nothing else.</p>
+
+        <h3>Why the numbers come out where they do</h3>
+        <p>The scale is set by e&sup2;/4&pi;&epsilon;<sub>0</sub> = 1.44 eV&middot;nm. Divide that by a typical interionic distance of 0.3 nm and you get about 5 eV; multiply by the Madelung constant and take off the 11 percent the repulsion costs, and you land near 8 eV per ion pair. Every ionic crystal in the table lives within a factor of two of that estimate, and the reason is simply that all ions are about the same size.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The agreement with experiment is genuinely good, but it leans on r<sub>0</sub> being taken from measurement rather than predicted. A real first-principles calculation would have to derive the equilibrium spacing too, which means treating the electron overlap properly instead of parameterising it as B/r<sup>n</sup>. Note also the sign convention in the electron-transfer term: for CsCl the ionization energy of caesium (3.89 eV) barely exceeds the electron affinity of chlorine (3.61 eV), so almost nothing is spent creating the ions &mdash; which is exactly why caesium halides are such good ionic crystals despite their large spacing.</p>
+      </div>
+    </div>
+
+    <!-- 2. van der Waals -->
+    <div class="card">
+      <h2>The Weakest Bond, and Why Argon Is a Solid At All <span class="eqtag">Sec. 10.4</span></h2>
+      <p class="desc">A neutral atom with no dipole moment still attracts another one, because "no dipole moment" means no <em>average</em> dipole moment. The fluctuations do the binding &mdash; and they bind a hundred times more weakly than anything else in this chapter.</p>
+      <div class="eq">U(r) = 4&epsilon;[(&sigma;/r)<sup>12</sup> &minus; (&sigma;/r)<sup>6</sup>] &nbsp;&nbsp; U<sub>crystal</sub>/N = 2&epsilon;[A<sub>12</sub>(&sigma;/R)<sup>12</sup> &minus; A<sub>6</sub>(&sigma;/R)<sup>6</sup>]</div>
+      <div class="controls">
+        <div class="ctrl"><label>Solid</label>
+          <select id="vw_gas">
+            <option value="Ar" selected>argon</option><option value="Ne">neon</option>
+            <option value="Kr">krypton</option><option value="Xe">xenon</option>
+          </select></div>
+      </div>
+      <canvas id="vw_canvas" height="300"></canvas>
+      <canvas id="vw_bars" height="260"></canvas>
+      <div class="readout" id="vw_readout"></div>
+
+      <div class="explain">
+        <h3>Where the 1/r&#8310; comes from</h3>
+        <p>At any instant the electron cloud of an atom is not centred on the nucleus, so the atom has a fluctuating dipole moment <b>p</b>. That dipole produces a field that falls off as 1/r&sup3;, which induces a dipole <b>p'</b> &prop; 1/r&sup3; in a neighbour, and the interaction energy of a dipole with a field is &minus;<b>p'</b>&middot;<b>E</b> &prop; 1/r&#8310;. Crucially the induced dipole is always oriented so that the force is attractive, which is why the fluctuations do not average to zero even though the dipole itself does. The repulsion is again the exclusion principle; the 12th power is a computational convenience (it is the 6th power squared) rather than physics.</p>
+
+        <h3>What you're looking at</h3>
+        <p>Grey is the potential between two isolated atoms. Red is the energy per atom in the face-centred cubic crystal, where the 1/r&#8310; and 1/r&sup1;&sup2; terms have been summed over <em>every</em> atom in the lattice &mdash; the sums converge to A<sub>6</sub> = 14.454 and A<sub>12</sub> = 12.132 in units of the nearest-neighbour contribution. Because those sums are pure geometry, the entire crystal is determined by the two numbers &epsilon; and &sigma; measured on a dilute gas.</p>
+        <p>The bar chart below puts the result in context against the other four kinds of bond, with the measured melting points overlaid. The correlation is not subtle: melting is what happens when kT becomes a respectable fraction of the bond energy, so a bond ten times weaker melts at roughly a tenth the temperature.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">With <b>argon</b> selected, read off the predicted nearest-neighbour spacing. The lattice sum gives R&#8320; = (2A<sub>12</sub>/A<sub>6</sub>)<sup>1/6</sup>&sigma; = <b>1.09&sigma;</b>, about 0.371 nm against a measured 0.376 &mdash; under 2 percent, from gas-phase parameters alone. The cohesive energy comes out as <b>8.61&epsilon;</b> per atom, roughly 10 percent above the measured value.</p>
+        <p class="tryit">Then note the ratio 8.61: each atom is bound by more than <b>eight times</b> the depth of a single pair bond, even though it has only 12 nearest neighbours. The second and third shells of neighbours contribute the extra 20 percent, and no further &mdash; 1/r&#8310; converges fast.</p>
+        <p class="tryit">Compare the readout line "kT at the melting point" across all four noble gases. It is close to the same <em>fraction</em> of the bond energy every time, which is why neon melts at 25 K and xenon at 161 K in almost exact proportion to their &epsilon;.</p>
+
+        <h3>Why it matters more than it looks</h3>
+        <p>Van der Waals forces are the weakest thing here and also the most universal &mdash; they act between every pair of atoms, charged or not, bonded or not. They hold the layers of graphite together (which is why a pencil works), hold molecular crystals and polymers together, let a gecko walk up glass, and are the reason any gas can be liquefied at all. The 10 percent error above is a better result than it appears, given that the entire attraction is a second-order perturbation effect.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The model quietly assumes the interaction is a sum of independent pair terms. It is not: three atoms in a row interact in a way that is not the sum of the three pairs (the Axilrod&ndash;Teller correction), which accounts for most of the remaining discrepancy. It also ignores zero-point motion, which is why the error grows steadily as the atoms get lighter: xenon comes out 1 percent high, krypton 4, argon 12, and neon <b>33</b>. Light atoms in a shallow well never sit still, and the energy of that unavoidable jiggling has to be subtracted from the binding. Helium is the limiting case &mdash; its zero-point energy exceeds its well depth, so it does not solidify at all under its own vapour pressure.</p>
+      </div>
+    </div>
+
+    <!-- 3. drift and Ohm's law -->
+    <div class="card">
+      <h2>Free Electrons, Drift, and Where Ohm's Law Comes From <span class="eqtag">Sec. 10.5, Examples 10.2&ndash;10.3</span></h2>
+      <p class="desc">The electrons in a copper wire move at a million metres per second. The current moves at a fraction of a millimetre per second. Both are true, and the gap between them is the whole story.</p>
+      <div class="eq">&upsilon;<sub>d</sub> = I/nAe &nbsp;&nbsp; &rho; = m&upsilon;<sub>F</sub>/ne&sup2;&lambda; &nbsp;&nbsp; R = &rho;L/A</div>
+      <div class="controls">
+        <div class="ctrl"><label>Metal</label>
+          <select id="dr_metal">
+            <option value="Cu" selected>copper</option><option value="Ag">silver</option>
+            <option value="Au">gold</option><option value="Al">aluminium</option>
+            <option value="Na">sodium</option><option value="Fe">iron</option>
+          </select></div>
+        <div class="ctrl"><label>Current (A) <span class="val" id="dr_i_val">1.0</span></label>
+          <input type="range" id="dr_i" min="0.1" max="20" step="0.1" value="1"></div>
+        <div class="ctrl"><label>Wire cross-section (mm&sup2;) <span class="val" id="dr_a_val">1.0</span></label>
+          <input type="range" id="dr_a" min="0.1" max="10" step="0.1" value="1"></div>
+        <div class="ctrl"><label><input type="checkbox" id="dr_field" checked style="width:auto; margin-right:6px;">apply an electric field</label></div>
+      </div>
+      <canvas id="dr_canvas" height="240"></canvas>
+      <div class="readout" id="dr_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Electrons ricocheting through a lattice of ions, with their recent paths trailing behind them. Toggle the field off and on. The change in each individual trajectory is almost invisible &mdash; the electrons keep moving fast and in random directions &mdash; but a slow systematic creep to the right appears, and that creep is the current. The animation exaggerates the drift by about ten orders of magnitude; the readout gives the honest number.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>copper, 1.0 A, 1.0 mm&sup2;</b>, which is Beiser's Example 10.2. The drift velocity is <b>7.4 &times; 10<sup>&minus;5</sup> m/s</b> &mdash; 0.074 mm/s, so an individual electron would take about <b>four hours</b> to cross a one-metre wire. Yet a lamp lights instantly when you throw the switch, because the field that starts every electron drifting propagates down the wire at close to the speed of light. The electrons were already there; they just all started shuffling at once.</p>
+        <p class="tryit">Now look at the ratio v<sub>F</sub>/v<sub>d</sub>, which is around <b>10<sup>10</sup></b>. Passing a current through a metal perturbs the electron velocities by one part in ten billion. This is why Ohm's law is linear over such an enormous range: you are always in the regime of infinitesimal perturbation.</p>
+        <p class="tryit">Then read the mean free path for copper &mdash; <b>38 nm</b>, Example 10.3, which is about <b>150 ion spacings</b>. That number should be startling. A perfect periodic lattice does not scatter an electron wave at all (that is what Bloch's theorem says, and what the last card of this chapter is about); an electron only scatters off a <em>defect</em>, or off an ion that thermal vibration has knocked out of place. Resistance is not caused by the lattice. It is caused by the lattice being imperfect.</p>
+        <p class="tryit">Switch to <b>sodium</b> and <b>iron</b>. Sodium has a third the free electrons of copper but a resistivity only 2.7 times higher; iron has twice copper's electron density and 5.6 times its resistivity. Iron's electrons travel only about <b>4 nm</b> between collisions against copper's 38, and it is that, not the carrier count, that makes it the worse conductor.</p>
+
+        <h3>Where Ohm's law actually comes from</h3>
+        <p>Between collisions an electron accelerates at eE/m for an average time &tau; = &lambda;/v<sub>F</sub>, picking up a drift eE&tau;/m before the next collision randomises its direction again. So v<sub>d</sub> &prop; E, hence I &prop; E &prop; V &mdash; and the constant of proportionality contains only material properties. Note which velocity appears in &tau;: the <b>Fermi</b> velocity, not a thermal one. Only electrons at the top of the distribution have empty states to scatter into, so only they matter, and their speed is set by the exclusion principle rather than by temperature. Drude got the right form of Ohm's law in 1900 using the Maxwell&ndash;Boltzmann speed instead, and his resistivities came out about ten times too large.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Beiser's Example 10.2 prints the drift velocity as 7.4 &times; 10<sup>&minus;4</sup> m/s. Substituting his own figures &mdash; n = 8.5 &times; 10<sup>28</sup> m<sup>&minus;3</sup>, A = 10<sup>&minus;6</sup> m&sup2;, I = 1.0 A &mdash; gives 1/(1.36 &times; 10<sup>4</sup>) = 7.4 &times; 10<sup>&minus;5</sup> m/s. The exponent appears to have slipped by one; his following sentence, "usually less than 1 mm/s", is satisfied either way. The value computed above is the arithmetic one.</p>
+        <p class="catch">The model also treats every metal as having exactly one free electron per atom, which is roughly right for the monovalent metals and wrong for aluminium (three) and iron. The densities used here are measured ones, not counted ones.</p>
+      </div>
+    </div>
+
+    <!-- 4. band formation -->
+    <div class="card">
+      <h2>How a Level Becomes a Band <span class="eqtag">Sec. 10.6</span></h2>
+      <p class="desc">Bring two atoms together and their identical levels split in two. Bring N together and you get exactly N levels &mdash; and once N is more than about twenty, they are spread over a width that stops depending on N entirely. That last sentence is the whole of band theory.</p>
+      <div class="eq">E<sub>j</sub> = E<sub>0</sub> + 2t cos(j&pi;/(N+1)), &nbsp; j = 1 &hellip; N &nbsp;&nbsp;&rarr;&nbsp;&nbsp; band width = 4t</div>
+      <div class="controls">
+        <div class="ctrl"><label>Number of atoms <span class="val" id="bf_n_val">2</span></label>
+          <input type="range" id="bf_n" min="2" max="160" step="1" value="2"></div>
+        <div class="ctrl"><label>Internuclear distance (nm) <span class="val" id="bf_a_val">0.367</span></label>
+          <input type="range" id="bf_a" min="0.20" max="1.00" step="0.002" value="0.367"></div>
+      </div>
+      <canvas id="bf_canvas" height="300"></canvas>
+      <canvas id="bf_wide" height="280"></canvas>
+      <div class="readout" id="bf_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the actual energy levels of a chain of N identical atoms, each coupled to its neighbours with strength t. Those levels are not sketched &mdash; the eigenvalues of that Hamiltonian have the closed form E<sub>0</sub> + 2t&thinsp;cos(j&pi;/(N+1)), and that is what is plotted. Two atoms give the bonding/antibonding pair of Chapter 8. Five give five levels. A hundred give something your eye already reads as a continuous band.</p>
+        <p>Below: how the band widths depend on how close the atoms are, which is Beiser's Fig. 10.20 computed rather than drawn. The outer level (sodium's 3s) has a diffuse wave function, so it starts broadening while the atoms are still far apart. The inner level (2p) is tucked close to the nucleus and stays a sharp line until the atoms are practically touching. Both bands widen exponentially as the atoms approach, because t is an overlap integral and overlap of exponential tails is exponential.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the distance to <b>0.367 nm</b>, the observed spacing in solid sodium, and step N up from 2. Watch the readout line for band width. At N = 2 you have just the bonding/antibonding pair and the width is only half its eventual value, but by N = 10 it is within 3 percent of the limit and by N = 20 within 1 percent. After that the width is simply <b>fixed</b>, and every further atom you add does nothing but subdivide it. Extrapolate that to a real crystal, as the last readout line does: a mole of sodium atoms gives a 3s band a couple of eV wide containing 6 &times; 10<sup>23</sup> levels, so the spacing between them is around <b>10<sup>&minus;24</sup> eV</b>. No measurement will ever resolve that, and no thermal or electrical perturbation will ever fail to bridge it. The band is a continuum for every purpose you will ever have.</p>
+        <p class="tryit">Now drag the distance out to 0.8 nm and back. The inner band collapses to a line long before the outer one does. This is why chemistry and conduction are the business of valence electrons only: the inner shells of neighbouring atoms simply never find out about each other.</p>
+
+        <h3>Why this decides conductor from insulator</h3>
+        <p>An s level holds 2 electrons, so an s band built from N atoms holds 2N. Sodium brings one 3s electron per atom, so its 3s band is <b>half full</b> and the Fermi level sits in the middle of it &mdash; there are empty states an infinitesimal energy above the occupied ones, an applied field can accelerate electrons into them, and sodium conducts. Magnesium brings two, which ought to fill its 3s band exactly; magnesium is nevertheless a metal because its 3s and 3p bands overlap into one band holding 8N, filled to a quarter. Everything about electrical behaviour follows from counting: how many electrons, how many states, and whether the last electron lands in the middle of a band or at the top of one.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The chain here is one-dimensional and each atom carries a single orbital, which is the simplest system that shows the effect honestly. Real bands in three dimensions have structure &mdash; their width depends on direction, and bands built from different atomic levels cross and hybridise, which is what Fig. 10.23 shows happening to carbon's 2s and 2p. The exponential form t = t<sub>0</sub>e<sup>&minus;(a&minus;a<sub>0</sub>)/&delta;</sup> used for the overlap is a model; the level count, the closed-form eigenvalues and the N-independence of the width are exact.</p>
+      </div>
+    </div>
+
+    <!-- 5. band gap -->
+    <div class="card">
+      <h2>Conductor, Semiconductor, Insulator &mdash; It Is All One Number <span class="eqtag">Sec. 10.6</span></h2>
+      <p class="desc">Diamond and silicon have the same crystal structure and the same kind of bonding. One is a jeweller's insulator, the other runs the world's computers. The difference is 4.4 eV.</p>
+      <div class="eq">n<sub>i</sub> = 2(2&pi;kT/h&sup2;)<sup>3/2</sup>(m*<sub>e</sub>m*<sub>h</sub>)<sup>3/4</sup> e<sup>&minus;E<sub>g</sub>/2kT</sup></div>
+      <div class="controls">
+        <div class="ctrl"><label>Material</label>
+          <select id="gp_mat">
+            <option value="Si" selected>silicon &mdash; 1.11 eV</option>
+            <option value="Ge">germanium &mdash; 0.67 eV</option>
+            <option value="GaAs">gallium arsenide &mdash; 1.43 eV</option>
+            <option value="InSb">indium antimonide &mdash; 0.17 eV</option>
+            <option value="C">diamond &mdash; 5.5 eV</option>
+          </select></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="gp_t_val">300</span></label>
+          <input type="range" id="gp_t" min="100" max="900" step="5" value="300"></div>
+      </div>
+      <canvas id="gp_canvas" height="320"></canvas>
+      <canvas id="gp_arr" height="280"></canvas>
+      <div class="readout" id="gp_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the two bands, with the Fermi&ndash;Dirac occupancy f(&epsilon;) = 1/(e<sup>(&epsilon;&minus;&epsilon;<sub>F</sub>)/kT</sup> + 1) plotted sideways against them on a <em>logarithmic</em> scale. On that scale the exponential tail is a straight line, and its slope is 1/kT&thinsp;ln10 &mdash; at 300 K, 16.8 decades of occupancy per electronvolt. Follow the line up to the conduction-band edge and the marked point is the answer: the fraction of edge states that are occupied. In an intrinsic semiconductor the Fermi level sits in the middle of the gap &mdash; not because there are states there (there are none) but because f is the probability a state <em>would</em> be filled, and the symmetry between electrons promoted up and holes left behind puts the 50 percent point at the centre.</p>
+        <p class="tryit">Drag the temperature and watch the line pivot about &epsilon;<sub>F</sub>. Nothing else on this card is doing any work &mdash; the entire temperature dependence of a semiconductor is the slope of that one line.</p>
+        <p>Below: the same physics as an Arrhenius plot. ln n<sub>i</sub> against 1/T is a straight line of slope &minus;E<sub>g</sub>/2k, which is how band gaps are measured &mdash; cool the sample, plot the log of its conductivity, take the slope. Every material is a parallel line displaced by its gap.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>silicon at 300 K</b>. The formula gives n<sub>i</sub> &asymp; <b>1.08 &times; 10<sup>10</sup> cm<sup>&minus;3</sup></b> against an accepted 1.0 &times; 10<sup>10</sup> &mdash; an 8 percent error on a number produced by exponentiating &minus;21.5. Try the other four materials: germanium, gallium arsenide and indium antimonide all land within a factor of 1.6, across <b>ten orders of magnitude</b> of carrier density. Then note what that means: silicon has 5 &times; 10<sup>22</sup> atoms per cm&sup3;, so about <b>one atom in 5 &times; 10<sup>12</sup></b> has donated a conduction electron. A semiconductor is an insulator with a rounding error's worth of carriers.</p>
+        <p class="tryit">Now switch to <b>diamond</b> and read the last line. At 300 K the carrier density is around 10<sup>&minus;27</sup> cm<sup>&minus;3</sup> &mdash; which is to say that a diamond <b>the size of the Earth</b> would contain roughly one thermally excited conduction electron. That is what a 5.5 eV gap buys you when kT is 0.026 eV. The exponential does not care that the gap is only about 200 times kT; e<sup>&minus;106</sup> is a very small number.</p>
+        <p class="tryit">Keep silicon and drag the temperature from 300 K to 600 K. The carrier density rises by about <b>five orders of magnitude</b>. This is why semiconductor devices need heatsinks and why they fail thermally rather than gracefully: the intrinsic carriers eventually swamp the doping, and the junction stops being a junction. It is also why germanium, with its smaller gap, was abandoned for silicon.</p>
+
+        <h3>Why the gap is E<sub>g</sub>/2 in the exponent</h3>
+        <p>Because the Fermi level sits in the middle. An electron reaching the conduction-band edge has climbed from &epsilon;<sub>F</sub> at the gap's centre, a distance E<sub>g</sub>/2, and the Boltzmann tail of the Fermi&ndash;Dirac function then gives e<sup>&minus;E<sub>g</sub>/2kT</sup>. The factor of two is worth a factor of 10<sup>10</sup> in silicon, so it is not a detail.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The effective masses are the one thing here that has to be supplied rather than derived &mdash; they encode the curvature of the real bands, which the free-electron picture cannot give you. The readout shows what happens if you use m* = m instead: silicon is then off by only 10 percent, but indium antimonide, whose electrons have an effective mass of 0.014m, is off by a factor of <b>47</b>. That is a useful warning about how far the free-electron model can be pushed.</p>
+        <p class="catch">And the gap itself is not constant: it shrinks with temperature (silicon's falls from 1.17 eV at 0 K to 1.11 at 300 K) because the lattice expands and the atoms vibrate. Holding it fixed, as here, slightly understates the high-temperature carrier density.</p>
+      </div>
+    </div>
+
+    <!-- 6. doping and the junction -->
+    <div class="card">
+      <h2>Doping and the p&ndash;n Junction <span class="eqtag">Sec. 10.6&ndash;10.7</span></h2>
+      <p class="desc">Add one foreign atom per billion and the conductivity changes by orders of magnitude. Put two differently doped pieces together and you get a device that passes current one way and not the other &mdash; which is, in the end, what the whole of electronics is built from.</p>
+      <div class="eq">np = n<sub>i</sub>&sup2; &nbsp;&nbsp; I = I<sub>0</sub>(e<sup>eV/kT</sup> &minus; 1)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Semiconductor</label>
+          <select id="pn_mat">
+            <option value="Si" selected>silicon</option><option value="Ge">germanium</option>
+            <option value="GaAs">gallium arsenide</option>
+          </select></div>
+        <div class="ctrl"><label>Donor density (cm&#8315;&sup3;) <span class="val" id="pn_dope_val">10^14.0</span></label>
+          <input type="range" id="pn_dope" min="10" max="19" step="0.1" value="14"></div>
+        <div class="ctrl"><label>Bias voltage (V) <span class="val" id="pn_v_val">0.00</span></label>
+          <input type="range" id="pn_v" min="-0.8" max="0.8" step="0.01" value="0"></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="pn_t_val">300</span></label>
+          <input type="range" id="pn_t" min="200" max="500" step="5" value="300"></div>
+      </div>
+      <canvas id="pn_bands" height="280"></canvas>
+      <canvas id="pn_iv" height="280"></canvas>
+      <div class="readout" id="pn_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the band edges bending across the junction. On the p side the Fermi level sits low in the gap, on the n side it sits high; joining them forces the bands to bend by the difference, and that bend is the barrier an electron must climb to cross from n to p. The shaded strip is the depletion region, swept clear of mobile carriers by the field of the exposed dopant ions. Drag the bias: forward bias lowers the barrier and the diagram's step flattens, reverse bias raises it.</p>
+        <p>Below: the resulting current, I = I<sub>0</sub>(e<sup>eV/kT</sup> &minus; 1). One equation, and the entire asymmetry of the device is in the exponential of a positive number versus the exponential of a negative one.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>silicon</b> at <b>10<sup>14</sup> cm<sup>&minus;3</sup></b> doping &mdash; that is one donor per 5 &times; 10<sup>8</sup> silicon atoms, a purity level that is itself a triumph of chemical engineering. The electron density jumps from 10<sup>10</sup> to 10<sup>14</sup>, the hole density <em>falls</em> to about 10<sup>6</sup> (because np = n<sub>i</sub>&sup2; is fixed), and the conductivity rises by four orders of magnitude. That is the point of doping: it does not just add carriers, it makes the material's behaviour depend on something you control instead of on the temperature.</p>
+        <p class="tryit">Now do the same on <b>germanium</b> and watch what fails. Germanium's intrinsic density is around 10<sup>13</sup>&ndash;10<sup>14</sup> cm<sup>&minus;3</sup>, so a doping of 10<sup>14</sup> barely beats the carriers that thermal energy is producing for free. Beiser's remark that one donor per 10<sup>9</sup> host atoms raises conductivity by nearly 10<sup>3</sup> holds for silicon &mdash; one per 10<sup>9</sup> gives N<sub>d</sub> = 5 &times; 10<sup>13</sup>, and the readout confirms a factor of about <b>3400</b>. Run the same sum on germanium and the factor is <b>2.3</b>. The doping does essentially nothing, because the thermal background has already swamped it. This is the real reason germanium lost.</p>
+        <p class="tryit">Set the bias to <b>+0.60 V</b> at 300 K and read e<sup>eV/kT</sup>: about <b>10<sup>10</sup></b>. Then set it to &minus;0.60 V and it is 8 &times; 10<sup>&minus;11</sup>, so the current sits at &minus;I<sub>0</sub> and stays there however hard you push. Twenty orders of magnitude of rectification from one exponential.</p>
+        <p class="tryit">Look at the "mV per decade" figure on the I&ndash;V plot &mdash; <b>59.5 mV at 300 K</b>, and it depends on nothing but kT/e. Every decade of diode current costs the same 60 mV. It is the most-used number in analogue circuit design, and it is on this plot for the same reason it is in the design manuals: ln(10)&thinsp;kT/e.</p>
+        <p class="tryit">Now raise the temperature to 400 K and watch that figure grow to 79 mV, while the whole curve shifts. A diode is a rather good thermometer and a rather poor voltage reference, and both facts are the same fact.</p>
+
+        <h3>Why the junction rectifies</h3>
+        <p>Two currents cross the junction. The thermal current i<sub>t</sub> comes from electron&ndash;hole pairs generated by heat in the depletion region and swept across by the built-in field; it depends on temperature but not on the applied voltage, because every carrier generated there gets swept across regardless. The recombination current i<sub>r</sub> comes from majority carriers that have enough energy to climb the barrier, and <em>that</em> is exponentially sensitive to the barrier height, hence to the bias. At zero bias they cancel exactly. Forward bias multiplies i<sub>r</sub> by e<sup>eV/kT</sup> and leaves i<sub>t</sub> alone; reverse bias kills i<sub>r</sub> and leaves i<sub>t</sub> alone. Subtract, and you have the diode equation with I<sub>0</sub> = i<sub>t</sub>.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The band diagram here is schematic in its shape &mdash; a real depletion region has a parabolic potential profile whose width depends on the doping as 1/&radic;N<sub>d</sub> &mdash; though the barrier height, the carrier densities and the I&ndash;V curve are all computed. The diode equation also assumes ideal injection; real diodes carry an ideality factor between 1 and 2, and at high forward bias the series resistance of the bulk material takes over and the current becomes linear again. Complete ionization of the dopants is assumed, which fails below about 100 K when the donor electrons freeze back onto their donors.</p>
+      </div>
+    </div>
+
+    <!-- 7. Brillouin zones -->
+    <div class="card">
+      <h2>Brillouin Zones, and Where the Gap Actually Comes From <span class="eqtag">Sec. 10.8</span></h2>
+      <p class="desc">The previous account built bands by bringing atoms together. Here is an entirely different one that gets the same answer: an electron in a periodic lattice is a wave, and at certain wavelengths the lattice Bragg-reflects it. Those wavelengths become forbidden.</p>
+      <div class="eq">n&lambda; = 2a sin&theta; &nbsp;&rarr;&nbsp; k = n&pi;/a sin&theta; &nbsp;&nbsp;&nbsp; E = &#8463;&sup2;k&sup2;/2m, except near the boundary</div>
+      <div class="controls">
+        <div class="ctrl"><label>Lattice spacing a (nm) <span class="val" id="bz_a_val">0.300</span></label>
+          <input type="range" id="bz_a" min="0.15" max="0.60" step="0.005" value="0.3"></div>
+        <div class="ctrl"><label>Lattice potential |U| (eV) <span class="val" id="bz_u_val">0.80</span></label>
+          <input type="range" id="bz_u" min="0" max="3" step="0.05" value="0.8"></div>
+        <div class="ctrl"><label>Electrons per atom <span class="val" id="bz_z_val">1.00</span></label>
+          <input type="range" id="bz_z" min="0.2" max="3" step="0.02" value="1"></div>
+      </div>
+      <canvas id="bz_ek" height="330"></canvas>
+      <canvas id="bz_zones" height="300"></canvas>
+      <canvas id="bz_standing" height="200"></canvas>
+      <div class="readout" id="bz_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Top: E against k. The dashed grey line is the free-electron parabola E = &#8463;&sup2;k&sup2;/2m. The coloured curves are the real answer, obtained by diagonalising the electron's Hamiltonian in a basis of nine plane waves coupled by the periodic potential &mdash; not sketched, computed, by bisection on the Sturm sequence of the resulting tridiagonal matrix. Away from the zone boundaries the two agree to the width of the line. At k = &plusmn;n&pi;/a the curve splits, and the shaded strips are energies no electron in this crystal can have.</p>
+        <p>Middle: the same boundaries in two dimensions. The first Brillouin zone is the square of k-values that can avoid Bragg reflection from the vertical and horizontal rows of ions; the second is the diamond of larger k that still avoids reflection from the diagonal rows. The black circle is the Fermi circle, whose radius is set by how many electrons you put in.</p>
+        <p>Bottom: why there is a gap at all. At exactly k = &pi;/a the electron waves are Bragg-reflected back on themselves, and the only solutions are standing waves. There are two of them with the <em>same</em> wavelength: sin(&pi;x/a), which has nodes at the ions, and cos(&pi;x/a), which has antinodes there. The cosine keeps its charge near the positive ions where the potential energy is lowest; the sine keeps it between them, where it is highest. Same k, different energy &mdash; and the difference between those two energies is the gap.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Drag <b>|U|</b> from 0 upward and watch the gaps open. At U = 0 the curve is exactly the free-electron parabola folded onto itself. The readout checks the computed first gap against <b>2|U|</b>, which is what the two-state secular equation predicts &mdash; and the numerical diagonalisation agrees, which is a good sign that the machinery is doing what it claims. Then look at the line for the next boundary, k = 2&pi;/a. With only the first Fourier component of the lattice potential present, the bands there are coupled only at <em>second</em> order &mdash; through an intermediate plane wave &mdash; so that gap goes as |U|&sup2;/E and is dramatically narrower. At |U| = 0.8 eV the first gap is 1.60 eV and the second only 0.076 eV, twenty times narrower. Push |U| up to 3 and the second gap grows to about 1.0 eV &mdash; the second-order term scales as the square, so it catches up fast once the potential is strong.</p>
+        <p class="tryit">Set <b>a = 0.300 nm</b> and read the wavelength at the zone boundary: <b>&lambda; = 2a = 0.600 nm</b>. That is the Bragg condition n&lambda; = 2a&thinsp;sin&theta; at normal incidence. An electron with that wavelength is diffracted by the crystal exactly as an X-ray of that wavelength would be &mdash; it is the same equation from Chapter 2, doing a completely different job.</p>
+        <p class="tryit">Now drag <b>electrons per atom</b>. At 1 electron per atom the Fermi circle sits comfortably inside the first zone, nowhere near a boundary, and the electrons never discover that the lattice exists &mdash; a monovalent metal. Push toward 2 and the circle reaches the zone faces; past that it would have to spill into the second zone, and whether it can depends on whether the gap is bigger than the energy difference between the zone corner and the second-zone bottom. That single question is the difference between a divalent metal and an insulator.</p>
+
+        <h3>The two stories are the same story</h3>
+        <p>Section 10.6 built bands by broadening atomic levels; this section builds them by diffracting free electrons. They are opposite limits of one problem &mdash; tight binding starts from strong lattice potential and weak overlap, nearly-free-electron theory starts from weak potential and strong delocalisation &mdash; and they meet in the middle. The number of states in a band comes out the same either way: 2N for an s band, because there are exactly N allowed k values in a Brillouin zone for N atoms and two spins for each. That is not a coincidence but a counting theorem, and it is the reason both pictures predict the same conductors.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The lattice is one-dimensional for the E&ndash;k plot and a two-dimensional square for the zone picture; real zones are polyhedra (Fig. 10.42) and real gaps depend on direction, which is why a material can have a gap along one axis and none along another and end up a metal anyway. |U| here is a single number standing in for the whole Fourier series of the crystal potential. And the electron's mass near a band edge is not m: the curvature of E(k) is different there, and the useful bookkeeping is to keep the free-electron formulas but replace m with an effective mass m* &mdash; 1.01m in copper, 0.85m in zinc, but 28m in nickel.</p>
+      </div>
+    </div>
+
+    <!-- 8. superconductivity -->
+    <div class="card">
+      <h2>Superconductivity <span class="eqtag">Secs. 10.9&ndash;10.10</span></h2>
+      <p class="desc">Not very little resistance &mdash; none. Currents set up in superconducting rings have been watched for years without measurable decay. The explanation took forty-six years to find, and it turns on electrons attracting each other.</p>
+      <div class="eq">B<sub>c</sub>(T) = B<sub>c</sub>(0)[1 &minus; (T/T<sub>c</sub>)&sup2;] &nbsp;&nbsp; E<sub>g</sub>(0) = 3.53kT<sub>c</sub> &nbsp;&nbsp; &Phi;<sub>0</sub> = h/2e</div>
+      <div class="controls">
+        <div class="ctrl"><label>Material</label>
+          <select id="sc_mat">
+            <option value="Hg" selected>mercury &mdash; type I</option>
+            <option value="Zn">zinc &mdash; type I</option>
+            <option value="Al">aluminium &mdash; type I</option>
+            <option value="Sn">tin &mdash; type I</option>
+            <option value="Pb">lead &mdash; type I</option>
+            <option value="Nb3Sn">Nb₃Sn &mdash; type II</option>
+            <option value="Nb3Ge">Nb₃Ge &mdash; type II</option>
+            <option value="YBCO">YBa₂Cu₃O₇ &mdash; type II</option>
+            <option value="HgBCCO">HgBa₂Ca₂Cu₃O₈ &mdash; type II</option>
+          </select></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="sc_t_val">2.00</span></label>
+          <input type="range" id="sc_t" min="0" max="5.19" step="0.02" value="2"></div>
+        <div class="ctrl"><label>Applied field, as a fraction of B<sub>c</sub>(0) <span class="val" id="sc_b_val">0.30</span></label>
+          <input type="range" id="sc_b" min="0" max="1.2" step="0.01" value="0.3"></div>
+      </div>
+      <canvas id="sc_phase" height="300"></canvas>
+      <canvas id="sc_gap" height="300"></canvas>
+      <div class="readout" id="sup_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the phase diagram. Below the curve the material is superconducting; above it, an ordinary conductor. The marker is your chosen temperature and field. Note that temperature is not the only way to destroy superconductivity &mdash; a strong enough magnetic field does it at any temperature, and for the type I elements the critical field is under a tenth of a tesla, which is why they are useless for magnets.</p>
+        <p>Below: the energy gap, from the BCS gap equation solved numerically here rather than quoted. The curve is flat near T = 0 and then falls to zero with a vertical tangent at T<sub>c</sub>. The readout checks the ratio it produces &mdash; 2&Delta;(0)/kT<sub>c</sub> &mdash; against Beiser's 3.53. Getting that number out of the integral rather than putting it in is the point of doing it this way.</p>
+
+        <h3>What a Cooper pair is</h3>
+        <p>An electron moving through the lattice drags the positive ions slightly toward it. They are heavy and respond slowly, so the region of enhanced positive charge persists after the electron has gone &mdash; and a second electron, arriving later, is attracted to it. The net effect is an attraction between the two electrons, mediated by the lattice, and if it beats their Coulomb repulsion they form a bound pair. The pair's members move in opposite directions and may be as much as a micrometre apart, which is thousands of lattice spacings; "pair" does not mean "adjacent".</p>
+        <p>Two electrons have spin &frac12; each, so a pair with opposite spins has spin 0. That makes Cooper pairs <b>bosons</b>, and any number of bosons may occupy the same state. All the pairs in a superconductor drop into one collective ground state described by a single wave function the size of the sample. To scatter one electron now means promoting the entire condensate, which costs far more than a lattice defect can supply &mdash; so nothing scatters, and the resistance is not small but exactly zero.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>mercury</b>, T<sub>c</sub> = 4.15 K. The gap is <b>1.26 meV</b> &mdash; about 10<sup>&minus;3</sup> eV, as Beiser says, which is four orders of magnitude below a chemical bond. Read the photon line: breaking a pair takes <b>microwave</b> radiation of wavelength around a millimetre, and that is exactly how gaps are measured. Shine microwaves on a superconductor and sweep the frequency; absorption switches on abruptly at h&nu; = E<sub>g</sub>.</p>
+        <p class="tryit">Then read the last line: room-temperature kT is roughly <b>twenty times</b> the gap. Superconductivity is cryogenic for the plainest possible reason &mdash; the binding is so feeble that ordinary thermal energy tears the pairs apart instantly.</p>
+        <p class="tryit">Drag the temperature up toward T<sub>c</sub>. The gap holds up remarkably well to about 0.4 T<sub>c</sub> and then collapses. It is a cooperative effect: breaking some pairs frees electrons that interfere with the remaining ones, which makes the next pairs easier to break, which is the runaway that ends at T<sub>c</sub>.</p>
+        <p class="tryit">Now compare <b>lead</b> with <b>copper</b> &mdash; except copper is not in the list, because copper does not superconduct at any temperature yet reached. This is the beautiful inversion at the heart of the theory. Copper and silver are superb ordinary conductors <em>because</em> their lattices barely vibrate and barely scatter electrons; and that same stiffness means the lattice cannot deform enough to mediate pairing. Lead, mercury and tin are mediocre conductors at room temperature because their lattices are floppy &mdash; and that floppiness is precisely what makes them superconductors when cooled. Good conductors make bad superconductors, and the reason is one property read two ways.</p>
+        <p class="tryit">Switch to <b>Nb&#8323;Sn</b> and then <b>YBa&#8322;Cu&#8323;O&#8327;</b>. Look at the field axis: the critical fields jump from hundredths of a tesla to tens of teslas. Type II materials admit magnetic flux in quantised filaments while staying superconducting elsewhere, which is why they survive fields that would destroy a type I superconductor a thousand times over &mdash; and why every MRI scanner and every particle accelerator magnet is wound with them.</p>
+
+        <h3>The flux quantum</h3>
+        <p>Flux threading a superconducting ring is trapped, because any change in it would induce a current that opposes the change and there is no resistance to damp that current. Since the pair wave function must come back to itself around the ring, the trapped flux is quantised in units of &Phi;<sub>0</sub> = h/2e = 2.068 &times; 10<sup>&minus;15</sup> T&middot;m&sup2;. The <b>2e</b> is the experimental fingerprint of pairing: it was measured before anyone could explain it, and it is why we know the carriers have twice the electron charge. That quantum is tiny &mdash; through a square-millimetre loop it corresponds to a field of 2 &times; 10<sup>&minus;9</sup> T &mdash; which is what makes a SQUID the most sensitive magnetometer that exists, able to detect the magnetic field of a thought.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The parabolic B<sub>c</sub>(T) is an empirical fit, good to a few percent but not exact. The BCS gap curve computed here assumes weak coupling; lead and mercury are strong-coupling superconductors whose measured 2&Delta;(0)/kT<sub>c</sub> runs to 4.3 rather than 3.53, so the universal curve is a first approximation for them.</p>
+        <p class="catch">Most importantly, the last two materials in the list are not explained by any of this. The cuprate superconductors above 90 K are type II and have gaps, but the pairing is not the phonon-mediated mechanism described here &mdash; forty years after their discovery, the mechanism remains unsettled. Everything on this card is solid physics for the elements; for the ceramics it is a description, not an explanation.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
-<footer>Built from Beiser, <em>Concepts of Modern Physics</em>, 6th ed., Chapters 1&ndash;2. All plots computed live from the equations shown &mdash; nothing here is pre-baked data.</footer>
+<footer>Built from Beiser, <em>Concepts of Modern Physics</em>, 6th ed. All plots computed live from the equations shown &mdash; nothing here is pre-baked data.</footer>
 
 <script src="app.js"></script>
 <script src="ch01.js"></script>
@@ -2312,5 +2639,6 @@
 <script src="ch07.js"></script>
 <script src="ch08.js"></script>
 <script src="ch09.js"></script>
+<script src="ch10.js"></script>
 </body>
 </html>
