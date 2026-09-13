@@ -74,6 +74,29 @@
   }
   .readout div b{ color:var(--accent2); }
   .note{ font-family:'Helvetica Neue',Arial,sans-serif; font-size:.8rem; color:var(--sub); margin-top:10px; border-top:1px dashed var(--line); padding-top:8px;}
+
+  /* extended explanation block under each simulation */
+  .explain{ margin-top:18px; border-top:1px solid var(--line); padding-top:16px; font-size:.94rem; }
+  .explain h3{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:.7rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.7px; color:var(--accent2);
+    margin:20px 0 7px;
+  }
+  .explain h3:first-child{ margin-top:0; }
+  .explain p{ margin:0 0 11px; line-height:1.65; color:#303236; }
+  .explain p:last-child{ margin-bottom:0; }
+  .explain b{ color:var(--ink); }
+  .explain .tryit{
+    background:#faf7f0; border-left:3px solid var(--accent);
+    padding:11px 15px; border-radius:0 8px 8px 0; margin:0 0 11px;
+  }
+  .explain .tryit:last-child{ margin-bottom:0; }
+  .explain .catch{
+    background:#eef4f4; border-left:3px solid var(--accent2);
+    padding:11px 15px; border-radius:0 8px 8px 0; margin:0 0 11px;
+  }
+  .explain .catch:last-child{ margin-bottom:0; }
+  .explain var{ font-family:'Cambria Math','Georgia',serif; font-style:italic; }
   .swatch{display:inline-block; width:16px; height:16px; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid rgba(0,0,0,.15);}
   .badge{ display:inline-block; font-family:'Helvetica Neue',Arial,sans-serif; font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:6px; }
   .badge.ok{background:#e5f4ea; color:#1e7a3d;}
@@ -82,6 +105,8 @@
   @media (max-width:600px){
     .topbar{padding:12px 14px;} main{padding:18px 12px 60px;}
     .card{padding:16px 16px;}
+    .explain{font-size:.9rem;}
+    .explain .tryit, .explain .catch{padding:10px 12px;}
   }
 </style>
 </head>
@@ -117,7 +142,22 @@
       </div>
       <canvas id="td_canvas" height="260"></canvas>
       <div class="readout" id="td_readout"></div>
-      <p class="note">Top lane: clock at rest — one tick every &Delta;t&#8320;. Bottom lane: the same clock moving at &beta;c as judged from the ground — the light has to travel a longer zig-zag path each tick, so the clock reads slow by &gamma;.</p>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A light clock is the simplest possible clock: a photon bouncing between two mirrors a fixed distance L&#8320; apart. One round trip is one tick, so the period at rest is &Delta;t&#8320; = 2L&#8320;/c. The top lane shows that clock sitting still. The bottom lane shows <em>the same clock</em>, built identically, flying past you at &beta;c — the faint trail traces the photon's actual path through your frame.</p>
+        <p>Notice what the trail is doing: while the photon travels from one mirror to the other, the whole clock has also moved sideways, so the photon's path is a <b>diagonal</b>, not a vertical line. It has further to go. And here is where the second postulate bites — the photon cannot compensate by moving faster, because light travels at c for <em>every</em> observer, no matter how the source moves. Longer path, same speed, therefore longer tick. Watch the two tick counters in the readout drift apart.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set &beta; = <b>0.866</b>. That gives &gamma; = 2 exactly, and the moving clock ticks precisely half as often — let it run until the rest clock reaches 10 ticks and you should find the moving one at 5. Then push &beta; toward 0.995 and watch the moving clock nearly freeze. Coming back the other way, at &beta; = 0.1 the two lanes look essentially identical: &gamma; = 1.005, a half-percent effect. That is exactly why nobody noticed any of this until we could accelerate particles.</p>
+
+        <h3>Why this isn't a trick of the apparatus</h3>
+        <p>It is tempting to think the moving light clock is merely <em>malfunctioning</em> while "real" time ticks on regardless. But nothing here is specific to photons and mirrors. If the moving clock read slow while a wristwatch beside it kept true time, you could compare the two and discover your own absolute speed through space — and the first postulate forbids that. Every process in the moving frame must slow by the same factor, which is another way of saying it is <b>time itself</b>, not any particular clock, that runs slow.</p>
+        <p>Beiser's demonstration of this is the muon. Muons created by cosmic rays high in the atmosphere decay after an average of just 2.2 &micro;s in their own rest frame, which at their speed of 0.998c would carry them only 0.66 km — yet they are created 6 km up and reach sea level in profusion, roughly one per square centimetre per minute. In our frame their lifetime is stretched by &gamma; &asymp; 16 to 34.8 &micro;s, and in that time they cover 10.4 km. The particles arrive because time dilation is real, and biological, chemical and nuclear clocks all slow together.</p>
+
+        <h3>The catch that makes it consistent</h3>
+        <p class="catch">The effect is perfectly symmetric: an observer riding the bottom clock sees <em>your</em> clock running slow by the same factor &gamma;, with equal justification. That sounds like a flat contradiction, and resolving it is the whole point of the Minkowski diagram in the last card on this page — the two of you also disagree about which distant events happen "at the same time," and that disagreement is exactly the right size to reconcile the two accounts.</p>
+      </div>
     </div>
 
     <!-- 2. Length contraction -->
@@ -133,6 +173,22 @@
       </div>
       <canvas id="lc_canvas" height="230"></canvas>
       <div class="readout" id="lc_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The red bar is the rod measured in its own rest frame — its <b>proper length</b> L&#8320;, the longest any observer will ever find it to be. The teal bar is the length <em>you</em> measure from the ground as it flies past at &beta;c. The curve underneath plots the whole story at once: L/L&#8320; against &beta;, with the dot marking where your current setting sits on it.</p>
+        <p>The shape of that curve is the thing worth absorbing. It leaves 1.0 almost reluctantly — it is flat near the origin, so at ordinary speeds the contraction is unmeasurably small — and then falls off a cliff as &beta; approaches 1. Contraction is not a gentle effect that grows steadily with speed; it is a nothing-nothing-nothing-everything effect concentrated in the last few percent before c.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start at &beta; = <b>0.1</b> — a rod moving at 30,000 km/s, which is fast beyond any human experience, and it shrinks by half a percent. Now &beta; = <b>0.6</b> gives 80% of proper length, &beta; = <b>0.9</b> gives 44%, and &beta; = <b>0.999</b> leaves you with 4.5%. The last step in that sequence covers less than a tenth as much speed as the first, and does more than fifty times as much contracting.</p>
+
+        <h3>The same fact, told from the other frame</h3>
+        <p>Length contraction and time dilation are not two independent phenomena; they are one phenomenon described from two frames, and Beiser derives the second from the first for exactly that reason. Return to the muon from the card above. In <em>our</em> frame, the muon survives the 6 km journey because its lifetime is dilated to 34.8 &micro;s. But ride along with the muon, and its lifetime is a perfectly ordinary 2.2 &micro;s — nothing is stretched at all.</p>
+        <p>What saves the muon in its own frame is that the <b>atmosphere</b> is the thing in motion, rushing up at 0.998c and contracted by the same factor of 16. The 6 km of air we measure is only about 0.4 km to the muon, and a 2.2 &micro;s lifetime is ample to cross it. Both observers agree the muon reaches the ground — they simply disagree about whether it was the clock or the distance that did the accommodating.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">"Length" here means what you get by marking the positions of both ends <em>simultaneously</em> in your frame and subtracting — and since observers disagree about simultaneity, they inevitably disagree about length. This is a statement about measurement, not about appearance: a fast rod does not <em>look</em> compressed to the eye or to a camera, because light from its far end left earlier than light from its near end, which produces a quite different (and merely optical) distortion. Note too that only the along-motion dimension changes. A rod held perpendicular to the motion is unaffected, which is why the light clock's mirror spacing L&#8320; was safe to treat as unchanged.</p>
+      </div>
     </div>
 
     <!-- 3. Velocity addition -->
@@ -148,7 +204,21 @@
       </div>
       <canvas id="va_canvas" height="170"></canvas>
       <div class="readout" id="va_readout"></div>
-      <p class="note">Example 1.11 from the book: v = 0.90c, u&prime; = 0.50c gives u &asymp; 0.97c &mdash; try it.</p>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A single velocity axis running from &minus;2c to +2c, with the regions beyond &plusmn;c shaded red because nothing with mass may be found there. Three markers sit on it: the grey one is the frame's own speed v, the upper marker is the naive classical sum u&prime; + v, and the teal one below is the correct relativistic result. Drag either slider and watch the classical marker wander cheerfully into forbidden territory while the teal marker refuses to leave the allowed zone, no matter what you do to it.</p>
+        <p>The entire difference is the denominator, 1 + u&prime;v/c&sup2;. At everyday speeds that term is so close to 1 that Galileo's answer is right to more decimal places than anyone can measure — for a jet at 300 m/s firing a bullet at 1000 m/s, the correction shows up around the twelfth decimal place. The formula does not <em>replace</em> classical velocity addition so much as reveal it as a low-speed approximation that happened to be all anyone could test for three centuries.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Reproduce the book's worked example first: <b>v = 0.90</b>, <b>u&prime; = 0.50</b>. Classically that is 1.40c, comfortably illegal; relativistically it is 0.966c. Now push both sliders to their 0.99 extremes — classically 1.98c, relativistically 0.99995c. This is the pattern to notice: feeding the formula speeds arbitrarily close to c gives back something closer still to c, but never past it. Then set <b>u&prime; = 0.99</b> and sweep v across its whole range; the teal marker barely stirs. A beam that is nearly light-speed in one frame is nearly light-speed in all of them, which is the second postulate re-emerging as an algebraic consequence rather than an assumption.</p>
+
+        <h3>Where it comes from</h3>
+        <p>This is not a patch bolted on to rescue the speed limit — it drops straight out of the Lorentz transformation. Write down how S and S&prime; disagree about both position and time, form the ratio dx/dt that each calls "velocity," and the denominator appears on its own. That shared origin is why the same factor keeps turning up: the reason velocities do not simply add is the same reason lengths contract and clocks dilate, namely that a boost mixes space and time into each other instead of shifting space alone.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Give the object a negative u&prime; while v is positive and you can make the two contributions fight, sending the result back toward zero or negative — the formula handles subtraction with no special cases. But notice it never lets the total escape the interval (&minus;c, c) from inside, in either direction. Light itself is the boundary case: put u&prime; = c into the algebra and you get exactly c back for <em>any</em> v, which is the only fixed point of the transformation.</p>
+      </div>
     </div>
 
     <!-- 4. Doppler / redshift -->
@@ -177,6 +247,22 @@
       </div>
       <canvas id="dp_canvas" height="120"></canvas>
       <div class="readout" id="dp_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The strip is the visible spectrum from 380 to 750 nm. The solid black line marks the wavelength the source actually emits, &lambda;&#8320;; the dashed red line marks what arrives at your detector. The two swatches beside the controls show the same comparison as flat colour, which makes small shifts easier to judge than a line on a rainbow does. Positive &beta; means the source is receding and the dashed line walks to the right (redshift); negative &beta; means approaching, and it walks left (blueshift).</p>
+        <p>The relativistic Doppler formula differs from the acoustic one you already know in two ways. First, sound needs a medium, so it matters separately whether the source moves through the air or the listener does — those give measurably different answers. Light has no medium, so <em>only the relative velocity</em> can appear in the formula, and it does. Second, the moving source's own emission process is time-dilated, which contributes an extra factor of &gamma; that has no acoustic counterpart at all.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Work Beiser's Example 1.3: a galaxy in Hydra recedes at 6.12 &times; 10&#8311; m/s, which is <b>&beta; = 0.204</b>, and emits a green line at <b>&lambda;&#8320; = 500 nm</b>. Dial those in and the observed wavelength lands near 615 nm — green light arriving as orange, a shift of 23%. Then try Example 1.2, the driver who told the judge the red light looked green. Red is 480 THz and green is 560 THz, which needs <b>&beta; &asymp; &minus;0.155</b> — about 46,000 km/s. The judge, fining $1 for each km/h over the 80 km/h limit, charged her roughly $165 million.</p>
+
+        <h3>From a colour shift to an expanding universe</h3>
+        <p>The second slider row reframes the same physics cosmologically. Hubble's law says recession speed grows in proportion to distance, at roughly 21 km/s for every million light-years, so a galaxy's redshift doubles as a distance measurement. Drag the distance slider and watch &beta; follow it — the deduction that the universe is expanding rests on precisely this, applied to spectral lines whose rest wavelengths we know from laboratory atoms.</p>
+        <p>One subtlety worth flagging: for the genuinely distant universe, the redshift is better understood as space itself expanding while the light is in flight than as motion through space, and the simple formula here is the nearby-galaxy approximation. Within a few hundred million light-years, which is the range of this slider, the two descriptions agree closely.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This formula is for purely <b>radial</b> motion, source and observer on the same line. A source moving perpendicular to your line of sight is not exempt from the effect — it still shows a redshift, purely from time dilation, with no classical counterpart whatsoever. That transverse Doppler shift is a second-order effect (it depends on &beta;&sup2; rather than &beta;), which is why it went unobserved for so long, and why its eventual measurement was such a clean confirmation of time dilation on its own.</p>
+      </div>
     </div>
 
     <!-- 5. Twin paradox -->
@@ -194,6 +280,23 @@
       </div>
       <canvas id="tw_canvas" height="320"></canvas>
       <div class="readout" id="tw_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A spacetime diagram drawn in Jane's (Earth's) frame: distance runs horizontally in light-years, time runs vertically in years. Jane never moves, so her worldline is the vertical teal line straight up the time axis. Dick's red worldline goes out at a slope set by &beta;, turns a sharp corner at the star, and comes back. The dashed grey 45&deg; line is the path a light signal would take — every physical worldline must stay steeper than it.</p>
+        <p>Both twins start at the same event (bottom corner) and meet again at the same event (top of Jane's line). There is no ambiguity about who is older when they are standing next to each other, which is what makes this a real prediction rather than a matter of perspective. The labels on the diagram give each twin's accumulated age at the turnaround and at the reunion.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the book's scenario exactly: <b>&beta; = 0.80</b>, <b>D = 20</b> light-years, starting age <b>20</b>. Jane waits 50 years and is 70 at the reunion; Dick experiences only 30 and is 50. As Beiser puts it, Jane sees Dick's heart beat 3 times for every 5 of hers, and thinks 3 thoughts for every 5 of hers. Now sweep &beta; up to 0.99 with the distance fixed: the trip gets a little quicker for Jane but dramatically quicker for Dick, and the age gap widens toward the extreme. Push &beta; down to 0.1 instead and the two ages nearly converge — a slow traveller barely gains anything.</p>
+
+        <h3>Where the paradox actually dissolves</h3>
+        <p>The puzzle is usually stated like this: motion is relative, so from Dick's point of view it is Jane who is moving, and <em>she</em> should end up younger. Both cannot be right. The resolution is that the two situations are not mirror images. Jane remains in a single inertial frame for the whole story. Dick does not — he changes frames when he departs, again when he turns around, and again when he lands. That corner in the red worldline has no counterpart in Jane's straight one, and it is what breaks the symmetry.</p>
+        <p>Dick's own accounting agrees, without invoking time dilation for himself at all. In his frame the distance to the star is length-contracted from 20 light-years to 12, and at 0.8c that takes 15 years each way — 30 years total, exactly what the diagram reports. The two twins explain the result with different mechanisms and arrive at the identical number, which is the signature of a theory that hangs together.</p>
+        <p>There is an elegant way to see the whole thing at a glance. In ordinary geometry, a straight line is the <b>shortest</b> path between two points. In the geometry of spacetime the minus sign in the interval flips this: between two events, the straight (unaccelerated) worldline carries the <b>longest</b> proper time. Dick's bent path is therefore necessarily the shorter experience. Ageing less is simply the price of taking a detour through spacetime.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Nothing strange happens to either twin during the trip — neither one ever catches their own clock misbehaving. If each sends a radio signal once a year, Beiser's Example 1.4 works out that Dick receives 5 signals on the way out (arriving 3 years apart) and 45 on the way back (arriving 4 months apart), for 50 in total; Jane receives 30. Each twin receives exactly as many signals as the other twin had years. The asymmetry is not hidden in the physics — it is right there in the tally.</p>
+      </div>
     </div>
 
     <!-- 6. KE / momentum -->
@@ -217,6 +320,22 @@
         <div class="colgrow"><canvas id="ke_canvas_p" height="230"></canvas></div>
       </div>
       <div class="readout" id="ke_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Two plots against &beta;, both in units that remove the particle's mass from the picture: kinetic energy in multiples of its rest energy mc&sup2; on the left, momentum in multiples of mc on the right. In each, the grey dashed curve is what classical mechanics predicts and the solid coloured curve is the relativistic truth. The dots mark your current &beta; on both. The particle selector then converts those dimensionless numbers into MeV in the readout, so you can see what the same &beta; costs for an electron versus a proton.</p>
+        <p>Look at how the two curves separate. Near the origin they are indistinguishable — the relativistic expression's leading term <em>is</em> &frac12;m&upsilon;&sup2;, so classical mechanics is not merely close, it is the first term of the correct answer. Classical kinetic energy stays within 1% of the truth all the way up to about 0.12c, roughly 36,000 km/s. Beyond that the curves peel apart and the relativistic one turns sharply upward, eventually leaving the top of the frame entirely.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Step through <b>&beta; = 0.1, 0.5, 0.9, 0.99</b> and watch the "understatement" line in the readout: the classical formula is low by about 0.75%, then 19%, then 69%, then 92%. At 0.99c, classical mechanics gets the energy wrong by more than a factor of twelve. Now leave &beta; at 0.99 and switch particles: the same &beta; costs an electron about 3.1 MeV and a proton about 5.7 GeV, because the identical &gamma; multiplies very different rest energies.</p>
+
+        <h3>Why c is a speed limit rather than a speed record</h3>
+        <p>The momentum plot is the more revealing of the two. Classically, momentum is proportional to speed, so doubling a particle's momentum doubles its speed and there is no reason the process should ever stop. Relativistically, p = &gamma;m&upsilon; has &gamma; growing without bound as &beta; &rarr; 1, so momentum runs to infinity while speed merely creeps toward c. At &beta; = 0.999 the momentum is already 22 times mc while the speed is still short of the target.</p>
+        <p>That is what makes c unreachable for anything with mass. It is not that some barrier appears at c; it is that each additional increment of speed costs more energy than the last, without limit. Accelerator physics is the daily confirmation — machines are specified by the energy they deliver, not the speed they reach, because past a certain point every extra GeV buys another decimal place of 0.999... and essentially no extra velocity.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Beiser presents these results in the older language of "relativistic mass" increasing with speed, which is how the &gamma; was often absorbed historically. Modern practice keeps mass as a fixed, frame-independent property and puts the &gamma; explicitly into the momentum and energy, which is the convention used here. The physics is identical either way — but the modern phrasing makes it clearer that the useful master equation is E&sup2; = (mc&sup2;)&sup2; + (pc)&sup2;, which holds for everything, and which reduces to E = pc for a massless particle. That limit is exactly what the photon momentum in the Compton card of the next chapter relies on.</p>
+      </div>
     </div>
 
     <!-- 7. Minkowski diagram -->
@@ -230,6 +349,22 @@
       </div>
       <canvas id="mk_canvas" height="380"></canvas>
       <div class="readout" id="mk_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The black horizontal and vertical lines are the x and ct axes of your frame S. The dashed grey diagonals at 45&deg; are the light cone. The red and teal lines are the axes of a frame S&prime; moving at &beta; relative to you: the red line is everywhere that S&prime; calls "t&prime; = 0," and the teal line is everywhere it calls "x&prime; = 0," meaning the worldline of its own origin. The faint red dashed lines parallel to the red axis are other instants of S&prime; time — each one is a set of events that S&prime; insists happened simultaneously.</p>
+        <p>Drag &beta; and watch the two coloured axes scissor <em>toward</em> each other, closing on the 45&deg; light cone from both sides but never crossing it. At &beta; = 0 they sit exactly on your own axes. Flip the sign of &beta; and they scissor the other way. Notice that the light cone itself never moves — it is the one feature of the diagram every observer agrees on, which is just the second postulate drawn as a picture.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set &beta; to about <b>0.5</b> and follow one of the dashed red lines with your eye from left to right. Every event on it is simultaneous as far as S&prime; is concerned — yet the line is tilted, so in <em>your</em> frame those events sit at visibly different heights, meaning different times. Two events that are simultaneous for one observer are simply not simultaneous for the other, and the disagreement grows with &beta;. Now push &beta; to 0.95 and watch the tilt become extreme.</p>
+
+        <h3>This is the card that explains the other six</h3>
+        <p>Every apparent paradox earlier on this page traces back to this one picture. Length contraction depended on measuring both ends of a rod "at the same time," and the dashed lines show that the two frames mean different things by that phrase — so of course they get different lengths. The mutual time dilation that looked self-contradictory in the light-clock card is fine for the same reason: each observer is comparing a single moving clock against a whole <em>row</em> of their own clocks, and the two rows are not synchronised with each other.</p>
+        <p>Put slightly differently: a boost does not slide space along while time ticks on unchanged, which is what Galileo assumed. It rotates the axes of spacetime into one another, so that some of what you call duration becomes what S&prime; calls separation and vice versa. Time dilation, length contraction and velocity addition are three shadows cast by that one rotation.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Simultaneity being negotiable might look like an invitation to reorder cause and effect — but the axes can never rotate past 45&deg;, however hard you push &beta;. If one event can influence another, their separation is timelike, meaning the line joining them is steeper than the light cone, and no boost can flip which came first. Observers can disagree about the timing and ordering of events that are too far apart to affect each other, and about nothing else. Relativity gives up absolute simultaneity precisely so that it can keep causality.</p>
+      </div>
     </div>
 
   </section>
@@ -253,6 +388,22 @@
       </div>
       <canvas id="bb_canvas" height="300"></canvas>
       <div class="readout" id="bb_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Energy density inside a heated cavity, plotted against wavelength. The solid red curve is Planck's formula and matches what is actually measured. The grey dashed curve is the Rayleigh&ndash;Jeans prediction — everything classical physics has to say on the subject. The pale blue band marks the visible range, and the teal dashed line marks the peak located by Wien's displacement law, &lambda;<sub>peak</sub>T = 2.898 &times; 10&#8315;&sup3; m&middot;K.</p>
+        <p>Follow the grey curve from right to left. Out at long wavelengths it lies right on top of Planck's — classical physics is not wrong everywhere, and that is what made the failure so puzzling. But as the wavelength shortens the grey curve keeps climbing, and climbing, without limit. It predicts that a merely warm cavity should be pouring out unbounded energy at the ultraviolet end, and that opening the door of any oven should be instantly fatal. This is the <b>ultraviolet catastrophe</b>.</p>
+
+        <h3>Where the classical argument goes wrong</h3>
+        <p>The classical derivation has two ingredients. Count the standing-wave modes that fit in the cavity, which gives a number growing as &nu;&sup2; — that part is correct. Then assign each mode an average energy of kT, from the equipartition theorem, which was one of the most secure results in nineteenth-century physics. Multiply, and you get a spectrum rising as &nu;&sup2; forever.</p>
+        <p>Planck's fix was to allow a mode of frequency &nu; to hold energy only in whole multiples of h&nu;. A high-frequency mode therefore cannot be excited <em>a little</em>; it must take a whole quantum or nothing. When h&nu; grows large compared with the thermal energy kT available, the Boltzmann factor makes that all-or-nothing purchase overwhelmingly unlikely, so those modes sit unexcited and the curve turns over instead of diverging. Equipartition survives only where the quanta are small compared with kT — which is exactly the long-wavelength region where the two curves agree.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>T = 5800 K</b>, the Sun's surface: the peak lands near 500 nm, squarely inside the visible band. Our eyes are tuned to the output of the star we evolved under, which is less of a coincidence than it first appears. Now try <b>T = 3000 K</b>, a tungsten filament bulb — the peak is at about 970 nm, in the infrared, meaning most of what an incandescent bulb emits is heat you cannot see. Drop to <b>T = 1500 K</b> to recreate the comparison in Beiser's Fig. 2.8, and push to <b>T = 10,000 K</b> to send the peak into the ultraviolet. Toggle the overlay off and on at each temperature and watch where the grey curve departs from reality.</p>
+
+        <h3>Why this card matters more than it looks</h3>
+        <p class="catch">Planck introduced quantization in 1900 as what he later called "lucky guesswork" — a mathematical device to fit the measured curve, which he expected would eventually be explained away by classical means. It never was. Every other card in this chapter is a consequence of taking that device seriously: the constant h fixed here to match a glowing cavity is the same h that turns up in the photoelectric slope, in Compton's wavelength shift, and eventually in the hydrogen atom. This curve is where quantum physics starts.</p>
+      </div>
     </div>
 
     <!-- 2. Photoelectric effect -->
@@ -279,6 +430,22 @@
         <div class="colgrow"><canvas id="pe_canvas_slope" height="230"></canvas></div>
       </div>
       <div class="readout" id="pe_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>On the left is the experiment Beiser describes in Fig. 2.9: light strikes a metal plate, electrons come off, and a retarding voltage is turned up until even the fastest of them can no longer reach the collector. The three red curves are three different light <b>intensities</b>. Brighter light produces proportionally more current — the curves stack vertically — but look where they all hit zero. They stop at <em>the same</em> voltage V&#8320;. Tripling the brightness does not give a single electron any extra energy.</p>
+        <p>On the right, KE<sub>max</sub> is plotted against frequency for the selected metal, with two reference metals dashed in grey. These lines are parallel. Changing the metal slides the line sideways, changing the threshold frequency, but never tilts it — and the slope is Planck's constant h. This is the plot Millikan spent a decade measuring, partly in an effort to prove Einstein wrong; it gave instead the most precise value of h then available.</p>
+
+        <h3>Why the wave picture cannot survive this</h3>
+        <p>Classically, light energy arrives spread across a wavefront, and an electron soaks it up gradually like a pebble worked loose by water waves. Three things then follow, and all three are wrong. There should be a measurable delay while a dim source delivers enough energy — none is observed, to better than a nanosecond. Brighter light should eject faster electrons — it does not, as the left plot shows. And light of any frequency should work if you wait long enough or shine hard enough — yet below a threshold frequency, absolutely nothing happens.</p>
+        <p>Einstein's resolution was to take Planck's quantum literally: the energy is not merely emitted in packets, it <em>travels</em> in packets. One photon of energy h&nu; is absorbed by one electron, all at once. The electron must spend &phi; getting out of the metal and keeps the rest. That single sentence explains all three observations at once — no delay because the transaction is instantaneous, no intensity dependence because more photons means more electrons rather than better-fed ones, and a threshold because a photon carrying less than &phi; cannot pay the toll no matter how many of its colleagues arrive.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Keep <b>sodium (&phi; = 2.3 eV)</b> and set <b>&lambda; = 300 nm</b>: each photon carries 4.13 eV, the electron surrenders 2.3 eV to escape, and KE<sub>max</sub> is 1.83 eV. Now drag the wavelength upward and watch KE<sub>max</sub> fall to zero at about <b>539 nm</b> — green light. Past that point, sodium emits nothing at all, and no amount of intensity will change it. Then switch to <b>platinum (6.4 eV)</b>, whose threshold is down at 194 nm in the deep ultraviolet, and to <b>cesium (1.9 eV)</b>, which still responds to red light at 652 nm. On the right-hand plot, watch the line shift sideways while its slope stays locked.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Notice what the threshold is set by: the <b>frequency</b> of the light, never its brightness. This is the sharpest possible break with the wave picture, because in wave physics intensity is the thing that carries energy and frequency is merely a label. It is also why Beiser calls x-ray production the inverse photoelectric effect — run the same transaction backwards, with a fast electron giving up its kinetic energy to create a photon, and the Bragg card two panels down is how the resulting wavelength gets measured.</p>
+      </div>
     </div>
 
     <!-- 3. Compton scattering -->
@@ -294,6 +461,22 @@
       </div>
       <canvas id="cp_canvas" height="300"></canvas>
       <div class="readout" id="cp_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A momentum vector diagram for a single collision. The grey arrow is the incoming photon's momentum p&#8320; = h/&lambda;&#8320;. The red arrow is the scattered photon leaving at angle &theta;. The teal arrow is the recoiling electron, drawn as the vector that closes the triangle — because momentum conservation says exactly that: p&#8320; = p&prime; + p<sub>e</sub>, so the electron's momentum is the vector difference of the two photon arrows.</p>
+        <p>Watch the red arrow as you change &theta;. It is always <em>shorter</em> than the grey one, and more so at large angles. Since p = h/&lambda;, a shorter momentum arrow means a longer wavelength: the photon leaves the collision redder than it arrived. The energy it lost is the energy the electron carried away, and the readout tracks both sides of that ledger.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Sweep &theta; from 0 to 180&deg; at fixed &lambda;&#8320;. At <b>&theta; = 0</b> nothing happens at all — a photon that misses is a photon unchanged. At <b>&theta; = 90&deg;</b> the shift is exactly one Compton wavelength, 2.426 pm. At <b>&theta; = 180&deg;</b>, a straight backscatter, it is the maximum 4.85 pm and the electron is knocked squarely forward. Now the important experiment: hold &theta; at 180&deg; and change &lambda;&#8320; instead. At <b>&lambda;&#8320; = 2 pm</b> the wavelength more than triples and the electron makes off with over two-thirds of the photon's energy. At <b>&lambda;&#8320; = 100 pm</b> the identical 4.85 pm shift is a mere 5% change and the electron gets a few hundred eV.</p>
+
+        <h3>The absolute shift is the whole point</h3>
+        <p>That last comparison is the key to the effect. &Delta;&lambda; = &lambda;<sub>C</sub>(1 &minus; cos&theta;) contains no &lambda;&#8320; anywhere — the shift is a <b>fixed number of picometres</b> set only by the scattering angle and by &lambda;<sub>C</sub> = h/m<sub>e</sub>c = 2.426 pm, a constant built from the electron's mass. Whether that fixed shift is dramatic or invisible depends entirely on what you compare it against.</p>
+        <p>This is why Compton needed x-rays. Visible light at 550 nm is 550,000 pm; the same 4.85 pm shift would be a change of 0.0009%, far below anything detectable, which is why centuries of optics gave no hint of the effect. At x-ray wavelengths of a few picometres it is impossible to miss. The effect was always there in visible light — it was simply swamped.</p>
+
+        <h3>Why this settled the argument</h3>
+        <p class="catch">The photoelectric effect showed that light delivers <em>energy</em> in quanta, but a determined classical physicist could still argue about how the energy got concentrated. Compton scattering is harder to evade: the numbers come out right only if you treat the photon as a particle carrying <b>momentum</b> p = h/&lambda; and apply ordinary conservation of energy and momentum to a two-body collision, exactly as you would for billiard balls. A photon has no rest mass, so E&sup2; = (mc&sup2;)&sup2; + (pc)&sup2; collapses to E = pc — momentum without mass, which has no classical counterpart at all. That the predicted angular dependence matches measurement to high precision is about as direct as evidence gets.</p>
+      </div>
     </div>
 
     <!-- 4. Bragg diffraction -->
@@ -311,6 +494,22 @@
       </div>
       <canvas id="bg_canvas" height="260"></canvas>
       <div class="readout" id="bg_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Two parallel planes of atoms in a crystal, separated by d, with x-rays coming in at a glancing angle &theta;. The teal ray reflects from the upper plane and the red ray from the lower one. The red ray has further to travel — down into the crystal and back out — and that extra distance works out to exactly 2d sin&theta;. If it equals a whole number of wavelengths the two rays emerge in step and reinforce; if not, they arrive out of phase and largely cancel.</p>
+        <p>The plot underneath sweeps &theta; across the full range and shows where the reinforcement happens: a set of sharp spikes at the angles satisfying Bragg's law, with near-darkness between them. The vertical red marker shows where your current &theta; sits. Diffraction from a crystal is not a smooth gradual brightening — it is silence punctuated by narrow, precisely located flashes, and that sharpness is what makes the technique so powerful for measurement.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">With <b>d = 0.28 nm</b> and <b>&lambda; = 0.15 nm</b>, drag &theta; slowly upward. The first-order peak (n = 1) arrives at about <b>15.5&deg;</b>, second order at <b>32.4&deg;</b>, third at <b>53.5&deg;</b> — and then nothing, because fourth order would require sin&theta; &gt; 1. Watch the "(2d sin&theta;)/&lambda;" line in the readout and treat it as a counter: every time it passes through a whole number you are on a peak. Now try <b>d = 0.10 nm</b> with <b>&lambda; = 0.30 nm</b> and sweep the entire range — there is no peak anywhere, because &lambda; exceeds 2d and even n = 1 is unreachable.</p>
+
+        <h3>Why crystals, and why x-rays</h3>
+        <p>That last case is the constraint that governs the whole technique: since sin&theta; cannot exceed 1, diffraction requires &lambda; &le; 2d. To probe a structure you need a wavelength comparable to or smaller than the spacing you are trying to resolve. Atomic planes sit a few tenths of a nanometre apart, so visible light at 550 nm is too coarse by a factor of a couple of thousand and returns no information whatever. X-rays, at wavelengths of tenths of a nanometre and below, are the right size — which is why the discovery that crystals diffract x-rays simultaneously established that x-rays are waves <em>and</em> handed us a ruler for atomic spacing.</p>
+        <p>Run the logic in reverse and the technique becomes a measuring instrument. If you know d for a reference crystal, then measuring the angles of the peaks tells you &lambda; for an unknown x-ray beam. This is precisely how wavelengths were determined in the Compton experiment — the picometre-scale shifts in the previous card were read off as shifts in Bragg angles, not measured directly.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The intensity curve here is schematic: the peak <em>positions</em> come straight from Bragg's law and are exact, but their relative heights and widths in a real crystal depend on how many planes contribute, on what atoms sit where within each cell, and on thermal motion. Extracting a full crystal structure from real diffraction data is the science of crystallography, and reading the peak positions is only its first step. Note also that the same geometry later applies to particles: when electrons were found to diffract from crystals according to this identical formula, it confirmed that matter has wave properties too — the subject that opens Chapter 3.</p>
+      </div>
     </div>
 
     <!-- 5. Attenuation -->
@@ -326,6 +525,21 @@
       </div>
       <canvas id="at_canvas" height="260"></canvas>
       <div class="readout" id="at_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The fraction of a photon beam that survives passage through an absorber of thickness x. The teal dashed lines mark the <b>half-thickness</b>, the depth that removes exactly half the beam. The defining feature of an exponential is that this distance is the same wherever you start: the next half-thickness removes half of what remains, and the one after that half again. The beam is never fully stopped, only reduced — which is why radiation shielding is quoted as an attenuation factor rather than a thickness that "blocks" the radiation.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Work Beiser's Example 2.7: 2.0-MeV gamma rays in water have &mu; = 4.9 m&#8315;&sup1;, which is <b>&mu; = 0.05 cm&#8315;&sup1;</b> in these units. Set that and put <b>x = 10 cm</b> — about 61% of the beam gets through, and the half-thickness is around 14 cm. To cut the beam to 1% you would need about 92 cm of water &mdash; the book's 94 cm, using the unrounded &mu; = 0.049 &mdash; which you can sanity-check by noting that 1% is a little under seven halvings. Now push &mu; to <b>2 cm&#8315;&sup1;</b>, closer to a dense shielding material: the half-thickness collapses to about 3.5 mm and the curve falls off a cliff. That enormous range in &mu; is why shielding is made of lead rather than water when space is tight.</p>
+
+        <h3>Why exponential, and why that is a quantum statement</h3>
+        <p>The exponential form is not an empirical curve fit — it follows from a single assumption, that each photon has a constant probability per unit distance of being removed from the beam, independent of how far it has already travelled. Photons do not wear out or gradually weaken. Each one either passes through untouched or is removed in a single event, and the beam dims because it contains <em>fewer photons</em>, not weaker ones.</p>
+        <p>This is worth pausing on, because it is where the particle picture shows up in a place you might not expect. A classical wave pushing through an absorbing medium would lose amplitude smoothly and continuously, every part of the wavefront weakening together. What the exponential law actually describes is a population of individual quanta being picked off one at a time — the surviving photons at depth x are every bit as energetic as the ones that went in.</p>
+
+        <h3>What &mu; is hiding</h3>
+        <p class="catch">The single coefficient &mu; is a sum over three quite different removal mechanisms, each dominant in its own energy range: the photoelectric effect at low photon energies, Compton scattering in the middle, and pair production above 1.02 MeV, where a photon can convert into an electron&ndash;positron pair. That last threshold is set by the rest energy of the two particles created, 2m<sub>e</sub>c&sup2; — and pair production cannot occur in empty space at all, since a nearby nucleus is needed to take up momentum while conserving energy. So &mu; is a property of the material <em>and</em> of the photon energy together, not a fixed constant of the substance; the value used in the example above holds specifically for 2.0-MeV photons in water.</p>
+      </div>
     </div>
 
   </section>
