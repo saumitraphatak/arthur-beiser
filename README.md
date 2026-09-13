@@ -68,6 +68,14 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Spin–orbit coupling and total angular momentum (j = ℓ ± ½, fine-structure doublets)
 - X-ray spectra and Moseley's law (√ν linear in Z, and why it is Z − 1)
 
+## Chapter 8 — Molecules
+- The molecular bond (potential well, bond length, dissociation energy, zero-point tax)
+- Electron sharing in H₂⁺ (bonding vs antibonding, and why one binds)
+- Rotational energy levels and spectra (measuring bond length from line spacing)
+- Vibrational energy levels (force constants, anharmonicity, Example 8.3)
+- The vibration–rotation band (P and R branches, the missing centre line)
+- Three energy scales, four decades apart
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -81,6 +89,7 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch05.js
     ch06.js
     ch07.js
+    ch08.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

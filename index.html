@@ -204,7 +204,7 @@
       <button class="chap-btn" data-chapter="ch5" role="tab" aria-selected="false"><span class="n">5</span>Quantum Mechanics</button>
       <button class="chap-btn" data-chapter="ch6" role="tab" aria-selected="false"><span class="n">6</span>Hydrogen Atom</button>
       <button class="chap-btn" data-chapter="ch7" role="tab" aria-selected="false"><span class="n">7</span>Many-Electron Atoms</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">8</span>Molecules</span>
+      <button class="chap-btn" data-chapter="ch8" role="tab" aria-selected="false"><span class="n">8</span>Molecules</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">9</span>Statistical Mechanics</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">10</span>The Solid State</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">11</span>Nuclear Structure</span>
@@ -1865,6 +1865,238 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 8 ===================== -->
+  <section class="chapter" id="ch8">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Eight</div>
+      <h1>Molecules</h1>
+      <p>Atoms bond because a shared electron spends time between two nuclei and pulls them together. Once bonded, a molecule can also rotate and vibrate — and those motions are quantized too, on energy scales four orders of magnitude apart, which is why molecular spectra look so different from atomic ones.</p>
+    </div>
+
+    <!-- 1. the bond -->
+    <div class="card">
+      <h2>The Molecular Bond <span class="eqtag">Sec. 8.1</span></h2>
+      <p class="desc">Every stable molecule is a compromise between attraction that wins at long range and repulsion that wins at short range. The minimum between them is the bond.</p>
+      <div class="eq">U(R) has a minimum at R = R<sub>e</sub>, of depth D<sub>e</sub> &mdash; the bond length and the bond energy</div>
+      <div class="controls">
+        <div class="ctrl"><label>Molecule</label>
+          <select id="mb_mol">
+            <option value="CO" selected>CO</option>
+            <option value="HCl">HCl</option>
+            <option value="HBr">HBr</option>
+            <option value="H2">H₂</option>
+            <option value="N2">N₂</option>
+            <option value="O2">O₂</option>
+          </select></div>
+        <div class="ctrl"><label>Separation R (nm) <span class="val" id="mb_r_val">0.113</span></label>
+          <input type="range" id="mb_r" min="0.03" max="0.45" step="0.001" value="0.113"></div>
+      </div>
+      <canvas id="mb_canvas" height="310"></canvas>
+      <div class="readout" id="mb_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The potential energy of two atoms as a function of how far apart their nuclei are. Far to the right it approaches zero — the atoms are separate and do not interact. Bring them together and the energy falls: that is the bond forming. Squeeze further and it rises steeply as the nuclei and their closed shells repel. The teal lines inside the well are the allowed vibrational levels.</p>
+        <p>The depth of the well is the bond energy, and its position is the bond length. Both are measurable, and both are what any theory of bonding has to predict.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Compare <b>H&#8322;</b> with <b>N&#8322;</b>. Hydrogen's well is shallow and narrow — 4.5 eV deep at a bond length of 0.074 nm. Nitrogen's is nearly 10 eV, because it is a triple bond, and that depth is why N&#8322; is so unreactive that it makes up most of the air you are breathing. Then look at what the readout calls the energy actually needed to break the bond: it is less than the well depth, because the molecule can never sit at the bottom. The zero-point energy of the v = 0 level is a permanent tax, and it is why deuterium bonds are measurably stronger than hydrogen bonds despite identical chemistry — a heavier reduced mass means a lower zero-point level.</p>
+
+        <h3>Where the attraction comes from</h3>
+        <p>Two neutral atoms have no net charge, so the attraction is not simple electrostatics between the atoms as wholes. In a covalent bond it comes from an electron being shared: a shared electron can be near both nuclei at once, which lowers its potential energy, and being spread over a larger region also lowers its kinetic energy by the uncertainty principle. The next card makes this concrete.</p>
+        <p>The repulsion at short range has two sources, and the exclusion principle is the larger of them. Pushing the nuclei together forces their closed inner shells to overlap, and since those states are already full, the electrons must be promoted to higher energies. That cost rises extremely steeply, which is why the left-hand wall of the well is so nearly vertical and why atoms behave like hard spheres in most circumstances.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The curve drawn here is a Morse potential, chosen because it has the right shape and can be written down; the true curve is computed numerically and differs in detail, particularly high in the well. Note also that this is a one-dimensional slice through what is really a many-dimensional energy surface — a molecule with N atoms has 3N &minus; 6 vibrational coordinates, and chemistry happens on the full surface, where saddle points between valleys are what we call reaction barriers.</p>
+      </div>
+    </div>
+
+    <!-- 2. electron sharing -->
+    <div class="card">
+      <h2>Electron Sharing: the H&#8322;&#8314; Ion <span class="eqtag">Sec. 8.2&ndash;8.3</span></h2>
+      <p class="desc">The simplest molecule there is: two protons and one electron. It is bound by 2.65 eV, and the reason is visible in where the electron goes.</p>
+      <div class="eq">&psi; = &psi;<sub>a</sub> &plusmn; &psi;<sub>b</sub> &nbsp;&mdash;&nbsp; the plus sign binds, the minus sign does not</div>
+      <div class="controls">
+        <div class="ctrl"><label>Combination</label>
+          <select id="sh_mode">
+            <option value="bonding" selected>symmetric (bonding)</option>
+            <option value="anti">antisymmetric (antibonding)</option>
+          </select></div>
+        <div class="ctrl"><label>Separation R (nm) <span class="val" id="sh_r_val">0.106</span></label>
+          <input type="range" id="sh_r" min="0.03" max="0.40" step="0.002" value="0.106"></div>
+      </div>
+      <canvas id="sh_canvas" height="280"></canvas>
+      <canvas id="sh_canvas_e" height="270" style="margin-top:12px;"></canvas>
+      <div class="readout" id="sh_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel shows the electron's wave function along the line joining the two protons, and beneath it the probability density. The lower panel gives the total energy of the molecule as the protons are brought together, for both combinations.</p>
+        <p>The whole of chemical bonding is in the difference between those two panels' red curves. Add the two atomic orbitals and the wave function is large in the middle, so the electron spends real time <em>between</em> the protons, attracting both. Subtract them and there is a node exactly at the midpoint — the electron is excluded from the one place where it could hold the nuclei together.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave it on <b>symmetric</b> and drag R inward from 0.40 nm. Watch the charge build up between the nuclei and the energy curve fall to its minimum at <b>0.106 nm</b>, which is the measured bond length of H&#8322;&#8314;, and <b>2.65 eV</b> below the separated atom. Then switch to <b>antisymmetric</b>: the density develops a node in the middle and the energy curve has no minimum anywhere — it just rises as the protons approach. Same two atoms, same electron, and one arrangement makes a molecule while the other cannot.</p>
+
+        <h3>Why sharing lowers the energy</h3>
+        <p>An electron confined to one atom is localised in a region about a Bohr radius across. Let it spread over two atoms and the region roughly doubles, which by the uncertainty principle reduces its momentum spread and therefore its kinetic energy. At the same time, sitting between two positive charges rather than beside one lowers its potential energy. Both effects push the same way, and together they beat the proton&ndash;proton repulsion over a range of separations. That range is the bond.</p>
+        <p>H&#8322;&#8314; is worth studying precisely because it has only one electron, so the calculation can be done essentially exactly. Adding the second electron to make H&#8322; roughly doubles the bond energy to 4.5 eV, and the exclusion principle permits it only because the two electrons take opposite spins — which is why the covalent bond is a <em>pair</em> of electrons, a fact chemistry takes as a starting point and quantum mechanics explains.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Writing &psi; as a sum of two atomic orbitals is an approximation — the LCAO method — and it gets the qualitative picture right while underestimating the bond energy noticeably. The true wave function is contracted toward the region between the nuclei more than a simple sum allows. Note also the antibonding state is not merely absent: it exists, it lies <em>above</em> the separated-atom energy, and populating it breaks bonds. That is what happens when a molecule absorbs enough light to dissociate.</p>
+      </div>
+    </div>
+
+    <!-- 3. rotation -->
+    <div class="card">
+      <h2>Rotational Energy Levels <span class="eqtag">Sec. 8.6, Examples 8.1&ndash;8.2</span></h2>
+      <p class="desc">A molecule is a dumbbell, and a rotating dumbbell has quantized angular momentum. The resulting spectrum is a comb of evenly spaced lines — and measuring the spacing measures the bond length.</p>
+      <div class="eq">E<sub>J</sub> = J(J+1)&#8463;&sup2;/2I, &nbsp; I = &mu;R&sup2;, &nbsp; &Delta;J = &plusmn;1</div>
+      <div class="controls">
+        <div class="ctrl"><label>Molecule</label>
+          <select id="rt_mol">
+            <option value="CO" selected>CO</option>
+            <option value="HCl">HCl</option>
+            <option value="HBr">HBr</option>
+            <option value="H2">H₂</option>
+            <option value="N2">N₂</option>
+            <option value="O2">O₂</option>
+          </select></div>
+        <div class="ctrl"><label>Rotational state J <span class="val" id="rt_j_val">1</span></label>
+          <input type="range" id="rt_j" min="0" max="7" step="1" value="1"></div>
+      </div>
+      <canvas id="rt_canvas" height="300"></canvas>
+      <canvas id="rt_canvas_spec" height="240" style="margin-top:12px;"></canvas>
+      <div class="readout" id="rt_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the ladder of rotational levels, which spread <em>apart</em> as J rises because the energy goes as J(J+1). The gaps are marked: from J&minus;1 to J the gap is 2JB, so successive gaps grow by a constant 2B. The lower panel is the absorption spectrum, where each line comes from one step up the ladder — and because the gaps grow by a constant amount, the lines come out evenly spaced.</p>
+        <p>The dashed gold line marks kT at room temperature, and it sits well above the first several levels. That is the key practical fact about rotation: at ordinary temperatures a gas is spread across many rotational states at once, which is why the spectrum shows a whole comb of lines rather than one.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>CO</b> at <b>J = 1</b> — Beiser's Example 8.1. The moment of inertia comes out at 1.46 &times; 10&#8315;&#8308;&#8310; kg m&sup2;, the energy at 4.8 &times; 10&#8315;&#8308; eV, and the molecule is turning at about 1.0 &times; 10&sup1;&sup2; rad/s. (Beiser's Example 8.1 prints 3.23 &times; 10&sup1;&sup1; for this last step, but both &radic;(2E/I) and L/I give 1.03 &times; 10&sup1;&sup2; from his own E and I &mdash; the printed figure is smaller by exactly &radic;10, which is what you get if the moment of inertia slips one decimal place.) Then read the J = 0 &rarr; 1 line frequency: about 1.15 &times; 10&sup1;&sup1; Hz, which is Example 8.2 — and running that backwards is exactly how CO's bond length of 0.113 nm was measured. Now switch to <b>H&#8322;</b>. Its reduced mass is fourteen times smaller, so its lines are spread out enormously by comparison. Light molecules rotate fast and have coarse rotational spectra; heavy ones have fine ones.</p>
+
+        <h3>Rotational spectroscopy as a ruler</h3>
+        <p>The chain of reasoning is short and completely rigid. Measure the line spacing, get B. From B get the moment of inertia I. From I, knowing the atomic masses, get R. No adjustable parameters enter anywhere, and the precision is extraordinary — bond lengths from microwave spectroscopy are among the most accurately known quantities in chemistry.</p>
+        <p>It works in astronomy too. The CO line at 115 GHz is one of the most important in radio astronomy, because molecular hydrogen is nearly invisible while the trace CO mixed in with it radiates brightly. Almost everything known about where molecular clouds are, and how fast they are moving, comes from watching this one rotational transition.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">A molecule must have a permanent electric dipole moment to absorb or emit this way, so H&#8322;, N&#8322; and O&#8322; — symmetric, with no dipole — have no rotational spectrum at all, and the curves shown for them here are what they <em>would</em> have. That is not a technicality: it is why the atmosphere's main constituents are transparent in the infrared while trace asymmetric molecules like CO&#8322; and H&#8322;O are not, and therefore why the greenhouse effect exists. Note also the molecule is treated as rigid; at high J, centrifugal stretching increases I slightly and the lines crowd together a little.</p>
+      </div>
+    </div>
+
+    <!-- 4. vibration -->
+    <div class="card">
+      <h2>Vibrational Energy Levels <span class="eqtag">Sec. 8.7, Example 8.3</span></h2>
+      <p class="desc">Near the bottom of the well the bond behaves like a spring, so the levels are those of a harmonic oscillator — evenly spaced, with a zero-point energy that never goes away. Higher up, the spring gets soft.</p>
+      <div class="eq">E<sub>v</sub> = (v + &frac12;)h&nu;&#8320;, &nbsp; &nu;&#8320; = (1/2&pi;)&radic;(k/&mu;)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Molecule</label>
+          <select id="vb_mol">
+            <option value="CO" selected>CO</option>
+            <option value="HCl">HCl</option>
+            <option value="HBr">HBr</option>
+            <option value="H2">H₂</option>
+            <option value="N2">N₂</option>
+            <option value="O2">O₂</option>
+          </select></div>
+        <div class="ctrl"><label>Vibrational state v <span class="val" id="vb_v_val">0</span></label>
+          <input type="range" id="vb_v" min="0" max="10" step="1" value="0"></div>
+      </div>
+      <canvas id="vb_canvas" height="320"></canvas>
+      <div class="readout" id="vb_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The same well as the first card, now with the harmonic approximation drawn over it as a dashed parabola, and the vibrational levels of each. The short grey ticks near the centre mark where the harmonic ladder would put each level — evenly spaced forever — while the teal lines are the real ones, which crowd together as they climb.</p>
+        <p>Near the bottom the two agree almost exactly, which is why the harmonic approximation is so useful. Higher up the real well flattens toward dissociation while the parabola keeps rising, and the levels converge to a limit rather than continuing indefinitely. A molecule cannot be vibrationally excited without bound: eventually it simply comes apart.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Work Example 8.3 with <b>CO</b>: the absorption at 6.42 &times; 10&sup1;&sup3; Hz gives a force constant of about <b>1860 N/m</b> — Beiser notes this is roughly 10 lb/in, a genuinely stiff spring — and a level spacing of <b>0.266 eV</b>. Compare that with kT at room temperature, 0.026 eV: the readout shows the ratio is about ten, which means vibrations are essentially <em>frozen out</em> at room temperature and nearly every molecule sits in v = 0. Contrast that with the rotational card, where kT spanned several levels. Now step v up to 10 and watch the gaps shrink measurably below h&nu;&#8320;.</p>
+
+        <h3>Why infrared spectroscopy identifies molecules</h3>
+        <p>The vibrational frequency depends on the force constant and the reduced mass, and both are characteristic of the particular bond rather than of the molecule as a whole. So a C=O group vibrates at much the same frequency whether it sits in a ketone, an ester or a protein, and a spectrum becomes a list of the functional groups present. Beiser gives the numbers: an &ndash;OH group at 1.1 &times; 10&sup1;&#8308; Hz, C&ndash;C at 3.3 &times; 10&sup1;&sup3;, C=C at 5.0 &times; 10&sup1;&sup3; — stiffer bonds vibrate faster, so the bond order can be read straight off the frequency.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The anharmonicity shown here matters in a way that goes beyond level spacing. In a strictly harmonic well the selection rule &Delta;v = &plusmn;1 is exact and no overtones exist; real anharmonicity weakly permits &Delta;v = &plusmn;2 and beyond, which is what produces the overtone bands that make near-infrared spectroscopy possible. Note also that this treats the molecule as a single oscillator; anything more complex than a diatomic has many modes at once, some of which are local to a functional group while others involve the whole molecule flexing.</p>
+      </div>
+    </div>
+
+    <!-- 5. vibration-rotation band -->
+    <div class="card">
+      <h2>The Vibration&ndash;Rotation Band <span class="eqtag">Sec. 8.7</span></h2>
+      <p class="desc">A molecule changing its vibrational state almost always changes its rotation at the same moment. The result is not one infrared line but two combs of them, with a conspicuous gap in the middle.</p>
+      <div class="eq">&Delta;v = &plusmn;1 <em>and</em> &Delta;J = &plusmn;1 &nbsp;&mdash;&nbsp; so every line sits at h&nu;&#8320; &plusmn; a rotational step</div>
+      <div class="controls">
+        <div class="ctrl"><label>Molecule</label>
+          <select id="vr_mol">
+            <option value="CO" selected>CO</option>
+            <option value="HCl">HCl</option>
+            <option value="HBr">HBr</option>
+            <option value="H2">H₂</option>
+            <option value="N2">N₂</option>
+            <option value="O2">O₂</option>
+          </select></div>
+        <div class="ctrl"><label>Temperature (K) <span class="val" id="vr_t_val">300</span></label>
+          <input type="range" id="vr_t" min="50" max="900" step="10" value="300"></div>
+      </div>
+      <canvas id="vr_canvas" height="300"></canvas>
+      <div class="readout" id="vr_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The infrared absorption band, plotted relative to the vibrational frequency at its centre. Lines to the right are the <b>R branch</b>, where the molecule gains a unit of rotation along with its vibrational quantum; those to the left are the <b>P branch</b>, where it loses one. The dashed line at the centre marks where a pure vibrational transition would sit — and there is nothing there, because &Delta;J = 0 is forbidden.</p>
+        <p>The heights follow the thermal population of each starting level, which is why the band has its characteristic double-humped shape: low J states are few because there are few ways to orient them, high J states are few because they cost energy, and the peak sits where the two effects balance.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>HCl</b> and drag the temperature from <b>50 K</b> up to <b>900 K</b>. The band spreads dramatically as higher rotational levels become populated, and the two humps move outward — which means an infrared band shape is a thermometer. Astronomers and combustion engineers both use it that way, reading gas temperatures from the envelope of a band in a spectrum. Then compare the readout's ratio of h&nu;&#8320; to 2B: for CO the vibrational quantum is some five hundred times the rotational spacing, which is exactly why the fine comb of rotational lines sits neatly around a single vibrational frequency rather than overlapping with the next one.</p>
+
+        <h3>The missing centre line</h3>
+        <p>The gap at the band centre is worth dwelling on. It is there because the photon carries one unit of angular momentum and must dispose of it somewhere — the molecule's rotation has to change by exactly one unit, up or down. A transition that changed the vibration while leaving the rotation alone would leave the books unbalanced, so it does not occur. The same conservation argument produced &Delta;&ell; = &plusmn;1 for atoms in Chapter 7; here it is producing a visible hole in the middle of a spectrum.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Real bands are not quite symmetric about the centre. The bond is slightly longer in the excited vibrational state, so B is slightly smaller there, and the R branch lines gradually crowd together while the P branch spreads out — at high enough J the R branch can even turn back on itself, forming a band head. That asymmetry is not a defect; fitting it gives the vibration&ndash;rotation coupling constant and, from that, how the bond length changes with vibrational state.</p>
+      </div>
+    </div>
+
+    <!-- 6. energy scales -->
+    <div class="card">
+      <h2>Three Energy Scales, Four Decades Apart <span class="eqtag">Sec. 8.8</span></h2>
+      <p class="desc">Electronic, vibrational and rotational energies are so different in size that each lives in its own part of the spectrum — and that separation is what makes molecular spectroscopy tractable at all.</p>
+      <div class="eq">E<sub>electronic</sub> &Gt; E<sub>vibrational</sub> &Gt; E<sub>rotational</sub></div>
+      <div class="controls">
+        <div class="ctrl"><label>Molecule</label>
+          <select id="sc_mol">
+            <option value="CO" selected>CO</option>
+            <option value="HCl">HCl</option>
+            <option value="HBr">HBr</option>
+            <option value="H2">H₂</option>
+            <option value="N2">N₂</option>
+            <option value="O2">O₂</option>
+          </select></div>
+      </div>
+      <canvas id="sc_canvas" height="270"></canvas>
+      <div class="readout" id="sc_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The three characteristic energies on one logarithmic axis, with the regions of the electromagnetic spectrum they fall into marked underneath, and kT at room temperature for comparison. The spread is enormous: rotational quanta are microwave-sized, vibrational quanta infrared, electronic transitions visible or ultraviolet.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Note where kT at 300 K lands: comfortably <em>above</em> the rotational quantum and well <em>below</em> the vibrational one. That single fact organises an enormous amount of everyday chemistry. Rotations are fully excited at room temperature and contribute to a gas's heat capacity; vibrations are frozen and do not — which is why the measured heat capacity of air corresponds to a molecule that can translate and rotate but not vibrate, a result that badly puzzled classical physics. Then switch between <b>H&#8322;</b> and <b>O&#8322;</b> and watch the rotational quantum shift by more than a decade, because it depends so strongly on the reduced mass.</p>
+
+        <h3>Why the separation is useful</h3>
+        <p>Because the scales are so far apart, a molecule's motions can be treated almost independently: the electrons rearrange so much faster than the nuclei move that the nuclei can be regarded as fixed while solving for the electrons, and the resulting electronic energy then serves as the potential well in which the nuclei vibrate. That is the Born&ndash;Oppenheimer approximation, and essentially every molecular calculation rests on it — including the potential-energy curve in the first card of this chapter, which is exactly such an electronic energy plotted against nuclear separation.</p>
+        <p>It also means each kind of transition is studied with its own instrument and answers its own question. Microwave spectroscopy gives bond lengths, infrared gives bond strengths and identifies functional groups, and visible or ultraviolet absorption probes the electrons. A single electronic transition carries vibrational structure inside it, and each vibrational component carries rotational structure inside that — which is why a molecular band spectrum looks so much richer than an atomic line spectrum.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The separation of scales is excellent but not perfect, and where it fails the consequences are interesting rather than merely inconvenient. When two electronic states approach each other in energy, nuclear and electronic motion stop being separable, and the Born&ndash;Oppenheimer approximation breaks down — which is exactly what happens at the conical intersections that let a molecule convert absorbed light into heat in femtoseconds. That mechanism is how your DNA survives ultraviolet exposure, and how the retinal in your eye responds to a photon, so the cases where this chapter's central approximation fails are among the most consequential in biology.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -1878,5 +2110,6 @@
 <script src="ch05.js"></script>
 <script src="ch06.js"></script>
 <script src="ch07.js"></script>
+<script src="ch08.js"></script>
 </body>
 </html>
