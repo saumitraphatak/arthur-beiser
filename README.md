@@ -52,6 +52,14 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - The harmonic oscillator (zero-point energy, quantum vs classical density)
 - Superposition — why stationary states are stationary, and why atoms radiate
 
+## Chapter 6 — Quantum Theory of the Hydrogen Atom
+- Three dimensions, three quantum numbers (every state, and where each restriction comes from)
+- Where the electron actually is (radial probability, most probable radius vs ⟨r⟩)
+- Orbital shapes (|ψ|² density slices computed from the wave functions)
+- Angular momentum cannot point anywhere (|L| = √(ℓ(ℓ+1))ℏ vs L_z = m_ℓℏ)
+- Selection rules (Δℓ = ±1 and why it is angular-momentum conservation)
+- The Zeeman effect (normal splitting, Example 6.4)
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 
 ## Layout
@@ -63,6 +71,7 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch03.js
     ch04.js
     ch05.js
+    ch06.js
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

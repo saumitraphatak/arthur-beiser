@@ -202,7 +202,7 @@
       <button class="chap-btn" data-chapter="ch3" role="tab" aria-selected="false"><span class="n">3</span>Wave Properties</button>
       <button class="chap-btn" data-chapter="ch4" role="tab" aria-selected="false"><span class="n">4</span>Atomic Structure</button>
       <button class="chap-btn" data-chapter="ch5" role="tab" aria-selected="false"><span class="n">5</span>Quantum Mechanics</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">6</span>Hydrogen Atom</span>
+      <button class="chap-btn" data-chapter="ch6" role="tab" aria-selected="false"><span class="n">6</span>Hydrogen Atom</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">7</span>Many-Electron Atoms</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">8</span>Molecules</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">9</span>Statistical Mechanics</span>
@@ -1481,6 +1481,202 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 6 ===================== -->
+  <section class="chapter" id="ch6">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Six</div>
+      <h1>Quantum Theory of the Hydrogen Atom</h1>
+      <p>Solve Schr&ouml;dinger's equation for an electron in a Coulomb field and three quantum numbers appear — one for each dimension of space. Bohr's energies come back unchanged, but the orbits are gone, replaced by probability clouds with shapes, and by rules about which transitions may occur.</p>
+    </div>
+
+    <!-- 1. quantum numbers -->
+    <div class="card">
+      <h2>Three Dimensions, Three Quantum Numbers <span class="eqtag">Sec. 6.3, Eq. 6.17</span></h2>
+      <p class="desc">Nobody postulates these. Separating the equation in spherical coordinates produces three ordinary differential equations, and each one turns out to have acceptable solutions only for particular integer values.</p>
+      <div class="eq">n = 1, 2, 3, &hellip; &nbsp;&nbsp; &ell; = 0, 1, &hellip;, n&minus;1 &nbsp;&nbsp; m<sub>&ell;</sub> = 0, &plusmn;1, &hellip;, &plusmn;&ell;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Show shells up to n <span class="val" id="qn_n_val">4</span></label>
+          <input type="range" id="qn_n" min="1" max="5" step="1" value="4"></div>
+      </div>
+      <canvas id="qn_canvas" height="330"></canvas>
+      <div class="readout" id="qn_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Every quantum state of hydrogen, up to the shell you select. Each row is a value of n, split into subshells by &ell;, and each dot is one allowed (n, &ell;, m<sub>&ell;</sub>) combination laid out by its m<sub>&ell;</sub> value. Count the dots in any row and you get n&sup2;.</p>
+        <p>The nesting is the point. &ell; cannot reach n, and |m<sub>&ell;</sub>| cannot exceed &ell; — so the three numbers are not independent knobs but a strict hierarchy, and each restriction comes from a different requirement on the wave function.</p>
+
+        <h3>Where each one comes from</h3>
+        <p>m<sub>&ell;</sub> is the easiest to see. The azimuthal equation gives &Phi; &prop; e<sup>im<sub>&ell;</sub>&phi;</sup>, and since &phi; and &phi; + 2&pi; label the same physical direction, the wave function must come back to itself after a full turn. That happens only if m<sub>&ell;</sub> is an integer. It is the same closure argument as de Broglie's standing wave in Chapter 4, now falling out of the mathematics rather than being supplied.</p>
+        <p>&ell; comes from the polar equation, which has well-behaved solutions only when &ell; is an integer at least as large as |m<sub>&ell;</sub>|. And n comes from the radial equation, which is solvable only when the energy takes one of the values E<sub>n</sub> = &minus;13.6 eV/n&sup2; — the same formula Bohr obtained, now derived rather than assumed — with the further condition that n exceed &ell;.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the slider to <b>n = 3</b> and count: one s state, three p states, five d states, nine in total. Then note what the readout says about energy — every one of those nine has exactly the same energy, &minus;1.51 eV, because E depends on n alone. That degeneracy is peculiar to the pure 1/r Coulomb potential; in any many-electron atom the s, p and d subshells separate in energy, which is what builds the periodic table in Chapter 7.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This picture is incomplete in a way that matters: the electron also has spin, which doubles every count here, so the n = 1 shell holds two electrons rather than one. Spin does not come out of Schr&ouml;dinger's equation at all — it has to be added, and only emerges naturally from Dirac's relativistic treatment. Chapter 7 introduces it, and without it the periodic table cannot be explained.</p>
+      </div>
+    </div>
+
+    <!-- 2. radial probability -->
+    <div class="card">
+      <h2>Where the Electron Actually Is <span class="eqtag">Sec. 6.7, Examples 6.2&ndash;6.3</span></h2>
+      <p class="desc">The quantity to look at is not |R|&sup2; but r&sup2;|R|&sup2; — because there is more room at larger radii, and the electron's chance of being at a given distance has to account for the size of the shell it would be found in.</p>
+      <div class="eq">P(r) dr = r&sup2;|R<sub>n&ell;</sub>(r)|&sup2; dr &nbsp;&nbsp;&mdash;&nbsp;&nbsp; the probability of lying between r and r + dr</div>
+      <div class="controls">
+        <div class="ctrl"><label>Principal number n <span class="val" id="rd_n_val">1</span></label>
+          <input type="range" id="rd_n" min="1" max="4" step="1" value="1"></div>
+        <div class="ctrl"><label>Orbital number &ell; <span class="val" id="rd_l_val">0  (s)</span></label>
+          <input type="range" id="rd_l" min="0" max="3" step="1" value="0"></div>
+      </div>
+      <canvas id="rd_canvas" height="250"></canvas>
+      <canvas id="rd_canvas_p" height="270" style="margin-top:12px;"></canvas>
+      <div class="readout" id="rd_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the radial wave function R<sub>n&ell;</sub> itself, with its zero crossings marked — there are exactly n &minus; &ell; &minus; 1 of them. The lower panel is the radial probability density r&sup2;|R|&sup2;, which is what you would actually measure, with the most probable radius, the average radius &lang;r&rang;, and the radius Bohr's model would have predicted all marked.</p>
+        <p>The factor of r&sup2; changes the answer completely. For the ground state |R|&sup2; is largest at r = 0, right at the nucleus — yet P(r) vanishes there, because a sphere of zero radius has no surface to be found on. The competition between a wave function that falls off and a shell volume that grows is what puts the peak where it is.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start at <b>1s</b>. The most probable radius comes out at exactly <b>1 a&#8320;</b> — the Bohr radius, recovered from a theory with no orbits in it. That is a genuinely striking result, and it is why the Bohr model works as well as it does. But look at &lang;r&rang;: it is 1.5 a&#8320;, not 1, because the distribution has a long tail outward. The most probable value and the average are different things, and Bohr's model had no way to distinguish them. Then check Example 6.3 in the readout: a 1s electron is about <b>1.47 times</b> more likely to be found near a&#8320; than near a&#8320;/2. Now walk out to <b>2s</b> and <b>3s</b> and watch extra humps appear, separated by radii where the electron is never found; switch to <b>2p</b> and <b>3d</b> and the humps vanish again, since &ell; = n &minus; 1 states have no radial nodes at all — and it is exactly those states whose single peak sits at n&sup2;a&#8320;, right where Bohr put it.</p>
+
+        <h3>What replaced the orbit</h3>
+        <p>Bohr's electron went round a circle of definite radius. This electron has a probability of being anywhere, with a distribution that happens to peak near Bohr's radius for the circular-orbit states and looks nothing like it otherwise. The 2s electron, for instance, spends time in two separate shells with a spherical surface between them where it is never located — and asking how it crosses that surface is a question the theory declines to answer, because it has no trajectory to describe.</p>
+        <p>Beiser's Example 6.2 makes a related point: &lang;1/r&rang; for a 1s electron is exactly 1/a&#8320;, even though &lang;r&rang; is 1.5a&#8320;. Averages of different functions of r are simply different numbers, and the one that matters depends on what you are computing — &lang;1/r&rang; is the one that gives the potential energy, which is why the energy comes out exactly as Bohr had it.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The number of radial nodes is n &minus; &ell; &minus; 1 and the number of angular nodes is &ell;, so the total is always n &minus; 1 regardless of how it is split — a pattern the next card makes visible. Note also that these curves extend forever: the probability of finding a ground-state electron beyond 10 a&#8320; is tiny but not zero, so the atom has no sharp edge. Every atomic radius you will ever see quoted is a convention about where to stop counting.</p>
+      </div>
+    </div>
+
+    <!-- 3. orbital shapes -->
+    <div class="card">
+      <h2>Orbital Shapes <span class="eqtag">Sec. 6.7</span></h2>
+      <p class="desc">A slice through the atom, with darkness showing where the electron is likely to be. These are the shapes chemistry is built on, and every one is computed here from the wave functions rather than drawn from memory.</p>
+      <div class="eq">|&psi;<sub>n&ell;m</sub>|&sup2; = |R<sub>n&ell;</sub>(r)|&sup2; &middot; |&Theta;<sub>&ell;m</sub>(&theta;)|&sup2; &middot; |&Phi;<sub>m</sub>(&phi;)|&sup2;, &nbsp; and the last factor is constant</div>
+      <div class="controls">
+        <div class="ctrl"><label>n <span class="val" id="os_n_val">3</span></label>
+          <input type="range" id="os_n" min="1" max="4" step="1" value="3"></div>
+        <div class="ctrl"><label>&ell; <span class="val" id="os_l_val">2 (d)</span></label>
+          <input type="range" id="os_l" min="0" max="3" step="1" value="2"></div>
+        <div class="ctrl"><label>m<sub>&ell;</sub> <span class="val" id="os_m_val">0</span></label>
+          <input type="range" id="os_m" min="-3" max="3" step="1" value="0"></div>
+      </div>
+      <canvas id="os_canvas" height="340"></canvas>
+      <div class="readout" id="os_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A plane cut through the atom containing the z axis, shaded by |&psi;|&sup2;. Because the &phi;-dependence is a pure phase, |&psi;|&sup2; does not depend on &phi; at all — so the real orbital is this picture rotated about the dashed vertical axis. The shading uses a mild gamma so that faint outer lobes remain visible; brightness is not linear in probability.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start with <b>1s</b>: a featureless ball, the only orbital with no nodes of any kind. Go to <b>2p, m = 0</b> and you get the familiar dumbbell along z, with a flat nodal plane through the nucleus where the electron is never found. Switch that same orbital to <b>m = &plusmn;1</b> and the shape becomes a ring around the z axis instead — same energy, same &ell;, different orientation of the angular momentum. Then try <b>3d, m = 0</b> for the distinctive two-lobes-plus-collar shape, and <b>3s</b> to see two spherical nodal shells nested inside each other. Throughout, check the node counts in the readout: radial and angular nodes trade off against each other, but the total is always n &minus; 1.</p>
+
+        <h3>Why these shapes matter</h3>
+        <p>The energy of a hydrogen orbital depends only on n, so shape costs nothing here. In every other atom it costs a great deal. An electron in a p orbital is distributed differently from one in an s orbital, so it experiences a different average shielding from the other electrons, and the subshells split apart in energy — which is what makes the periodic table have the shape it does.</p>
+        <p>Shape also determines how atoms bond. A directional p orbital can overlap strongly with a neighbour in one direction and not at all at right angles to it, which is where molecular geometry comes from: bond angles are angular nodes made visible at the scale of a molecule.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">These are the m<sub>&ell;</sub> eigenstates, which are complex functions and are cylindrically symmetric about z. The p<sub>x</sub> and p<sub>y</sub> orbitals of chemistry textbooks are real combinations of the m = +1 and m = &minus;1 states here — equally valid solutions, since the two are degenerate, and more convenient when the interesting axis is set by a bond rather than by a magnetic field. Both descriptions are correct; which is useful depends on what breaks the symmetry. Note also that the picture is a slice, not a surface: the familiar lobed drawings in chemistry books are contours enclosing some chosen fraction of the probability, and the choice of fraction is arbitrary.</p>
+      </div>
+    </div>
+
+    <!-- 4. angular momentum -->
+    <div class="card">
+      <h2>Angular Momentum Cannot Point Anywhere <span class="eqtag">Sec. 6.5&ndash;6.6</span></h2>
+      <p class="desc">Both the magnitude and the direction of the electron's angular momentum are quantized — and the two conditions are subtly incompatible, in a way that rules out the vector ever lining up with the field.</p>
+      <div class="eq">|L| = &radic;(&ell;(&ell;+1)) &#8463; &nbsp;&nbsp; L<sub>z</sub> = m<sub>&ell;</sub>&#8463;, &nbsp; m<sub>&ell;</sub> = 0, &plusmn;1, &hellip;, &plusmn;&ell;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Orbital number &ell; <span class="val" id="am_l_val">2</span></label>
+          <input type="range" id="am_l" min="0" max="4" step="1" value="2"></div>
+        <div class="ctrl"><label>m<sub>&ell;</sub> <span class="val" id="am_m_val">1</span></label>
+          <input type="range" id="am_m" min="-4" max="4" step="1" value="1"></div>
+      </div>
+      <canvas id="am_canvas" height="320"></canvas>
+      <div class="readout" id="am_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The angular momentum vector drawn at every orientation the rules permit, with the selected one picked out in red. The dashed horizontal lines are the allowed values of L<sub>z</sub>, one for each m<sub>&ell;</sub>. The ellipse around the selected vector is the cone it is understood to lie on: with L<sub>z</sub> fixed, the other two components are completely undetermined, so the vector has a definite length and a definite z-projection and no definite direction.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>&ell; = 2</b>. The magnitude is &radic;6 &#8463; = 2.449&#8463;, but the largest available L<sub>z</sub> is only 2&#8463;. The vector cannot be made to lie along z, even at its best — the closest it manages is 35.3&deg; away. That is not an approximation or a limitation of measurement; it is what the two quantization conditions jointly require. Now raise &ell; and watch the ratio L<sub>z,max</sub>/|L| = &ell;/&radic;(&ell;(&ell;+1)) creep toward 1 without ever arriving: 0.707 at &ell; = 1, 0.816 at &ell; = 2, 0.894 at &ell; = 4. Large angular momenta behave more classically, exactly as the correspondence principle demands.</p>
+
+        <h3>Why the vector cannot align</h3>
+        <p>If L could point exactly along z then L<sub>x</sub> and L<sub>y</sub> would both be zero — all three components known simultaneously. The uncertainty principle forbids that for angular momentum just as it does for position and momentum: you may know the magnitude and one component, and knowing one component precisely leaves the other two entirely open. The gap between &ell;&#8463; and &radic;(&ell;(&ell;+1))&#8463; is exactly the room those unknown components need.</p>
+        <p>The z direction is not special in itself. It becomes special only when something picks it out — a magnetic field, most usually, which is why m<sub>&ell;</sub> is called the magnetic quantum number and why its effects are invisible until you apply a field. That is the next card.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">For &ell; = 0 the magnitude is zero and the whole picture degenerates: an s electron has no orbital angular momentum at all, which is another thing Bohr's model got wrong, since it assigned the ground state one unit. Note also the language of "precessing around the cone" is a helpful image but not a literal description — nothing is going round. The cone simply expresses that L<sub>x</sub> and L<sub>y</sub> have no values until they are measured.</p>
+      </div>
+    </div>
+
+    <!-- 5. selection rules -->
+    <div class="card">
+      <h2>Selection Rules <span class="eqtag">Sec. 6.9, Eq. 6.35</span></h2>
+      <p class="desc">Energy conservation permits a transition between any two levels. Most of them never happen, because the integral that governs the transition rate vanishes.</p>
+      <div class="eq">&Delta;&ell; = &plusmn;1, &nbsp; &Delta;m<sub>&ell;</sub> = 0 or &plusmn;1</div>
+      <div class="controls">
+        <div class="ctrl"><label>Starting n <span class="val" id="sr_n_val">4</span></label>
+          <input type="range" id="sr_n" min="2" max="5" step="1" value="4"></div>
+        <div class="ctrl"><label>Starting &ell; <span class="val" id="sr_l_val">2 (d)</span></label>
+          <input type="range" id="sr_l" min="0" max="3" step="1" value="2"></div>
+      </div>
+      <canvas id="sr_canvas" height="340"></canvas>
+      <div class="readout" id="sr_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Hydrogen's levels arranged by &ell; across the page and by n up it. Teal arrows are the downward transitions the selection rule allows from the state you have chosen; the crossed-out dashed arrow is one it forbids, even though the energy difference is perfectly ordinary and a photon of exactly that energy would be a perfectly ordinary photon.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start from <b>4d</b> (n = 4, &ell; = 2). The electron may drop to 3p or 2p — both have &Delta;&ell; = &minus;1 — or climb sideways to 4f, but it cannot go to 3d, 2s or 1s. The 1s ground state is two steps away in &ell;, so a 4d electron cannot reach the ground state in a single photon no matter how much energy the jump would release; it has to go through a p state. Now try <b>starting from an s state</b> and notice the only destinations are p states. This is what organises spectra into series of sharp, principal, diffuse and fundamental lines — those old names are where the letters s, p, d and f come from.</p>
+
+        <h3>Where the rule comes from</h3>
+        <p>The rate of a radiative transition is governed by an integral of the form &int;&psi;*<sub>final</sub> &middot; r &middot; &psi;<sub>initial</sub> dV, which measures how strongly the oscillating charge distribution of the superposition — the thing from the last card of Chapter 5 — behaves like a dipole antenna. When the two wave functions have angular parts whose product with r integrates to zero over all angles, the atom has no oscillating dipole moment at that frequency and simply does not radiate.</p>
+        <p>The physical content is angular-momentum conservation. A photon carries one unit of angular momentum, so an atom emitting one must change its own by exactly one unit to balance the books. &Delta;&ell; = &plusmn;1 is not a mysterious quantum restriction; it is a conservation law wearing different clothes.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">"Forbidden" means forbidden for single-photon electric dipole radiation, which is by far the fastest channel — not impossible. Atoms in states with no allowed downward transition are <b>metastable</b> and can survive for seconds rather than the usual nanoseconds, eventually decaying by much weaker mechanisms such as two-photon emission or magnetic dipole radiation. Those slow channels matter enormously in practice: they are how lasers maintain population inversions, and forbidden lines from metastable states in thin nebular gas are prominent in astronomical spectra precisely because nothing collides with the atoms long enough to knock them out of it.</p>
+      </div>
+    </div>
+
+    <!-- 6. Zeeman -->
+    <div class="card">
+      <h2>The Zeeman Effect <span class="eqtag">Sec. 6.10, Example 6.4</span></h2>
+      <p class="desc">An orbiting electron is a current loop, so it has a magnetic moment. Put the atom in a field and the orientations that were degenerate acquire different energies — making m<sub>&ell;</sub> visible for the first time.</p>
+      <div class="eq">U<sub>m</sub> = m<sub>&ell;</sub> &mu;<sub>B</sub> B, &nbsp; &mu;<sub>B</sub> = e&#8463;/2m = 9.274 &times; 10&#8315;&sup2;&#8308; J/T</div>
+      <div class="controls">
+        <div class="ctrl"><label>Magnetic field B (T) <span class="val" id="ze_B_val">0.30</span></label>
+          <input type="range" id="ze_B" min="0.05" max="5" step="0.05" value="0.3"></div>
+        <div class="ctrl"><label>Spectral line &lambda; (nm) <span class="val" id="ze_lam_val">450</span></label>
+          <input type="range" id="ze_lam" min="380" max="700" step="1" value="450"></div>
+        <div class="ctrl"><label>Upper-state &ell; <span class="val" id="ze_l_val">1</span></label>
+          <input type="range" id="ze_l" min="1" max="3" step="1" value="1"></div>
+      </div>
+      <canvas id="ze_canvas" height="300"></canvas>
+      <canvas id="ze_canvas_line" height="190" style="margin-top:12px;"></canvas>
+      <div class="readout" id="ze_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel shows what the field does to the levels: the upper state splits into 2&ell; + 1 evenly spaced sublevels, one per value of m<sub>&ell;</sub>, while the lower s state does not split at all because it has no orbital angular momentum to orient. The arrows are the three transitions the &Delta;m<sub>&ell;</sub> rule permits. The lower panel shows the result a spectrometer records: where there was one line, there are now three.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>B = 0.300 T</b> and <b>&lambda; = 450 nm</b> — Beiser's Example 6.4. The components come out about <b>0.0028 nm</b> apart, which is why the Zeeman effect needs a good spectrometer: the splitting is roughly six parts in a million of the wavelength. Crank the field to <b>5 T</b>, about what a hospital MRI magnet produces, and it grows proportionally but is still under 0.05 nm. Then raise the upper state's <b>&ell;</b> and watch the level diagram sprout more sublevels while the spectrum stubbornly stays three lines — because the sublevel spacing is the same in the upper and lower states, so all the &Delta;m<sub>&ell;</sub> = 0 transitions land on top of each other, and likewise for &plusmn;1.</p>
+
+        <h3>Why this was such a strong test</h3>
+        <p>The splitting is &mu;<sub>B</sub>B with &mu;<sub>B</sub> = e&#8463;/2m — built entirely from constants already known from other experiments, with nothing adjustable. Measuring the splitting therefore tests the theory quantitatively rather than qualitatively, and it confirms something no classical model predicts at all: that an atom's angular momentum has a discrete set of allowed orientations relative to a field. Before the field is applied those orientations are indistinguishable, which is why m<sub>&ell;</sub> seems like idle bookkeeping until you switch on a magnet.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This is the <b>normal</b> Zeeman effect, and it is the exception rather than the rule. Most lines split into more components than three, with spacings that are not simple multiples of &mu;<sub>B</sub>B — the anomalous Zeeman effect, which was a serious embarrassment for years. The resolution is electron spin, which carries its own magnetic moment with an anomalous factor of very nearly 2, so the total moment depends on how spin and orbital angular momentum combine. The normal effect appears only in the special cases where the spins happen to cancel. Chapter 7 takes this up, and it is the route by which spin was discovered.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -1492,5 +1688,6 @@
 <script src="ch03.js"></script>
 <script src="ch04.js"></script>
 <script src="ch05.js"></script>
+<script src="ch06.js"></script>
 </body>
 </html>
