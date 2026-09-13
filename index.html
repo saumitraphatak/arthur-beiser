@@ -3,129 +3,231 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23a4342c%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2219%22 font-family=%22Georgia,serif%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E%CE%A8%3C/text%3E%3C/svg%3E">
 <title>Concepts of Modern Physics — Interactive Companion</title>
 <style>
   :root{
-    --bg:#f7f5f0; --panel:#ffffff; --ink:#1c1d20; --sub:#5a5d63;
-    --accent:#a4342c; --accent2:#1f6f78; --line:#e1ddd3; --grid:#e7e4dc;
-    --code:#f1efe8; --plot-bg:#fffdf8; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.08);
+    --bg:#f6f4ef; --panel:#ffffff; --ink:#14161a; --body:#2f3238; --sub:#6b6f76;
+    --accent:#a4342c; --accent2:#1f6f78; --accent3:#8a6d1f;
+    --line:#e3ded3; --line2:#efebe2; --grid:#e7e4dc;
+    --code:#f2efe7; --plot-bg:#fffdf8;
+    --shadow-sm: 0 1px 2px rgba(20,22,26,.05), 0 1px 3px rgba(20,22,26,.06);
+    --shadow-md: 0 2px 4px rgba(20,22,26,.04), 0 8px 24px rgba(20,22,26,.07);
+    --serif:'Iowan Old Style','Palatino Linotype','Georgia',serif;
+    --sans:'Helvetica Neue',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+    --nav-h:58px;
   }
   *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 18px);}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation:none!important; transition:none!important;} }
   body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family: 'Georgia', 'Iowan Old Style', serif;
-    line-height:1.5;
+    margin:0; background:var(--bg); color:var(--body);
+    font-family:var(--serif); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
   }
-  .topbar{
-    position:sticky; top:0; z-index:50;
-    background:var(--panel); border-bottom:1px solid var(--line);
-    padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:10px;
-  }
-  .brand{font-size:1.15rem; font-weight:700; letter-spacing:.2px;}
-  .brand small{display:block; font-family:'Helvetica Neue',Arial,sans-serif; font-weight:400; font-size:.72rem; color:var(--sub); letter-spacing:.5px; text-transform:uppercase; margin-top:2px;}
-  .tabs{display:flex; gap:8px; font-family:'Helvetica Neue',Arial,sans-serif;}
-  .tab-btn{
-    padding:9px 18px; border-radius:999px; border:1px solid var(--line); background:var(--panel);
-    color:var(--sub); font-size:.9rem; cursor:pointer; font-weight:600; transition:.15s;
-  }
-  .tab-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
-  .tab-btn:not(.active):hover{ border-color:var(--accent); color:var(--accent); }
 
-  main{max-width:980px; margin:0 auto; padding:28px 20px 80px;}
+  /* ---------- masthead + chapter nav ---------- */
+  .masthead{
+    position:sticky; top:0; z-index:60;
+    background:rgba(255,255,255,.94); backdrop-filter:saturate(180%) blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .masthead-inner{
+    max-width:1320px; margin:0 auto; padding:0 22px;
+    height:var(--nav-h); display:flex; align-items:center; gap:22px;
+  }
+  .brand{ flex:none; line-height:1.15; }
+  .brand b{ font-family:var(--serif); font-size:1.02rem; font-weight:700; color:var(--ink); letter-spacing:.1px; display:block;}
+  .brand span{ font-family:var(--sans); font-size:.63rem; font-weight:600; color:var(--sub);
+    letter-spacing:.9px; text-transform:uppercase; }
+  .chapnav{
+    display:flex; gap:5px; overflow-x:auto; scrollbar-width:none;
+    -ms-overflow-style:none; padding:9px 2px; margin-left:auto;
+  }
+  .chapnav::-webkit-scrollbar{ display:none; }
+  .chap-btn{
+    flex:none; display:inline-flex; align-items:baseline; gap:6px;
+    padding:6px 13px; border-radius:999px; border:1px solid transparent; background:transparent;
+    color:var(--sub); font-family:var(--sans); font-size:.8rem; font-weight:600;
+    cursor:pointer; white-space:nowrap; transition:.16s;
+  }
+  .chap-btn .n{ font-size:.68rem; font-weight:700; opacity:.62; font-variant-numeric:tabular-nums; }
+  .chap-btn:hover{ background:var(--code); color:var(--ink); }
+  .chap-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .chap-btn.active .n{ opacity:.72; }
+  .chap-btn.soon{ opacity:.36; cursor:default; font-weight:500; }
+  .chap-btn.soon:hover{ background:transparent; color:var(--sub); }
+
+  /* ---------- page layout ---------- */
+  .shell{ max-width:1320px; margin:0 auto; padding:0 22px;
+    display:grid; grid-template-columns:214px minmax(0,1fr); gap:38px; align-items:start; }
+  .sidebar{ position:sticky; top:calc(var(--nav-h) + 22px); padding:30px 0 40px; }
+  .sidebar h4{
+    font-family:var(--sans); font-size:.62rem; font-weight:700; letter-spacing:1px;
+    text-transform:uppercase; color:var(--sub); margin:0 0 11px; padding-left:11px;
+  }
+  #module-index{ display:flex; flex-direction:column; gap:1px; border-left:2px solid var(--line); }
+  #module-index a{
+    display:flex; gap:9px; align-items:baseline;
+    padding:6px 11px; margin-left:-2px; border-left:2px solid transparent;
+    font-family:var(--sans); font-size:.78rem; line-height:1.34; color:var(--sub);
+    text-decoration:none; transition:.14s;
+  }
+  #module-index a:hover{ color:var(--ink); background:var(--line2); }
+  #module-index a.current{ color:var(--accent); border-left-color:var(--accent); font-weight:600; }
+  .mi-num{ font-size:.64rem; font-weight:700; opacity:.55; font-variant-numeric:tabular-nums; flex:none; }
+  main{ min-width:0; padding:30px 0 90px; max-width:900px; }
+
+  /* ---------- chapter head ---------- */
   .chapter{display:none;}
-  .chapter.active{display:block;}
-  .chapter-head{margin-bottom:28px;}
-  .chapter-head h1{font-size:1.9rem; margin:0 0 6px;}
-  .chapter-head p{color:var(--sub); font-family:'Helvetica Neue',Arial,sans-serif; font-size:.95rem; max-width:680px;}
+  .chapter.active{display:block; animation:fade .22s ease-out;}
+  @keyframes fade{ from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:none;} }
+  .chapter-head{ margin:0 0 34px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+  .chapter-head .kicker{
+    font-family:var(--sans); font-size:.66rem; font-weight:700; letter-spacing:1.3px;
+    text-transform:uppercase; color:var(--accent); margin-bottom:9px;
+  }
+  .chapter-head h1{ font-size:2.3rem; line-height:1.14; margin:0 0 12px; color:var(--ink); letter-spacing:-.4px; font-weight:700;}
+  .chapter-head p{ color:var(--sub); font-family:var(--sans); font-size:.95rem; line-height:1.6; max-width:660px; margin:0;}
 
+  /* ---------- cards ---------- */
   .card{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px;
-    padding:22px 24px; margin-bottom:26px; box-shadow:var(--shadow);
+    background:var(--panel); border:1px solid var(--line); border-radius:15px;
+    padding:26px 28px; margin-bottom:30px; box-shadow:var(--shadow-sm);
+    scroll-margin-top:calc(var(--nav-h) + 20px);
   }
-  .card h2{
-    font-size:1.15rem; margin:0 0 4px; display:flex; align-items:baseline; gap:10px;
-  }
+  .card h2{ font-size:1.24rem; line-height:1.3; margin:0 0 5px; color:var(--ink);
+    display:flex; align-items:baseline; gap:11px; flex-wrap:wrap; letter-spacing:-.2px;}
   .card h2 .eqtag{
-    font-family:'Helvetica Neue',Arial,sans-serif; font-size:.68rem; font-weight:700;
-    color:var(--accent2); background:#e9f2f2; padding:2px 8px; border-radius:6px; letter-spacing:.3px;
+    font-family:var(--sans); font-size:.66rem; font-weight:700; color:var(--accent2);
+    background:#e9f2f2; padding:3px 9px; border-radius:6px; letter-spacing:.3px; white-space:nowrap;
   }
-  .card p.desc{ color:var(--sub); font-size:.92rem; margin:4px 0 16px; font-family:'Helvetica Neue',Arial,sans-serif;}
-  .eq{ font-family:'Cambria Math','Georgia',serif; font-style:italic; background:var(--code); padding:10px 14px; border-radius:8px; font-size:.95rem; margin:8px 0 16px; overflow-x:auto;}
+  .card p.desc{ color:var(--sub); font-size:.93rem; line-height:1.6; margin:6px 0 17px; font-family:var(--sans); max-width:72ch;}
+  .eq{ font-family:'Cambria Math','Georgia',serif; font-style:italic; background:var(--code);
+    padding:12px 16px; border-radius:9px; font-size:.96rem; margin:10px 0 18px; overflow-x:auto;
+    color:var(--ink); border:1px solid var(--line2); }
 
-  .controls{
-    display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end; margin-bottom:14px;
-    font-family:'Helvetica Neue',Arial,sans-serif;
-  }
-  .ctrl{display:flex; flex-direction:column; gap:5px; min-width:160px;}
-  .ctrl label{font-size:.76rem; color:var(--sub); font-weight:600; text-transform:uppercase; letter-spacing:.3px; display:flex; justify-content:space-between;}
-  .ctrl label .val{color:var(--accent); font-weight:700;}
-  .ctrl input[type=range]{ width:100%; accent-color:var(--accent); }
+  /* ---------- controls ---------- */
+  .controls{ display:flex; flex-wrap:wrap; gap:18px 22px; align-items:flex-end; margin-bottom:16px; font-family:var(--sans);}
+  .ctrl{display:flex; flex-direction:column; gap:6px; min-width:168px;}
+  .ctrl label{font-size:.71rem; color:var(--sub); font-weight:700; text-transform:uppercase;
+    letter-spacing:.5px; display:flex; justify-content:space-between; gap:10px;}
+  .ctrl label .val{color:var(--accent); font-weight:700; font-variant-numeric:tabular-nums;}
+  .ctrl input[type=range]{ width:100%; accent-color:var(--accent); cursor:pointer; }
   .ctrl select, .ctrl input[type=number]{
-    padding:7px 9px; border:1px solid var(--line); border-radius:8px; font-size:.88rem; background:#fff; font-family:inherit;
+    padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:.86rem;
+    background:#fff; font-family:var(--sans); color:var(--ink); cursor:pointer;
   }
-  .rowflex{display:flex; gap:24px; flex-wrap:wrap;}
-  .colgrow{flex:1; min-width:280px;}
+  .rowflex{display:flex; gap:22px; flex-wrap:wrap;}
+  .colgrow{flex:1; min-width:275px;}
 
-  canvas{ width:100%; display:block; background:var(--plot-bg); border:1px solid var(--grid); border-radius:10px; touch-action:none;}
+  canvas{ width:100%; display:block; background:var(--plot-bg); border:1px solid var(--grid);
+    border-radius:11px; touch-action:none;}
   .readout{
-    font-family:'Helvetica Neue',Arial,sans-serif; font-size:.86rem; background:var(--code);
-    border-radius:8px; padding:10px 14px; margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px 18px;
+    font-family:var(--sans); font-size:.845rem; background:var(--code);
+    border-radius:10px; padding:13px 16px; margin-top:14px; display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:9px 20px; color:var(--sub);
   }
-  .readout div b{ color:var(--accent2); }
-  .note{ font-family:'Helvetica Neue',Arial,sans-serif; font-size:.8rem; color:var(--sub); margin-top:10px; border-top:1px dashed var(--line); padding-top:8px;}
-
-  /* extended explanation block under each simulation */
-  .explain{ margin-top:18px; border-top:1px solid var(--line); padding-top:16px; font-size:.94rem; }
-  .explain h3{
-    font-family:'Helvetica Neue',Arial,sans-serif; font-size:.7rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:.7px; color:var(--accent2);
-    margin:20px 0 7px;
-  }
-  .explain h3:first-child{ margin-top:0; }
-  .explain p{ margin:0 0 11px; line-height:1.65; color:#303236; }
-  .explain p:last-child{ margin-bottom:0; }
-  .explain b{ color:var(--ink); }
-  .explain .tryit{
-    background:#faf7f0; border-left:3px solid var(--accent);
-    padding:11px 15px; border-radius:0 8px 8px 0; margin:0 0 11px;
-  }
-  .explain .tryit:last-child{ margin-bottom:0; }
-  .explain .catch{
-    background:#eef4f4; border-left:3px solid var(--accent2);
-    padding:11px 15px; border-radius:0 8px 8px 0; margin:0 0 11px;
-  }
-  .explain .catch:last-child{ margin-bottom:0; }
-  .explain var{ font-family:'Cambria Math','Georgia',serif; font-style:italic; }
+  .readout div b{ color:var(--accent2); font-variant-numeric:tabular-nums; }
+  .note{ font-family:var(--sans); font-size:.8rem; color:var(--sub); margin-top:11px;
+    border-top:1px dashed var(--line); padding-top:9px;}
   .swatch{display:inline-block; width:16px; height:16px; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid rgba(0,0,0,.15);}
-  .badge{ display:inline-block; font-family:'Helvetica Neue',Arial,sans-serif; font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:6px; }
+  .badge{ display:inline-block; font-family:var(--sans); font-size:.71rem; font-weight:700; padding:3px 9px; border-radius:6px; }
   .badge.ok{background:#e5f4ea; color:#1e7a3d;}
   .badge.no{background:#fbe7e5; color:var(--accent);}
-  footer{ text-align:center; color:var(--sub); font-family:'Helvetica Neue',Arial,sans-serif; font-size:.78rem; padding:20px; }
-  @media (max-width:600px){
-    .topbar{padding:12px 14px;} main{padding:18px 12px 60px;}
-    .card{padding:16px 16px;}
-    .explain{font-size:.9rem;}
-    .explain .tryit, .explain .catch{padding:10px 12px;}
+
+  /* ---------- explanation blocks ---------- */
+  .explain{ margin-top:20px; border-top:1px solid var(--line); padding-top:18px; font-size:.945rem; }
+  .explain h3{
+    font-family:var(--sans); font-size:.66rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:1px; color:var(--accent2); margin:22px 0 8px;
+  }
+  .explain h3:first-child{ margin-top:0; }
+  .explain p{ margin:0 0 12px; line-height:1.68; color:var(--body); max-width:74ch; }
+  .explain p:last-child{ margin-bottom:0; }
+  .explain b{ color:var(--ink); }
+  .explain .tryit, .explain .catch{ padding:13px 17px; border-radius:0 10px 10px 0; margin:0 0 12px; max-width:none; }
+  .explain .tryit{ background:#faf6ee; border-left:3px solid var(--accent); }
+  .explain .catch{ background:#eef4f4; border-left:3px solid var(--accent2); }
+  .explain .tryit:last-child, .explain .catch:last-child{ margin-bottom:0; }
+  .explain var{ font-family:'Cambria Math','Georgia',serif; font-style:italic; }
+
+  footer{ text-align:center; color:var(--sub); font-family:var(--sans); font-size:.78rem;
+    padding:26px 22px 44px; border-top:1px solid var(--line); margin-top:10px; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1080px){
+    .shell{ grid-template-columns:minmax(0,1fr); gap:0; }
+    .sidebar{ position:sticky; top:var(--nav-h); z-index:50; padding:0;
+      background:rgba(255,255,255,.95); backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line); margin:0 -22px; padding:0 22px; }
+    .sidebar h4{ display:none; }
+    #module-index{ flex-direction:row; border-left:none; overflow-x:auto; gap:2px;
+      scrollbar-width:none; padding:7px 0; }
+    #module-index::-webkit-scrollbar{ display:none; }
+    #module-index a{ white-space:nowrap; border-left:none; border-bottom:2px solid transparent;
+      margin-left:0; border-radius:7px 7px 0 0; }
+    #module-index a.current{ border-left-color:transparent; border-bottom-color:var(--accent); }
+    main{ padding-top:24px; }
+  }
+  @media (max-width:640px){
+    .masthead-inner{ padding:0 14px; gap:12px; height:auto; flex-wrap:wrap; }
+    .brand{ padding-top:9px; }
+    .chapnav{ margin-left:0; width:100%; padding:4px 0 8px; }
+    .shell{ padding:0 14px; }
+    .sidebar{ margin:0 -14px; padding:0 14px; }
+    .card{ padding:18px 17px; border-radius:13px; }
+    .chapter-head h1{ font-size:1.72rem; }
+    .explain{ font-size:.9rem; }
+    .explain .tryit, .explain .catch{ padding:11px 13px; }
+    main{ padding-bottom:60px; }
+  }
+  @media print{
+    .masthead,.sidebar{ display:none; }
+    .chapter{ display:block!important; }
+    .card{ break-inside:avoid; box-shadow:none; }
   }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand">Concepts of Modern Physics<small>Interactive companion &middot; Beiser, 6th ed.</small></div>
-  <div class="tabs">
-    <button class="tab-btn active" data-chapter="ch1">Ch.1 Relativity</button>
-    <button class="tab-btn" data-chapter="ch2">Ch.2 Particle Properties of Waves</button>
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="brand"><b>Concepts of Modern Physics</b><span>Interactive companion &middot; Beiser, 6th ed.</span></div>
+    <!-- To add a chapter: build chNN.js, add its <section class="chapter" id="chNN">,
+         add a <script> tag at the foot, and promote its pill from .soon to a button. -->
+    <nav class="chapnav" role="tablist">
+      <button class="chap-btn" data-chapter="ch1" role="tab" aria-selected="false"><span class="n">1</span>Relativity</button>
+      <button class="chap-btn" data-chapter="ch2" role="tab" aria-selected="false"><span class="n">2</span>Particle Properties</button>
+      <button class="chap-btn" data-chapter="ch3" role="tab" aria-selected="false"><span class="n">3</span>Wave Properties</button>
+      <span class="chap-btn soon" title="not built yet"><span class="n">4</span>Atomic Structure</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">5</span>Quantum Mechanics</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">6</span>Hydrogen Atom</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">7</span>Many-Electron Atoms</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">8</span>Molecules</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">9</span>Statistical Mechanics</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">10</span>The Solid State</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">11</span>Nuclear Structure</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">12</span>Nuclear Transf.</span>
+      <span class="chap-btn soon" title="not built yet"><span class="n">13</span>Elementary Particles</span>
+    </nav>
   </div>
 </div>
 
+<div class="shell">
+  <aside class="sidebar">
+    <h4>In this chapter</h4>
+    <nav id="module-index"></nav>
+  </aside>
+
 <main>
+
 
   <!-- ===================== CHAPTER 1 ===================== -->
   <section class="chapter active" id="ch1">
     <div class="chapter-head">
-      <h1>Chapter 1 &mdash; Relativity</h1>
+      <div class="kicker">Chapter One</div>
+      <h1>Relativity</h1>
       <p>Eight small labs built from the equations in this chapter, starting with the experiment that made the whole theory necessary. Drag the sliders — nothing here is decorative, every number on screen comes straight out of the formula shown above it.</p>
     </div>
 
@@ -406,7 +508,8 @@
   <!-- ===================== CHAPTER 2 ===================== -->
   <section class="chapter" id="ch2">
     <div class="chapter-head">
-      <h1>Chapter 2 &mdash; Particle Properties of Waves</h1>
+      <div class="kicker">Chapter Two</div>
+      <h1>Particle Properties of Waves</h1>
       <p>Eight labs on light behaving like particles: blackbody radiation, the photoelectric effect, x-ray production, Compton scattering, Bragg diffraction, pair production, beam attenuation, and the behaviour of photons in gravity.</p>
     </div>
 
@@ -680,10 +783,258 @@
 
   </section>
 
+
+  <!-- ===================== CHAPTER 3 ===================== -->
+  <section class="chapter" id="ch3">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Three</div>
+      <h1>Wave Properties of Particles</h1>
+      <p>Chapter 2 forced light to behave like a particle. This chapter runs the argument the other way and finds that matter behaves like a wave — which turns out to be where energy quantization, the structure of the atom, and the limits of measurement all come from.</p>
+    </div>
+
+    <!-- 1. de Broglie wavelength -->
+    <div class="card">
+      <h2>De Broglie Wavelength <span class="eqtag">Eq. 3.2</span></h2>
+      <p class="desc">De Broglie's proposal was to take the photon relation &lambda; = h/p and apply it to everything, matter included. The formula is trivial; the consequences are not.</p>
+      <div class="eq">&lambda; = h / &gamma;m&upsilon; &nbsp;&nbsp;&mdash;&nbsp;&nbsp; the same relation that holds for a photon, now applied to matter</div>
+      <div class="controls">
+        <div class="ctrl"><label>Object</label>
+          <select id="db_obj">
+            <option value="electron" selected>electron</option>
+            <option value="proton">proton</option>
+            <option value="c60">C&#8326;&#8320; molecule</option>
+            <option value="dust">dust grain (1 ng)</option>
+            <option value="golf">golf ball (46 g)</option>
+            <option value="person">person (70 kg)</option>
+          </select></div>
+        <div class="ctrl"><label>Speed (m/s) <span class="val" id="db_v_val">1.0e7</span></label>
+          <input type="range" id="db_v" min="-1" max="8.4766" step="0.0001" value="7"></div>
+      </div>
+      <canvas id="db_canvas" height="250"></canvas>
+      <div class="readout" id="db_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A single axis covering forty powers of ten, from well below nuclear dimensions up to human scale. Two markers sit on it: the grey one is the size of the object itself (or of whatever structure it would have to interact with), and the red one is its de Broglie wavelength. The distance between them is the entire story of why the wave nature of matter went unnoticed for so long.</p>
+        <p>Wave behaviour becomes apparent only when a wavelength is comparable to the things it meets — that is the same condition that governs whether light diffracts through a slit or sails straight past an obstacle. So the question is never "is this object a wave?" but "is its wavelength big enough to matter here?"</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Work Beiser's Example 3.1 in both halves. A <b>golf ball at 30 m/s</b> has a wavelength of 4.8 &times; 10&#8315;&sup3;&#8308; m — twenty powers of ten smaller than a nucleus, which is why no golf ball has ever diffracted. Switch to an <b>electron at 10&#8311; m/s</b> and the wavelength is 7.3 &times; 10&#8315;&sup1;&sup1; m, essentially the radius of a hydrogen atom. That single coincidence is why the wave nature of the electron is not a curiosity but the organising principle of atomic structure. Then try the <b>C&#8326;&#8320; molecule</b>, a ball of sixty carbon atoms that has genuinely been made to interfere in the laboratory, and watch its wavelength sit only a little below its own size.</p>
+
+        <h3>The relativistic case</h3>
+        <p>The &gamma; in the denominator matters as soon as speeds get high, and it can be worked backwards. Beiser's Example 3.2 asks what kinetic energy a proton needs for a wavelength of 1.00 fm, roughly its own diameter. The answer is 617 MeV — a proton must be relativistic before its wave nature is on the scale of a proton. This is the logic behind every particle accelerator ever built: to resolve small structure you need short wavelength, short wavelength means large momentum, and large momentum means enormous energy. Accelerators are, in the end, very expensive microscopes.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Nothing here says an electron "is" a wave, any more than Chapter 2 said light "is" a particle. Beiser's own framing is careful: the wave and particle aspects of a moving body can never be observed at the same time, so asking which is the correct description is not a well-posed question. What the formula gives you is a wavelength to compare against the situation at hand, and that comparison tells you which set of properties will be conspicuous. Notice also that the speed slider is logarithmic — at these ranges nothing else would fit on a screen.</p>
+      </div>
+    </div>
+
+    <!-- 2. phase and group velocity -->
+    <div class="card">
+      <h2>Phase and Group Velocity <span class="eqtag">Eq. 3.3, 3.16</span></h2>
+      <p class="desc">A single de Broglie wave stretches to infinity and localises nothing. A real particle must be a packet of them — and the packet moves at a different speed from the ripples inside it.</p>
+      <div class="eq">v<sub>p</sub> = &omega;/k = c&sup2;/&upsilon; &nbsp;&nbsp;|&nbsp;&nbsp; v<sub>g</sub> = d&omega;/dk = &upsilon; &nbsp;&nbsp;|&nbsp;&nbsp; v<sub>p</sub> &middot; v<sub>g</sub> = c&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Particle speed &beta; = v/c <span class="val" id="pg_beta_val">0.771</span></label>
+          <input type="range" id="pg_beta" min="0.15" max="0.99" step="0.001" value="0.771"></div>
+        <div class="ctrl"><label><input type="checkbox" id="pg_run" checked style="width:auto; margin-right:6px;">animate</label></div>
+      </div>
+      <canvas id="pg_canvas" height="230"></canvas>
+      <canvas id="pg_canvas_plot" height="250" style="margin-top:12px;"></canvas>
+      <div class="readout" id="pg_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is a wave packet: many waves of slightly different wavelength added together, so that they reinforce in one region and cancel elsewhere. The dashed teal outline is the envelope, and the teal dot rides it at the <b>group velocity</b>. The black dot rides a single crest at the <b>phase velocity</b>. Watch for a while and you will see the crests visibly sliding forward through the envelope, overtaking it and dying at the front — the packet as a whole lags behind the ripples that compose it.</p>
+        <p>The lower panel plots both velocities against the particle's speed. The group velocity is just the particle speed, a straight line. The phase velocity is c²/v, which blows up as the particle slows down and only ever comes down to c in the unreachable limit v &rarr; c.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>&beta; = 0.771</b>, which is Beiser's Example 3.3: an electron with a de Broglie wavelength of 2.00 pm, a kinetic energy of 292 keV, a group velocity of 0.771c and a phase velocity of 1.30c. Now drag &beta; downward and watch the two dots separate dramatically — at &beta; = 0.2 the phase velocity is five times the speed of light while the packet crawls along at a fifth of it. Slow particles have wildly superluminal phase velocities, which sounds alarming until you notice what is actually moving.</p>
+
+        <h3>Why a faster-than-light phase velocity breaks nothing</h3>
+        <p>The product v<sub>p</sub>v<sub>g</sub> = c² means that whenever the group velocity is below c — always, for a massive particle — the phase velocity must be above it. That looks like a violation of relativity until you ask what a phase velocity actually transports. The answer is nothing. An infinite, uniform wave train carries no information: every crest is identical to every other, so nothing about the position of a crest can signal anything. Information lives in changes to the wave, and changes travel with the envelope.</p>
+        <p>The group velocity is what corresponds to the particle, and it comes out exactly equal to the particle's own speed — which is the real result of this section. De Broglie waves were not invented to have this property; it falls out of taking &lambda; = h/p and E = h&nu; together and asking how the packet moves. That the answer matches the particle's velocity is the first sign that the wave picture and the particle picture are describing the same thing.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This separation of phase and group velocity only happens because de Broglie waves are <b>dispersive</b>: their phase velocity depends on wavelength, so the components of a packet travel at different speeds. That is also why packets spread out over time, a point that comes back in the uncertainty modules below. Light in a vacuum is the opposite case — every wavelength travels at c, no dispersion, and phase and group velocity coincide. Matter waves and light waves are not the same kind of wave.</p>
+      </div>
+    </div>
+
+    <!-- 3. Davisson-Germer -->
+    <div class="card">
+      <h2>Davisson&ndash;Germer: Diffracting Electrons <span class="eqtag">Sec. 3.5</span></h2>
+      <p class="desc">Diffraction is a wave effect with no Newtonian analogue whatsoever. In 1927 electrons were caught doing it, by accident, and de Broglie's guess became physics.</p>
+      <div class="eq">&lambda; = h/&radic;(2m&middot;eV) &nbsp;&nbsp;must match&nbsp;&nbsp; n&lambda; = 2d sin&theta; &nbsp;&nbsp; (&theta; = 65&deg;, d = 0.091 nm for this nickel crystal)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Accelerating voltage (V) <span class="val" id="dg_V_val">54</span></label>
+          <input type="range" id="dg_V" min="30" max="80" step="1" value="54"></div>
+        <div class="ctrl"><label>Plane spacing d (nm) <span class="val" id="dg_d_val">0.091</span></label>
+          <input type="range" id="dg_d" min="0.070" max="0.115" step="0.001" value="0.091"></div>
+      </div>
+      <canvas id="dg_canvas" height="290"></canvas>
+      <canvas id="dg_canvas_scan" height="250" style="margin-top:12px;"></canvas>
+      <div class="readout" id="dg_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is a polar plot in the style of Beiser's Fig. 3.7: the electron beam comes straight down the dashed grey line, and the distance from the centre to the red curve at any angle is how many electrons scatter in that direction. If electrons were simply bouncing off nickel atoms like tiny balls, this curve would be a featureless near-circle. Instead a distinct lobe appears at 50&deg;, and it grows and fades as you change the voltage.</p>
+        <p>The lower panel shows why. The red curve is the electron's de Broglie wavelength as a function of accelerating voltage; the teal line is the one wavelength this particular crystal can diffract, namely 2d sin65&deg;. The lobe is strongest where the two cross.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the voltage to <b>54 V</b> — the case Beiser works through. The de Broglie wavelength comes out at 0.167 nm and the crystal's Bragg condition wants 0.165 nm; they agree to about one percent, and the lobe is at full strength. Now sweep the voltage from 30 up to 80 and watch the lobe swell and collapse, reproducing the sequence of panels in Fig. 3.7. Nothing about the geometry changed — only the electron's wavelength did. Then change the plane spacing and watch the matching voltage move, which is the same calculation run backwards: measure the voltage that gives the peak, and you have measured d.</p>
+
+        <h3>Why this was decisive</h3>
+        <p>The accident is worth remembering. Davisson and Germer were doing a routine scattering study, and classical physics was describing their results perfectly well, until air leaked into the apparatus and oxidised the nickel target. Baking the target to clean it annealed the many small crystals into a few large ones — and suddenly the scattering showed sharp maxima whose positions depended on electron energy. They had accidentally built a diffraction grating with the right spacing.</p>
+        <p>What makes the result decisive is that two completely independent numbers have to agree. One comes from the electron gun: &lambda; = h/&radic;(2m&middot;eV), containing Planck's constant and nothing about crystals. The other comes from x-ray crystallography: d = 0.091 nm, containing nothing about electrons. The Bragg condition then predicts where the peak must be, with no free parameters left to adjust. It lands at 50&deg;, where it is observed.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The shape and width of the lobe drawn here are schematic — real intensity profiles depend on how many atomic layers contribute, on the inner potential of the metal that slightly refracts the electrons on entry, and on thermal motion. What is exact is the position of the peak and the wavelengths involved, which is what the argument turns on. Note too that this is the same Bragg equation from the previous chapter, doing the same job; the only thing that has changed is that the waves being diffracted are electrons. G. P. Thomson demonstrated the same thing independently that year, using a different method — and won a Nobel Prize for showing the electron is a wave, three decades after his father won one for showing it is a particle.</p>
+      </div>
+    </div>
+
+    <!-- 4. particle in a box -->
+    <div class="card">
+      <h2>Particle in a Box <span class="eqtag">Eq. 3.17, 3.18</span></h2>
+      <p class="desc">Trap a wave between two walls and only certain wavelengths will fit. Since wavelength fixes momentum, and momentum fixes energy, a trapped particle can only have certain energies. Quantization is a standing-wave condition and nothing more mysterious than that.</p>
+      <div class="eq">&lambda;<sub>n</sub> = 2L/n &nbsp;&nbsp;&rarr;&nbsp;&nbsp; E<sub>n</sub> = n&sup2;h&sup2;/8mL&sup2;, &nbsp; n = 1, 2, 3, &hellip;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Particle</label>
+          <select id="pb_mass">
+            <option value="9.109e-31" selected>electron</option>
+            <option value="1.673e-27">proton</option>
+            <option value="0.010">10 g marble</option>
+          </select></div>
+        <div class="ctrl"><label>Box width L <span class="val" id="pb_L_val">0.100 nm</span></label>
+          <input type="range" id="pb_L" min="-10.7" max="-0.7" step="0.01" value="-10"></div>
+        <div class="ctrl"><label>Quantum number n <span class="val" id="pb_n_val">1</span></label>
+          <input type="range" id="pb_n" min="1" max="6" step="1" value="1"></div>
+      </div>
+      <canvas id="pb_canvas" height="270"></canvas>
+      <canvas id="pb_canvas_levels" height="260" style="margin-top:12px;"></canvas>
+      <div class="readout" id="pb_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the box with its two infinitely hard walls. The red curve is the wave function &psi;<sub>n</sub>, which must go to zero at both walls because the wave simply stops there — exactly like a guitar string clamped at both ends. The shaded teal curve beneath is |&psi;<sub>n</sub>|&sup2;, the probability of finding the particle at each position, and the black dots mark the nodes, the places it is never found. The lower panel is the resulting ladder of allowed energies.</p>
+        <p>Notice what the ladder does as n increases: the rungs get further apart, not closer. Because E &prop; n&sup2;, the gap between consecutive levels grows steadily, so the spectrum never settles into something that could be mistaken for a continuum by getting denser at the top.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start with an <b>electron in a 0.10 nm box</b>, roughly an atom's width — Beiser's Example 3.4. The ground state comes out at 38 eV, with the sequence continuing 152, 342, 608 eV. These are enormous gaps, comparable to the energies of chemistry, which is why energy quantization dominates atomic physics. Now switch to the <b>10 g marble</b> and drag the box out to 10 cm, which is Example 3.5. The ground-state energy is about 5.5 &times; 10&#8315;&#8310;&#8308; J and the corresponding speed is 3.3 &times; 10&#8315;&sup3;&sup1; m/s — indistinguishable from a stationary marble. Watch the "n for a speed of 1/3 m/s" readout: it lands around 10&sup3;&#8304;. The levels are there, but no measurement could ever resolve one from the next.</p>
+
+        <h3>The three conclusions</h3>
+        <p>Beiser draws out three results here, and they hold for any confined particle, including an electron bound to a nucleus where the "walls" are not sharp at all. First, a trapped particle cannot have arbitrary energy: confinement restricts the wave, and restricting the wave restricts the energy. Second, a trapped particle cannot have <em>zero</em> energy. Zero speed would mean infinite wavelength, and an infinite wavelength cannot be fitted between two walls, so there is always some irreducible motion. Third, because h is so small, quantization only becomes conspicuous when m and L are both small — which is precisely why Newtonian mechanics works so well for everything we can see.</p>
+        <p>That second point deserves emphasis, because it has no classical counterpart at all. A classical marble in a box can sit perfectly still. A quantum particle cannot, and the smaller the box the more violently it must move — a fact that turns up again in the next two modules as the uncertainty principle, and again in Chapter 4 as the reason atoms do not collapse.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">This is a deliberately crude treatment: infinitely hard walls, no potential energy inside, no relativity. Chapter 5 redoes it properly by solving Schr&ouml;dinger's equation, and the answers here survive that treatment intact — which is why it is worth doing the crude version first. What does not survive is the assumption of perfectly hard walls: with a finite wall the wave function leaks a little way into the barrier instead of stopping dead, which lowers the energies slightly and opens the door to tunnelling.</p>
+      </div>
+    </div>
+
+    <!-- 5. wave packet -->
+    <div class="card">
+      <h2>Building a Wave Packet <span class="eqtag">Sec. 3.4, 3.7</span></h2>
+      <p class="desc">Where the uncertainty principle actually comes from. It is not a statement about clumsy instruments — it is a property of waves, and it would apply to sound and water just as well.</p>
+      <div class="eq">a localised packet requires a spread of wave numbers: &nbsp; &Delta;x &middot; &Delta;k &ge; &frac12; &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &Delta;x &middot; &Delta;p &ge; &#8463;/2</div>
+      <div class="controls">
+        <div class="ctrl"><label>Waves superposed <span class="val" id="wp_n_val">24</span></label>
+          <input type="range" id="wp_n" min="1" max="60" step="1" value="24"></div>
+        <div class="ctrl"><label>Spread in k <span class="val" id="wp_spread_val">20%</span></label>
+          <input type="range" id="wp_spread" min="0" max="0.6" step="0.005" value="0.2"></div>
+      </div>
+      <canvas id="wp_canvas" height="250"></canvas>
+      <canvas id="wp_canvas_spec" height="240" style="margin-top:12px;"></canvas>
+      <div class="readout" id="wp_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel adds together a number of waves whose wave numbers are spread around a central value; the faint grey curves are a few of the components and the red curve is their sum. The lower panel is the recipe: one vertical line for each component, showing which wave numbers went into the mixture. Since p = &#8463;k, that lower panel is also the momentum distribution.</p>
+        <p>Drag the spread to zero and the packet disappears — you are left with a single endless wave of one exact wavelength. That wave has a perfectly defined momentum and tells you absolutely nothing about position, since it is the same everywhere. Widen the spread and a packet forms, sharpening as the spread grows. You cannot have both.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the spread to <b>0%</b> first and note that the packet width is unbounded while &Delta;k is exactly zero. Now push the spread up gradually and watch the product &Delta;x &middot; &Delta;k in the readout: the packet narrows in exactly the proportion that the momentum spread widens, and their product stalls around a half and refuses to go lower no matter what you do. Separately, raise the <b>number of waves</b> at fixed spread. The packet gets cleaner — the spurious repeats away from the centre fade out — but the central width does not shrink. Only widening &Delta;k does that.</p>
+
+        <h3>Why this is not about disturbing the particle</h3>
+        <p>The usual first explanation of the uncertainty principle is that measuring a particle requires poking it, and poking it changes its momentum. Beiser gives that argument too, in Section 3.8, and it does yield the same inequality. But this panel shows something stronger: the limit is already there before any measurement is contemplated. It is a mathematical fact about waves that a short pulse requires a broad band of frequencies, known to radio engineers long before quantum mechanics and true of any wave whatsoever.</p>
+        <p>What quantum mechanics adds is the identification p = &#8463;k. Once momentum <em>is</em> wave number, the bandwidth theorem stops being a statement about signal processing and becomes a statement about what a particle can simultaneously possess. The uncertainty is not in our knowledge of a definite value — it is that a state with both properties sharply defined does not exist to be known.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The product here is measured in the display's own units and the packet width is read off where the envelope falls to 1/e, so the exact number depends on those conventions; what is real is that it has a floor and cannot be driven to zero. A genuine Gaussian packet achieves the minimum of exactly &#8463;/2, and every other shape does worse. Beiser also notes that in practice &Delta;x &Delta;p &ge; &#8463;/2 is rarely attained — more often the product is around &#8463; or even h, so the principle is usually used as an order-of-magnitude tool rather than a precise bound, which is exactly how the next module uses it.</p>
+      </div>
+    </div>
+
+    <!-- 6. applying the uncertainty principle -->
+    <div class="card">
+      <h2>Applying the Uncertainty Principle <span class="eqtag">Examples 3.7, 3.8</span></h2>
+      <p class="desc">A negative-sounding principle turned into a positive tool. Confine a particle and you can put a hard floor under its energy — which is enough to rule out whole theories of what a nucleus is made of.</p>
+      <div class="eq">&Delta;p &ge; &#8463;/2&Delta;x &nbsp;&nbsp;&rarr;&nbsp;&nbsp; KE<sub>min</sub> from E&sup2; = (mc&sup2;)&sup2; + (pc)&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Confine to &Delta;x <span class="val" id="ua_size_val">5.00 fm</span></label>
+          <input type="range" id="ua_size" min="-15.3" max="-8" step="0.01" value="-14.30"></div>
+        <div class="ctrl"><label>Particle</label>
+          <select id="ua_particle">
+            <option value="9.109e-31" selected>electron</option>
+            <option value="1.673e-27">proton</option>
+          </select></div>
+      </div>
+      <canvas id="ua_canvas" height="230"></canvas>
+      <div class="readout" id="ua_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A logarithmic energy axis with some landmarks on it, and a red marker showing the minimum kinetic energy a particle must have if it is confined to the width you have chosen. Squeeze the confinement and the marker marches to the right, because a smaller box demands a larger momentum spread, and a larger momentum spread means the particle cannot be slow.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the width to <b>5 fm</b>, a typical nuclear radius, with the <b>electron</b> selected. The minimum energy comes out near 20 MeV — Beiser quotes the estimate as "must exceed 20 MeV", using KE &asymp; pc for a particle this relativistic. That is Beiser's Example 3.7, and its consequence is remarkable: electrons emitted by unstable nuclei are observed with at most a small fraction of that energy, so nuclei cannot contain electrons waiting to be emitted. The electron in beta decay must be created at the moment of decay. Now drag out to <b>0.053 nm</b>, the Bohr radius — Example 3.8 — and the answer drops to a few eV, the right order for the 13.6 eV that actually binds hydrogen. The same inequality that forbids the first case comfortably permits the second.</p>
+
+        <h3>What makes this a tool rather than a complaint</h3>
+        <p>The uncertainty principle is usually introduced as a restriction, but here it does real work as an estimator. It takes a single length — how tightly something is confined — and returns an energy scale, with no detailed model of the forces involved. That is why it can settle the question of nuclear electrons without anyone knowing the nuclear force: whatever holds a nucleus together, it would need to bind an electron carrying more than 20 MeV, and nothing observed about nuclear energetics allows that.</p>
+        <p>The same reasoning explains why atoms have the size they do. An electron pulled closer to the nucleus lowers its potential energy but, by this principle, must raise its kinetic energy — and the kinetic term rises faster. The atom settles at the radius where the trade-off bottoms out. Matter is as big as it is because confinement costs energy.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">These are order-of-magnitude estimates and should be read as such. Example 3.8 returns about 3.4 eV where the true hydrogen ground-state kinetic energy is 13.6 eV — a factor of four out, which is exactly the accuracy this method promises. It gets the scale right and the scale is what decides the argument. Note also that the calculation switches to the relativistic expression when pc becomes comparable with mc², which is what happens in the nuclear case; using the non-relativistic p²/2m there would overstate the energy by a wide margin.</p>
+      </div>
+    </div>
+
+    <!-- 7. energy-time uncertainty -->
+    <div class="card">
+      <h2>Energy, Time, and the Width of a Spectral Line <span class="eqtag">Eq. 3.26, Example 3.9</span></h2>
+      <p class="desc">The second uncertainty relation. A state that does not last forever cannot have a perfectly definite energy — which means no spectral line is ever truly sharp, no matter how good the spectrometer.</p>
+      <div class="eq">&Delta;E &middot; &Delta;t &ge; &#8463;/2 &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &Delta;&nu; = &Delta;E/h</div>
+      <div class="controls">
+        <div class="ctrl"><label>Excited-state lifetime <span class="val" id="et_tau_val">1.0e-8 s</span></label>
+          <input type="range" id="et_tau" min="-12" max="-5" step="0.01" value="-8"></div>
+        <div class="ctrl"><label>Transition frequency (&times;10&sup1;&#8308; Hz) <span class="val" id="et_nu_val">5.00</span></label>
+          <input type="range" id="et_nu" min="0.5" max="10" step="0.01" value="5"></div>
+      </div>
+      <canvas id="et_canvas" height="270"></canvas>
+      <div class="readout" id="et_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The emission line an atom actually produces, plotted as intensity against frequency offset from the nominal transition. It is not a spike — it has a width, marked in teal at half maximum, and that width is set entirely by how long the excited state survives before radiating. Shorten the lifetime and the line broadens; lengthen it and the line sharpens. This is the <b>natural linewidth</b>, and no improvement in apparatus can narrow it.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the lifetime to <b>1.0 &times; 10&#8315;&#8312; s</b>, the typical interval between an atom being excited and radiating, which is Beiser's Example 3.9. The energy is uncertain by about 5.3 &times; 10&#8315;&sup2;&#8311; J, giving a frequency spread of roughly 8 &times; 10&#8310; Hz. Against a transition at 5.0 &times; 10&sup1;&#8308; Hz that is a fractional width of 1.6 &times; 10&#8315;&#8312; — sharp by any ordinary standard, and yet irreducibly finite. Now drag the lifetime down toward 10&#8315;&sup1;&sup2; s and watch the line bloat; long-lived metastable states, at the other end, give the extraordinarily sharp lines that make atomic clocks possible.</p>
+
+        <h3>Where the relation comes from</h3>
+        <p>The argument is almost embarrassingly simple. To measure a frequency you count waves, and if you only have a time &Delta;t to watch, you cannot know the count to better than about one wave. So &Delta;&nu; &asymp; 1/&Delta;t, and multiplying through by h gives &Delta;E &asymp; h/&Delta;t. A more careful treatment based on the shape of wave groups tightens this to &#8463;/2, but the essential content is already in the counting argument: a finite window on a wave is a finite window on its frequency.</p>
+        <p>This has a reach well beyond spectroscopy. It is why unstable particles have a width as well as a mass — a particle that lives 10&#8315;&sup2;&sup3; s has a mass uncertain by tens of MeV, so experimentalists quote its width alongside its mass and read the lifetime straight off the peak. The shorter-lived the state, the fuzzier its energy.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The natural width is usually the smallest contributor to what a real spectrometer sees. Atoms in a gas are moving, so their lines are Doppler-shifted by varying amounts, and that thermal broadening typically swamps the natural width by orders of magnitude; collisions broaden lines further still. Beiser makes exactly this point at the end of Example 3.9. Getting down to the natural width is a hard experimental achievement — it takes cold, dilute, carefully prepared samples — and the fact that it is even a meaningful floor is the physics here.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
+</div>
 
 <footer>Built from Beiser, <em>Concepts of Modern Physics</em>, 6th ed., Chapters 1&ndash;2. All plots computed live from the equations shown &mdash; nothing here is pre-baked data.</footer>
 
 <script src="app.js"></script>
+<script src="ch01.js"></script>
+<script src="ch02.js"></script>
+<script src="ch03.js"></script>
 </body>
 </html>
