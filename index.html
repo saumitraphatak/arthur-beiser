@@ -126,7 +126,41 @@
   <section class="chapter active" id="ch1">
     <div class="chapter-head">
       <h1>Chapter 1 &mdash; Relativity</h1>
-      <p>Seven small labs built from the equations in this chapter. Drag the sliders — nothing here is decorative, every number on screen comes straight out of the formula shown above it.</p>
+      <p>Eight small labs built from the equations in this chapter, starting with the experiment that made the whole theory necessary. Drag the sliders — nothing here is decorative, every number on screen comes straight out of the formula shown above it.</p>
+    </div>
+
+    <!-- 0. Michelson-Morley -->
+    <div class="card">
+      <h2>The Michelson&ndash;Morley Experiment <span class="eqtag">Sec. 1.1</span></h2>
+      <p class="desc">The experiment that found nothing, and by finding nothing forced everything else on this page. Two light beams race down perpendicular arms; if the earth moves through a light-carrying ether, the beams should return out of step.</p>
+      <div class="eq">t<sub>&#8741;</sub> = (2L/c)/(1&minus;&beta;&sup2;) &nbsp;&nbsp; t<sub>&#8869;</sub> = (2L/c)/&radic;(1&minus;&beta;&sup2;) &nbsp;&nbsp;&mdash;&nbsp;&nbsp; fringe shift on 90&deg; rotation n = 2c&Delta;t/&lambda;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Ether wind v (km/s) <span class="val" id="mm_v_val">30</span></label>
+          <input type="range" id="mm_v" min="0" max="100" step="1" value="30"></div>
+        <div class="ctrl"><label>Arm length L (m) <span class="val" id="mm_L_val">11.0</span></label>
+          <input type="range" id="mm_L" min="1" max="20" step="0.5" value="11"></div>
+        <div class="ctrl"><label>Wavelength &lambda; (nm) <span class="val" id="mm_lam_val">589</span></label>
+          <input type="range" id="mm_lam" min="400" max="700" step="1" value="589"></div>
+      </div>
+      <canvas id="mm_canvas" height="250"></canvas>
+      <canvas id="mm_canvas_fringes" height="190" style="margin-top:12px;"></canvas>
+      <div class="readout" id="mm_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Light from a source hits a half-silvered mirror that splits it in two. One beam runs along the direction of the supposed ether wind and back; the other runs across it and back. They recombine at the screen, and any difference in transit time shows up as a shift in the interference fringes. The lower panel shows those fringes, with the pattern the ether theory predicts once you rotate the whole apparatus by 90&deg; and swap which arm faces the wind.</p>
+        <p>The asymmetry the experiment hunts for is a familiar one. A swimmer crossing a river and returning takes less time than one swimming the same distance upstream and back, because the upstream leg is punished more than the downstream leg rewards. Light in an ether should behave the same way, and the two transit times printed on the diagram differ by exactly that amount.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">The 1887 configuration was an effective arm length of about <b>11 m</b>, sodium light at <b>589 nm</b>, and the earth's orbital speed of <b>30 km/s</b>. That predicts a shift of roughly 0.37 fringes, while the apparatus could comfortably resolve 0.01 &mdash; the effect should have been about forty times larger than the noise. Michelson and Morley were not straining to see something marginal; they were looking for something that could hardly be missed. Now drag the ether wind down toward zero and watch the predicted shift collapse as &beta;&sup2;. That quadratic dependence is why the experiment needed such long arms in the first place.</p>
+
+        <h3>What the null result cost</h3>
+        <p>Nothing moved. Not in 1887, and not in any of the steadily more sensitive repetitions since. The result is arguably the most consequential non-observation in the history of physics, and it left two conclusions standing. There is no ether, so there is no universal frame against which absolute motion could be measured &mdash; all motion is relative to some specified frame. And the speed of light comes out the same regardless of how the observer moves, which is exactly what waves in a medium never do.</p>
+        <p>The second of those becomes Einstein's second postulate, and once you accept it the rest of this chapter is forced. If c is the same for everyone, then the light clock in the next card <em>must</em> run slow when it moves, lengths <em>must</em> contract, and simultaneity <em>must</em> become frame-dependent. None of that was invented to explain the null result; it is what follows from taking it seriously.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Notice the shape of the &beta;&sup2; dependence: the predicted effect is second order in v/c, not first. A first-order effect would have been detected decades earlier by much cruder apparatus. That is precisely why FitzGerald and Lorentz could rescue the ether for a while by proposing that objects physically contract along their direction of motion by exactly the factor needed to cancel the difference &mdash; the contraction in the length-contraction card below, arrived at for entirely the wrong reason. Their fix worked numerically but explained nothing. Einstein's contribution was not a better fix; it was noticing that no fix was needed once you stopped assuming space and time were absolute.</p>
+      </div>
     </div>
 
     <!-- 1. Light clock / time dilation -->
@@ -373,7 +407,7 @@
   <section class="chapter" id="ch2">
     <div class="chapter-head">
       <h1>Chapter 2 &mdash; Particle Properties of Waves</h1>
-      <p>Five labs on light behaving like particles: blackbody radiation, the photoelectric effect, Compton scattering, Bragg diffraction, and beam attenuation.</p>
+      <p>Eight labs on light behaving like particles: blackbody radiation, the photoelectric effect, x-ray production, Compton scattering, Bragg diffraction, pair production, beam attenuation, and the behaviour of photons in gravity.</p>
     </div>
 
     <!-- 1. Blackbody radiation -->
@@ -444,7 +478,43 @@
         <p class="tryit">Keep <b>sodium (&phi; = 2.3 eV)</b> and set <b>&lambda; = 300 nm</b>: each photon carries 4.13 eV, the electron surrenders 2.3 eV to escape, and KE<sub>max</sub> is 1.83 eV. Now drag the wavelength upward and watch KE<sub>max</sub> fall to zero at about <b>539 nm</b> — green light. Past that point, sodium emits nothing at all, and no amount of intensity will change it. Then switch to <b>platinum (6.4 eV)</b>, whose threshold is down at 194 nm in the deep ultraviolet, and to <b>cesium (1.9 eV)</b>, which still responds to red light at 652 nm. On the right-hand plot, watch the line shift sideways while its slope stays locked.</p>
 
         <h3>The catch</h3>
-        <p class="catch">Notice what the threshold is set by: the <b>frequency</b> of the light, never its brightness. This is the sharpest possible break with the wave picture, because in wave physics intensity is the thing that carries energy and frequency is merely a label. It is also why Beiser calls x-ray production the inverse photoelectric effect — run the same transaction backwards, with a fast electron giving up its kinetic energy to create a photon, and the Bragg card two panels down is how the resulting wavelength gets measured.</p>
+        <p class="catch">Notice what the threshold is set by: the <b>frequency</b> of the light, never its brightness. This is the sharpest possible break with the wave picture, because in wave physics intensity is the thing that carries energy and frequency is merely a label. It is also why Beiser calls x-ray production the inverse photoelectric effect — run the same transaction backwards, with a fast electron giving up its kinetic energy to create a photon, which is exactly what the next card does.</p>
+      </div>
+    </div>
+
+    <!-- 2b. X-ray production -->
+    <div class="card">
+      <h2>X-ray Production: the Inverse Photoelectric Effect <span class="eqtag">Sec. 2.5</span></h2>
+      <p class="desc">Run the photoelectric transaction backwards. Fast electrons slam into a metal target and their kinetic energy reappears as photons &mdash; and the spectrum stops dead at a shortest wavelength that classical physics has no way to account for.</p>
+      <div class="eq">&lambda;<sub>min</sub> = hc/eV &nbsp;&nbsp;&mdash;&nbsp;&nbsp; set by the accelerating voltage alone, whatever the target is made of</div>
+      <div class="controls">
+        <div class="ctrl"><label>Accelerating voltage (kV) <span class="val" id="xr_V_val">50</span></label>
+          <input type="range" id="xr_V" min="10" max="120" step="1" value="50"></div>
+        <div class="ctrl"><label>Target</label>
+          <select id="xr_target">
+            <option value="W" selected>Tungsten (K edge 69.5 kV)</option>
+            <option value="Mo">Molybdenum (K edge 20.0 kV)</option>
+            <option value="Cu">Copper (K edge 9.0 kV)</option>
+          </select></div>
+        <div class="ctrl"><label><input type="checkbox" id="xr_classical" checked style="width:auto; margin-right:6px;">show classical prediction</label></div>
+      </div>
+      <canvas id="xr_canvas" height="300"></canvas>
+      <div class="readout" id="xr_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The x-ray spectrum coming off the target. The broad red hump is <b>bremsstrahlung</b> &mdash; "braking radiation" &mdash; produced as electrons decelerate in the target, and classical electromagnetism predicts it happily enough. What classical physics cannot produce is the wall on the left: the spectrum stops abruptly at &lambda;<sub>min</sub> and there is nothing whatsoever beyond it. The grey dashed curve shows what the classical account expects instead, a continuum that simply keeps going.</p>
+        <p>The black spikes are <b>characteristic lines</b>, emitted when an incoming electron knocks out an inner-shell electron of the target atom and an outer electron drops in to fill the hole. They belong to the element, not to the machine.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start with <b>tungsten at 50 kV</b>, which reproduces one of the curves in Beiser's Fig. 2.16: the cutoff sits at 24.8 pm. Now drag the voltage and watch the cutoff sweep left as 1/V while the continuum's peak stays pinned at twice &lambda;<sub>min</sub>. Double the voltage and you exactly halve the cutoff wavelength. Next, recreate Fig. 2.17 by putting both targets at <b>35 kV</b>: molybdenum shows its K&alpha; and K&beta; spikes at 71 and 63 pm, while tungsten shows none at all, because 35 kV cannot reach tungsten's 69.5 kV K edge. Push the voltage past 70 kV and tungsten's lines appear &mdash; at 20.9 pm, where they always were.</p>
+
+        <h3>Two different things, two different rules</h3>
+        <p>The contrast between those two features is the whole lesson of the card. The cutoff depends <em>only</em> on the accelerating voltage and not at all on what the target is made of. The characteristic lines depend <em>only</em> on the target element and not at all on the voltage &mdash; raising the voltage makes them brighter and can switch them on, but never moves them. One number belongs to the electron gun, the other to the atom.</p>
+        <p>The cutoff is the photoelectric equation run backwards. An electron accelerated through V arrives with kinetic energy eV, and the most it can possibly give to a single photon is all of it: h&nu;<sub>max</sub> = eV, hence &lambda;<sub>min</sub> = hc/eV. A continuous, classical energy transfer would allow any amount to go into radiation with no upper bound on frequency. The existence of a sharp limit says the energy is handed over in one indivisible lump &mdash; the same claim Einstein made about absorption, now demonstrated in emission.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Measuring &lambda;<sub>min</sub> against V gives h directly, independently of the photoelectric effect and of blackbody radiation &mdash; the relation is known as the Duane&ndash;Hunt law, and it agrees with the other two determinations. That agreement is what makes h a property of nature rather than a fudge factor: three experiments with nothing in common but the constant return the same number. Note also that most of the electrons' energy never becomes x-rays at all; the overwhelming majority is dissipated as heat, which is why real x-ray tubes need aggressive cooling.</p>
       </div>
     </div>
 
@@ -512,6 +582,36 @@
       </div>
     </div>
 
+    <!-- 4b. Pair production -->
+    <div class="card">
+      <h2>Pair Production <span class="eqtag">Sec. 2.8, Example 2.5</span></h2>
+      <p class="desc">The most literal demonstration of E&#8320; = mc&sup2; available: a photon vanishes and two particles of matter appear in its place. Energy does not merely convert into mass here &mdash; it becomes two objects that can be caught, tracked and weighed.</p>
+      <div class="eq">h&nu; &rarr; e&#8315; + e&#8314; &nbsp;&nbsp; requires h&nu; &ge; 2m&#8320;c&sup2; = 1.022 MeV, &nbsp; and a nearby nucleus</div>
+      <div class="controls">
+        <div class="ctrl"><label>Photon energy h&nu; (MeV) <span class="val" id="pp_E_val">2.00</span></label>
+          <input type="range" id="pp_E" min="0.2" max="10" step="0.01" value="2"></div>
+      </div>
+      <canvas id="pp_canvas" height="280"></canvas>
+      <canvas id="pp_canvas_split" height="240" style="margin-top:12px;"></canvas>
+      <div class="readout" id="pp_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the event: a photon arrives, passes close to an atomic nucleus, and converts into an electron and a positron. The two tracks curl away in opposite directions, as they would in a bubble chamber's magnetic field, since the particles carry equal and opposite charge. Raise the energy and the tracks straighten, because stiffer momentum bends less &mdash; in a real detector, that curvature is how the particles' momenta get measured.</p>
+        <p>The lower panel is the energy ledger. The red dashed floor is the 1.022 MeV that must be paid to create two electron masses, and it never changes. Everything above it, shaded teal, is kinetic energy shared between the pair. Below threshold there is no event at all: the photon cannot make half an electron, so it makes nothing and carries on.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Sweep the energy up from 0.2 MeV and watch nothing happen until you cross <b>1.022 MeV</b>, where the pair abruptly appears with essentially zero kinetic energy. Just above threshold the particles are barely moving and almost the entire photon energy has gone into rest mass. At <b>2.00 MeV</b> the split is roughly half and half. By <b>10 MeV</b> only about 10% is spent on rest mass and the rest is motion, with each particle at &gamma; &asymp; 9.8 and moving at 0.995c. The threshold is a hard wall, but once past it the cost of the mass becomes a smaller and smaller share of the bill.</p>
+
+        <h3>Why the nucleus has to be there</h3>
+        <p>Beiser's Example 2.5 asks you to show that pair production cannot happen in empty space, and the argument is worth following because it is pure bookkeeping. Suppose a photon of energy h&nu; turned into a pair flying off symmetrically at angle &theta; either side of the original direction. Conservation of energy demands h&nu; = 2&gamma;m&#8320;c&sup2;. Conservation of momentum along the photon's direction demands h&nu;/c = 2&gamma;m&#8320;&upsilon;cos&theta;, which is to say h&nu; = 2&gamma;m&#8320;c&sup2;(&upsilon;/c)cos&theta;.</p>
+        <p>Since &upsilon;/c is less than 1 and cos&theta; is at most 1, the second equation gives a strictly <em>smaller</em> value of h&nu; than the first demands. The two conditions cannot both hold. A massive nucleus sitting nearby resolves the contradiction by absorbing the surplus momentum &mdash; and because it is so much heavier than the pair, it can take up momentum while carrying away almost no energy, leaving the energy ledger in the lower panel essentially untouched. The nucleus is a bystander that makes the books balance.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The process runs backwards too, and more easily. An electron meeting a positron annihilates into two photons of 0.511 MeV each &mdash; and <em>that</em> needs no nucleus, because two photons going opposite ways can conserve momentum between themselves. This is the basis of PET scanning, where a positron-emitting tracer is injected and the pair of back-to-back 0.511 MeV photons is detected to locate where the annihilation happened. Note also that pair production is the third of the three processes hiding inside the attenuation coefficient &mu; in the next card, and the only one with a threshold: below 1.022 MeV it contributes exactly nothing.</p>
+      </div>
+    </div>
+
     <!-- 5. Attenuation -->
     <div class="card">
       <h2>Exponential Attenuation of a Photon Beam <span class="eqtag">Eq. 2.25, 2.26</span></h2>
@@ -539,6 +639,42 @@
 
         <h3>What &mu; is hiding</h3>
         <p class="catch">The single coefficient &mu; is a sum over three quite different removal mechanisms, each dominant in its own energy range: the photoelectric effect at low photon energies, Compton scattering in the middle, and pair production above 1.02 MeV, where a photon can convert into an electron&ndash;positron pair. That last threshold is set by the rest energy of the two particles created, 2m<sub>e</sub>c&sup2; — and pair production cannot occur in empty space at all, since a nearby nucleus is needed to take up momentum while conserving energy. So &mu; is a property of the material <em>and</em> of the photon energy together, not a fixed constant of the substance; the value used in the example above holds specifically for 2.0-MeV photons in water.</p>
+      </div>
+    </div>
+
+    <!-- 6. Photons and gravity -->
+    <div class="card">
+      <h2>Photons in a Gravitational Field <span class="eqtag">Eq. 2.28, 2.29</span></h2>
+      <p class="desc">A photon has no rest mass, yet gravity still acts on it. Drop one down a tower and it gains energy exactly as a stone would &mdash; but having nowhere to put that energy as speed, it puts it into frequency instead.</p>
+      <div class="eq">falling through H: &nbsp; &nu;&prime; = &nu;(1 + gH/c&sup2;) &nbsp;&nbsp;|&nbsp;&nbsp; escaping a star: &nbsp; &Delta;&nu;/&nu; = &minus;GM/c&sup2;R</div>
+      <div class="controls">
+        <div class="ctrl"><label>Tower height H (m) <span class="val" id="gr_H_val">22.5</span></label>
+          <input type="range" id="gr_H" min="0.5" max="500" step="0.5" value="22.5"></div>
+        <div class="ctrl"><label>Escaping from</label>
+          <select id="gr_obj">
+            <option value="earth">Earth</option>
+            <option value="sun">the Sun</option>
+            <option value="wd" selected>Sirius B (white dwarf)</option>
+            <option value="ns">a neutron star</option>
+          </select></div>
+      </div>
+      <canvas id="gr_canvas" height="260"></canvas>
+      <canvas id="gr_canvas_star" height="280" style="margin-top:12px;"></canvas>
+      <div class="readout" id="gr_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is the laboratory version: a photon falling down a tower of height H, arriving with a slightly higher frequency than it left with. The wavelength change drawn there is exaggerated by something like fourteen orders of magnitude, because at the real scale nothing whatever would be visible &mdash; the number printed underneath is the honest one.</p>
+        <p>The lower panel is the astronomical version, plotting the red shift of a photon escaping a body against how close that body's radius is to its own Schwarzschild radius. The red dashed curve is Beiser's Eq. 2.29; the solid teal curve is the exact general-relativistic result. They agree wherever gravity is weak, which is everywhere on the right-hand side of the plot, and part company only as the object approaches its horizon.</p>
+
+        <h3>The argument, which is disarmingly simple</h3>
+        <p>Drop a stone of mass m through a height H and it gains energy mgH. A photon cannot speed up, since it already travels at c. But it has energy h&nu;, and by E = mc&sup2; that energy behaves gravitationally like a mass of h&nu;/c&sup2;. Give it the same energy gain that a mass of h&nu;/c&sup2; would receive, and h&nu;&prime; = h&nu; + (h&nu;/c&sup2;)gH, which is Eq. 2.28. The photon banks its winnings as frequency.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>H = 22.5 m</b>, the height of the tower at Harvard that Pound and Rebka used in 1960. The fractional shift is 2.45 &times; 10&#8315;&#185;&#8309; &mdash; about two parts in a thousand trillion. For the red light in Beiser's Example 2.8 that is a change of 1.8 Hz out of 7.3 &times; 10&#185;&#8308;. Detecting a shift that small is the real achievement, and it took the M&ouml;ssbauer effect, which produces gamma rays with an extraordinarily sharp frequency, to do it. Then work down the object menu in the lower panel: <b>Earth</b> gives 7 &times; 10&#8315;&#185;&#8304;, <b>the Sun</b> 2 &times; 10&#8315;&#8310;, <b>Sirius B</b> 2.6 &times; 10&#8315;&#8308; &mdash; which is why white dwarfs were where the effect was first seen astronomically &mdash; and <b>a neutron star</b> around 0.17, a shift of 17% that no one could miss.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Beiser is careful to flag that his own formula is an approximation. Taken literally it says a photon can never escape once GM/c&sup2;R reaches 1; general relativity, worked through properly, gives the criterion as 1/2, so the horizon sits at the Schwarzschild radius R<sub>S</sub> = 2GM/c&sup2;. You can watch that discrepancy appear in the lower panel: the two curves lie on top of each other until R is within an order of magnitude or so of R<sub>S</sub>, then diverge sharply, with only the exact curve running away to infinity at the horizon itself. This is a good habit to notice &mdash; an argument built from special relativity plus Newtonian gravity gets the weak-field answer exactly right and the strong-field answer wrong by a factor of two. Note finally that this red shift has nothing to do with the Doppler shift in the Chapter 1 card: nothing here is receding. The photon is losing energy climbing out of a gravitational well, not being stretched by relative motion.</p>
       </div>
     </div>
 

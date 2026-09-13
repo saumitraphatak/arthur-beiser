@@ -12,6 +12,12 @@ const HC_EV_NM = 1239.84;     // eV*nm
 const HC_EV_PM = 1.23984e6;   // eV*pm
 const LAMBDA_C_PM = 2.426;    // electron Compton wavelength, pm
 const WIEN_B = 2.8978e-3;     // m*K
+const C_EXACT = 2.99792458e8; // m/s, for ratios where the rounding shows
+const ME_C2_MEV = 0.511;      // electron rest energy, MeV
+const G_GRAV = 6.674e-11;     // m^3 kg^-1 s^-2
+const G_EARTH = 9.80665;      // m/s^2
+const M_SUN = 1.989e30, R_SUN = 6.957e8;      // kg, m
+const M_EARTH = 5.972e24, R_EARTH = 6.371e6;  // kg, m
 
 // ---------- tab switching ----------
 const drawFns = {};
@@ -166,6 +172,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // means one broken module can only ever take itself down, never the rest of
   // the page.
   const modules = [
+    ['setupMichelsonMorley', setupMichelsonMorley],
     ['setupTimeDilation', setupTimeDilation],
     ['setupLengthContraction', setupLengthContraction],
     ['setupVelocityAddition', setupVelocityAddition],
@@ -175,9 +182,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     ['setupMinkowski', setupMinkowski],
     ['setupBlackbody', setupBlackbody],
     ['setupPhotoelectric', setupPhotoelectric],
-    ['setupCompton', setupCompton],
+    ['setupXrayProduction', setupXrayProduction],
     ['setupBragg', setupBragg],
+    ['setupCompton', setupCompton],
+    ['setupPairProduction', setupPairProduction],
     ['setupAttenuation', setupAttenuation],
+    ['setupGravRedshift', setupGravRedshift],
   ];
   modules.forEach(([name, fn])=>{
     try{ fn(); }
@@ -935,4 +945,559 @@ function setupAttenuation(){
   }
   muEl.addEventListener('input',draw); xEl.addEventListener('input',draw);
   registerCanvas('at_canvas',draw);
+}
+
+/* =====================================================================
+   0. MICHELSON-MORLEY  (the experiment that started Chapter 1)
+   ===================================================================== */
+function setupMichelsonMorley(){
+  const cDiag = document.getElementById('mm_canvas');
+  const cFr   = document.getElementById('mm_canvas_fringes');
+  const vEl=document.getElementById('mm_v'), vVal=document.getElementById('mm_v_val');
+  const LEl=document.getElementById('mm_L'), LVal=document.getElementById('mm_L_val');
+  const lamEl=document.getElementById('mm_lam'), lamVal=document.getElementById('mm_lam_val');
+  const readout=document.getElementById('mm_readout');
+  const SENSITIVITY = 0.01;   // fringes; what the 1887 apparatus could see
+
+  function physics(){
+    const v = parseFloat(vEl.value)*1000;          // km/s -> m/s
+    const L = parseFloat(LEl.value);               // m
+    const lam = parseFloat(lamEl.value)*1e-9;      // nm -> m
+    const beta = v/C_EXACT;
+    const b2 = beta*beta;
+    // round-trip times through a hypothetical ether wind
+    const tPar  = (2*L/C_EXACT)/(1-b2);            // arm along the wind
+    const tPerp = (2*L/C_EXACT)/Math.sqrt(1-b2);   // arm across the wind
+    const dt = tPar - tPerp;
+    const pathDiff = C_EXACT*dt;                   // metres of extra path
+    // rotating the apparatus 90 deg swaps the arms, so the shift is doubled
+    const fringes = 2*pathDiff/lam;
+    return {v,L,lam,beta,tPar,tPerp,dt,pathDiff,fringes};
+  }
+
+  function drawDiagram(){
+    const {ctx,w,h}=fitCanvas(cDiag);
+    const p = physics();
+    ctx.clearRect(0,0,w,h);
+
+    const sx = Math.min(w*0.30, 118);              // arm length on screen
+    const bsx = w*0.34, bsy = h*0.70;              // beam splitter position
+    const mirA = {x:bsx, y:bsy-sx};                // perpendicular arm (up)
+    const mirB = {x:bsx+sx, y:bsy};                // parallel arm (along wind)
+
+    // ether wind arrows across the background
+    ctx.strokeStyle='rgba(31,111,120,0.30)'; ctx.fillStyle='rgba(31,111,120,0.30)'; ctx.lineWidth=1.4;
+    for(let i=0;i<4;i++){
+      const y = 16 + i*((h-30)/4), x0 = 8, x1 = 8+34;
+      ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x1-6,y-3.5); ctx.lineTo(x1-6,y+3.5); ctx.closePath(); ctx.fill();
+    }
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#1f6f78';
+    ctx.fillText(`hypothetical ether wind  v = ${fmt(p.v/1000,0)} km/s`, 8, h-8);
+
+    // beams
+    ctx.lineWidth=2.2;
+    ctx.strokeStyle='#a4342c';                     // parallel arm (with/against the wind)
+    ctx.beginPath(); ctx.moveTo(bsx,bsy); ctx.lineTo(mirB.x,mirB.y); ctx.stroke();
+    ctx.strokeStyle='#1f6f78';                     // perpendicular arm (across the wind)
+    ctx.beginPath(); ctx.moveTo(bsx,bsy); ctx.lineTo(mirA.x,mirA.y); ctx.stroke();
+    ctx.strokeStyle='#8a8d92';                     // source in, combined beam out
+    ctx.beginPath(); ctx.moveTo(bsx-sx*0.75,bsy); ctx.lineTo(bsx,bsy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bsx,bsy); ctx.lineTo(bsx,bsy+sx*0.42); ctx.stroke();
+
+    // mirrors
+    function mirror(x,y,horiz,label,color){
+      ctx.strokeStyle=color; ctx.lineWidth=4;
+      ctx.beginPath();
+      if(horiz){ ctx.moveTo(x-16,y); ctx.lineTo(x+16,y); } else { ctx.moveTo(x,y-16); ctx.lineTo(x,y+16); }
+      ctx.stroke();
+      ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle=color; ctx.textAlign='center';
+      ctx.fillText(label, x, horiz? y-8 : y-22);
+    }
+    mirror(mirA.x,mirA.y,true,'mirror A (across)','#1f6f78');
+    mirror(mirB.x,mirB.y,false,'mirror B (along)','#a4342c');
+
+    // beam splitter
+    ctx.strokeStyle='#1c1d20'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(bsx-11,bsy+11); ctx.lineTo(bsx+11,bsy-11); ctx.stroke();
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63'; ctx.textAlign='right';
+    ctx.fillText('half-silvered mirror', bsx-14, bsy+22);
+    ctx.textAlign='left';
+    ctx.fillText('source', bsx-sx*0.75, bsy-8);
+    ctx.textAlign='center';
+    ctx.fillText('screen', bsx, bsy+sx*0.42+14);
+
+    // Per-arm transit times. Printing them in full is useless — they agree to
+    // eight significant figures — so show each arm's DELAY relative to the
+    // no-ether round trip 2L/c, which is where the whole effect lives.
+    const base = 2*p.L/C_EXACT;
+    const tx = bsx + sx + 34;
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+    ctx.fillStyle='#5a5d63';
+    ctx.fillText(`with no ether both arms take 2L/c = ${fmtSci(base,4)} s`, tx, bsy+20);
+    ctx.fillStyle='#a4342c';
+    ctx.fillText(`along:  +${fmtSci(p.tPar-base,3)} s   (≈ 2L/c · β²)`, tx, bsy+37);
+    ctx.fillStyle='#1f6f78';
+    ctx.fillText(`across: +${fmtSci(p.tPerp-base,3)} s   (≈ 2L/c · β²/2)`, tx, bsy+52);
+    ctx.fillStyle='#1c1d20';
+    ctx.fillText(`difference Δt = ${fmtSci(p.dt,3)} s`, tx, bsy+69);
+  }
+
+  function drawFringes(){
+    const {ctx,w,h}=fitCanvas(cFr);
+    const p = physics();
+    ctx.clearRect(0,0,w,h);
+    const m={l:14,r:14};
+    const bandH = 40, gap = 30;
+    const fringeW = 46;                             // px per fringe, purely for display
+    const y0 = 26, y1 = y0+bandH+gap+14;
+
+    function band(yTop, shiftFringes, label, labelColor){
+      for(let x=m.l; x<w-m.r; x++){
+        const phase = (x - m.l)/fringeW - shiftFringes;
+        const I = Math.pow(Math.cos(Math.PI*phase),2);
+        const g = Math.round(255*(1-0.92*I));
+        ctx.fillStyle = `rgb(${g},${g},${g})`;
+        ctx.fillRect(x,yTop,1,bandH);
+      }
+      ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=1; ctx.strokeRect(m.l,yTop,w-m.l-m.r,bandH);
+      ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle=labelColor;
+      ctx.fillText(label, m.l, yTop-6);
+    }
+
+    band(y0, 0, 'Fringes before rotating the apparatus', '#5a5d63');
+    band(y1, p.fringes, `Ether theory predicts this pattern after a 90° rotation — shifted by ${fmt(p.fringes,3)} fringes`, '#a4342c');
+
+    // mark a reference fringe centre in both bands so the shift is visible
+    const refX = m.l + fringeW*Math.round((w-m.l-m.r)/(2*fringeW));
+    ctx.strokeStyle='#1f6f78'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(refX,y0-2); ctx.lineTo(refX,y0+bandH+2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(refX,y1-2); ctx.lineTo(refX,y1+bandH+2); ctx.stroke();
+    const shiftedX = refX + p.fringes*fringeW;
+    if(shiftedX > m.l && shiftedX < w-m.r){
+      ctx.strokeStyle='#a4342c'; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(shiftedX,y1-2); ctx.lineTo(shiftedX,y1+bandH+2); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // the actual result
+    ctx.font='bold 12px Helvetica,Arial,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#1e7a3d';
+    ctx.fillText('Measured in 1887, and in every repeat since: no shift whatsoever.', w/2, y1+bandH+24);
+  }
+
+  function draw(){
+    const p = physics();
+    vVal.textContent = fmt(p.v/1000,0);
+    LVal.textContent = fmt(p.L,1);
+    lamVal.textContent = fmt(p.lam*1e9,0);
+    drawDiagram(); drawFringes();
+    const detectable = p.fringes/SENSITIVITY;
+    readout.innerHTML = `
+      <div>&beta; = v/c <b>${fmtSci(p.beta,3)}</b></div>
+      <div>t&#8741; &minus; t&#8869; <b>${fmtSci(p.dt,3)} s</b></div>
+      <div>extra path <b>${fmt(p.pathDiff*1e9,4)} nm</b></div>
+      <div>predicted shift <b>${fmt(p.fringes,3)} fringes</b></div>
+      <div>apparatus could see <b>${SENSITIVITY} fringes</b></div>
+      <div>predicted / detectable <b>${fmt(detectable,1)}&times;</b>
+        ${detectable>1?'<span class="badge no">should have been obvious</span>':'<span class="badge ok">too small to see</span>'}</div>
+      <div>observed shift <b>0</b> <span class="badge ok">no ether</span></div>`;
+  }
+  [vEl,LEl,lamEl].forEach(el=>el.addEventListener('input',draw));
+  registerCanvas('mm_canvas',draw);
+  registerCanvas('mm_canvas_fringes',draw);
+}
+
+/* =====================================================================
+   X-RAY PRODUCTION  (the inverse photoelectric effect)
+   ===================================================================== */
+function setupXrayProduction(){
+  const canvas=document.getElementById('xr_canvas');
+  const VEl=document.getElementById('xr_V'), VVal=document.getElementById('xr_V_val');
+  const targetEl=document.getElementById('xr_target');
+  const classicalEl=document.getElementById('xr_classical');
+  const readout=document.getElementById('xr_readout');
+
+  // K-series lines: excitation energy (keV) and line wavelengths (pm)
+  const TARGETS = {
+    'W':  {name:'Tungsten',    Z:74, Kedge:69.5, Ka:20.9,  Kb:18.4},
+    'Mo': {name:'Molybdenum',  Z:42, Kedge:20.0, Ka:71.1,  Kb:63.2},
+    'Cu': {name:'Copper',      Z:29, Kedge:8.98, Ka:154.1, Kb:139.2}
+  };
+
+  // Kramers' law for the bremsstrahlung continuum, zero below the cutoff
+  function kramers(lam, lamMin){
+    if(lam <= lamMin) return 0;
+    return (1/(lam*lam))*(lam/lamMin - 1);
+  }
+
+  function draw(){
+    const {ctx,w,h}=fitCanvas(canvas);
+    const kV = parseFloat(VEl.value); VVal.textContent = fmt(kV,0);
+    const t = TARGETS[targetEl.value];
+    const lamMin = HC_EV_PM/(kV*1000);          // pm; depends ONLY on the voltage
+    const Emax = kV;                             // keV
+    ctx.clearRect(0,0,w,h);
+
+    const xmax = 200;                            // pm
+    const m={l:56,r:16,t:22,b:34};
+    // continuum peaks at 2*lamMin; normalise the plot to that
+    const peak = kramers(2*lamMin, lamMin);
+    const ymax = peak*1.45;
+    const {X,Y}=drawAxes(ctx,w,h,m,0,xmax,0,ymax,'λ (pm)','relative intensity',
+                         {nx:5,ny:4,yfmt:()=>''});
+
+    // what classical electromagnetism predicts: a continuum with no cutoff at all
+    if(classicalEl.checked){
+      const cl=[];
+      for(let l=2;l<=xmax;l+=0.5){
+        // same falling shape, but continuing straight through the cutoff to lambda -> 0
+        cl.push({x:l, y:Math.min(ymax*1.4, peak*Math.pow(2*lamMin/l,2))});
+      }
+      plotLine(ctx,X,Y,cl,'#8a8d92',1.8,[5,3]);
+    }
+
+    // the measured continuum
+    const pts=[];
+    for(let l=0.2;l<=xmax;l+=0.35) pts.push({x:l,y:kramers(l,lamMin)});
+    plotLine(ctx,X,Y,pts,'#a4342c',2.4);
+
+    // sharp cutoff line
+    plotLine(ctx,X,Y,[{x:lamMin,y:0},{x:lamMin,y:ymax}],'#1f6f78',1.8,[3,3]);
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1f6f78'; ctx.textAlign='left';
+    ctx.fillText(`λ_min = ${fmt(lamMin,1)} pm`, X(lamMin)+6, m.t+14);
+
+    // characteristic lines, present only if the beam can knock out a K electron
+    const excited = kV >= t.Kedge;
+    if(excited){
+      const drive = Math.pow((kV - t.Kedge)/t.Kedge, 1.5);
+      [[t.Ka,'Kα',1.0],[t.Kb,'Kβ',0.52]].forEach(([lam,label,rel])=>{
+        if(lam>xmax || lam<lamMin) return;
+        const hgt = Math.min(ymax*0.96, ymax*0.42*rel*Math.max(0.35,Math.min(2.4,drive)) + kramers(lam,lamMin));
+        plotLine(ctx,X,Y,[{x:lam,y:kramers(lam,lamMin)},{x:lam,y:hgt}],'#1c1d20',2.6);
+        ctx.fillStyle='#1c1d20'; ctx.textAlign='center';
+        ctx.fillText(label, X(lam), Y(hgt)-6);
+      });
+    }
+
+    // legend on the right, clear of the cutoff label on the left
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='right';
+    let ly = m.t+14;
+    ctx.fillStyle='#a4342c'; ctx.fillText(`${t.name} target, ${fmt(kV,0)} kV`, w-m.r-8, ly); ly+=16;
+    if(classicalEl.checked){
+      ctx.fillStyle='#8a8d92'; ctx.fillText('classical prediction: no cutoff', w-m.r-8, ly); ly+=16;
+    }
+    ctx.fillStyle='#5a5d63';
+    ctx.fillText(excited
+      ? `${fmt(kV,0)} kV clears the ${fmt(t.Kedge,1)} kV K edge — lines present`
+      : `below the ${fmt(t.Kedge,1)} kV K edge — no ${t.name} lines`, w-m.r-8, ly);
+
+    readout.innerHTML = `
+      <div>accelerating voltage <b>${fmt(kV,0)} kV</b></div>
+      <div>max photon energy <b>${fmt(Emax,1)} keV</b></div>
+      <div>&lambda;<sub>min</sub> = hc/eV <b>${fmt(lamMin,2)} pm</b></div>
+      <div>continuum peak &asymp; 2&lambda;<sub>min</sub> <b>${fmt(2*lamMin,1)} pm</b></div>
+      <div>${t.name} K excitation <b>${fmt(t.Kedge,1)} kV</b></div>
+      <div>K lines <b>${excited?`K&alpha; ${fmt(t.Ka,1)} pm`:'not excited'}</b>
+        ${excited?'<span class="badge ok">present</span>':'<span class="badge no">absent</span>'}</div>`;
+  }
+  VEl.addEventListener('input',draw);
+  targetEl.addEventListener('change',draw);
+  classicalEl.addEventListener('change',draw);
+  registerCanvas('xr_canvas',draw);
+}
+
+/* =====================================================================
+   PAIR PRODUCTION
+   ===================================================================== */
+function setupPairProduction(){
+  const cEvent=document.getElementById('pp_canvas');
+  const cSplit=document.getElementById('pp_canvas_split');
+  const EEl=document.getElementById('pp_E'), EVal=document.getElementById('pp_E_val');
+  const readout=document.getElementById('pp_readout');
+  const THRESH = 2*ME_C2_MEV;   // 1.022 MeV
+
+  function drawEvent(){
+    const {ctx,w,h}=fitCanvas(cEvent);
+    const E = parseFloat(EEl.value);
+    ctx.clearRect(0,0,w,h);
+    const allowed = E >= THRESH;
+    const nx = w*0.44, ny = h*0.52;
+
+    // incoming photon drawn as a wave
+    ctx.strokeStyle='#8a8d92'; ctx.lineWidth=2.2;
+    ctx.beginPath();
+    const x0 = 24, amp = 7, per = 17;
+    for(let x=x0;x<=nx-16;x++){
+      const y = ny + amp*Math.sin((x-x0)/per*2*Math.PI);
+      if(x===x0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(nx-16,ny); ctx.lineTo(nx-26,ny-5); ctx.lineTo(nx-26,ny+5); ctx.closePath();
+    ctx.fillStyle='#8a8d92'; ctx.fill();
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#8a8d92';
+    ctx.fillText(`photon, ${fmt(E,3)} MeV`, x0, ny-16);
+
+    // the nucleus, which is what makes the whole thing possible
+    ctx.fillStyle='#1c1d20'; ctx.beginPath(); ctx.arc(nx,ny,9,0,7); ctx.fill();
+    ctx.fillStyle='#5a5d63'; ctx.textAlign='center';
+    ctx.fillText('nucleus', nx, ny+26);
+
+    if(allowed){
+      // tracks curve apart, as they would in a bubble chamber's magnetic field.
+      // higher momentum => straighter track, so curvature falls as energy rises.
+      const KEtot = E - THRESH;
+      // Each track is a circular arc whose radius grows with the particle's
+      // momentum, exactly as it would in a bubble chamber: stiffer particles
+      // bend less. Marched forward until the arc would leave the frame.
+      const pMeV = Math.sqrt(Math.max(0,Math.pow(E/2,2) - ME_C2_MEV*ME_C2_MEV));
+      const R = 42 + pMeV*95;
+      [[-1,'#a4342c','e⁻'],[1,'#1f6f78','e⁺']].forEach(([sgn,color,label])=>{
+        ctx.strokeStyle=color; ctx.lineWidth=2.4;
+        ctx.beginPath();
+        let lastX=nx, lastY=ny;
+        for(let phi=0; phi<=Math.PI*0.92; phi+=0.012){
+          const x = nx + R*Math.sin(phi);
+          const y = ny + sgn*R*(1-Math.cos(phi));
+          if(x > w-104 || y < 15 || y > h-15) break;
+          if(phi===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          lastX=x; lastY=y;
+        }
+        ctx.stroke();
+        ctx.fillStyle=color; ctx.textAlign='left';
+        const ly = Math.max(14, Math.min(h-8, lastY + sgn*13));
+        ctx.fillText(`${label}  KE ${fmt(KEtot/2,3)} MeV`, Math.min(lastX+8, w-100), ly);
+      });
+      ctx.textAlign='center'; ctx.fillStyle='#1e7a3d'; ctx.font='bold 12px Helvetica,Arial,sans-serif';
+      ctx.fillText('pair created', nx+60, 18);
+    } else {
+      // photon simply carries on
+      ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=2; ctx.setLineDash([5,3]);
+      ctx.beginPath();
+      for(let x=nx+12;x<=w-24;x++){
+        const y = ny + amp*Math.sin((x-x0)/per*2*Math.PI);
+        if(x===nx+12) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+      ctx.textAlign='center'; ctx.fillStyle='#a4342c'; ctx.font='bold 12px Helvetica,Arial,sans-serif';
+      ctx.fillText(`below threshold — needs ${THRESH} MeV`, w/2, 18);
+      ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63';
+      ctx.fillText('no pair can be made; the photon carries on', w/2, h-10);
+    }
+  }
+
+  function drawSplit(){
+    const {ctx,w,h}=fitCanvas(cSplit);
+    const E = parseFloat(EEl.value);
+    ctx.clearRect(0,0,w,h);
+    const m={l:52,r:16,t:22,b:34};
+    const xmax=10;
+    const {X,Y}=drawAxes(ctx,w,h,m,0,xmax,0,10,'photon energy hν (MeV)','energy (MeV)',{nx:5,ny:5});
+
+    // the fixed rest-mass floor that must be paid before anything else happens
+    const restPts=[], kePts=[];
+    for(let e=0;e<=xmax;e+=0.05){
+      restPts.push({x:e, y: e>=THRESH ? THRESH : null});
+      kePts.push({x:e, y: e>=THRESH ? e : null});
+    }
+    // shade the region that becomes kinetic energy
+    ctx.save();
+    ctx.fillStyle='rgba(31,111,120,0.13)';
+    ctx.beginPath();
+    ctx.moveTo(X(THRESH),Y(THRESH));
+    for(let e=THRESH;e<=xmax;e+=0.05) ctx.lineTo(X(e),Y(e));
+    ctx.lineTo(X(xmax),Y(THRESH)); ctx.closePath(); ctx.fill();
+    ctx.restore();
+
+    plotLine(ctx,X,Y,kePts,'#1f6f78',2.4);
+    plotLine(ctx,X,Y,restPts,'#a4342c',2.2,[5,3]);
+    plotLine(ctx,X,Y,[{x:THRESH,y:0},{x:THRESH,y:10}],'#a4342c',1.4,[3,3]);
+
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+    ctx.fillStyle='#a4342c'; ctx.fillText('rest energy 2m₀c² = 1.022 MeV (fixed)', m.l+8, Y(THRESH)-8);
+    ctx.fillStyle='#1f6f78'; ctx.fillText('shaded: shared kinetic energy', m.l+8, m.t+14);
+    if(E>=THRESH){
+      dotAt(ctx,X,Y,E,Math.min(10,E),'#1f6f78',5);
+      dotAt(ctx,X,Y,E,THRESH,'#a4342c',4);
+    } else {
+      plotLine(ctx,X,Y,[{x:E,y:0},{x:E,y:THRESH}],'#8a8d92',2);
+    }
+  }
+
+  function draw(){
+    const E = parseFloat(EEl.value); EVal.textContent = fmt(E,2);
+    drawEvent(); drawSplit();
+    const allowed = E>=THRESH;
+    const KEtot = Math.max(0, E-THRESH);
+    const gamma = E/(2*ME_C2_MEV);
+    const beta = gamma>1 ? Math.sqrt(1-1/(gamma*gamma)) : 0;
+    const lam_pm = HC_EV_PM/(E*1e6);
+    readout.innerHTML = `
+      <div>photon energy <b>${fmt(E,3)} MeV</b></div>
+      <div>&lambda; of that photon <b>${fmt(lam_pm,4)} pm</b></div>
+      <div>threshold 2m&#8320;c&sup2; <b>${THRESH} MeV</b></div>
+      <div>status <b>${allowed?'pair can be created':'forbidden'}</b>
+        ${allowed?'<span class="badge ok">allowed</span>':'<span class="badge no">below threshold</span>'}</div>
+      <div>kinetic energy shared <b>${fmt(KEtot,3)} MeV</b></div>
+      <div>KE each particle <b>${fmt(KEtot/2,3)} MeV</b></div>
+      <div>&gamma; of each <b>${allowed?fmt(gamma,3):'—'}</b></div>
+      <div>speed of each <b>${allowed?fmt(beta,4)+'c':'—'}</b></div>
+      <div>fraction spent on rest mass <b>${allowed?fmt(THRESH/E*100,1)+'%':'—'}</b></div>`;
+  }
+  EEl.addEventListener('input',draw);
+  registerCanvas('pp_canvas',draw);
+  registerCanvas('pp_canvas_split',draw);
+}
+
+/* =====================================================================
+   PHOTONS IN A GRAVITATIONAL FIELD  (Pound-Rebka, and the red shift)
+   ===================================================================== */
+function setupGravRedshift(){
+  const cTower=document.getElementById('gr_canvas');
+  const cStar =document.getElementById('gr_canvas_star');
+  const HEl=document.getElementById('gr_H'), HVal=document.getElementById('gr_H_val');
+  const objEl=document.getElementById('gr_obj');
+  const readout=document.getElementById('gr_readout');
+
+  // M (kg), R (m)
+  const OBJECTS = {
+    earth: {name:'Earth',              M:M_EARTH,       R:R_EARTH},
+    sun:   {name:'the Sun',            M:M_SUN,         R:R_SUN},
+    wd:    {name:'Sirius B (white dwarf)', M:1.018*M_SUN, R:5.85e6},
+    ns:    {name:'a neutron star',     M:1.4*M_SUN,     R:1.2e4}
+  };
+
+  function drawTower(){
+    const {ctx,w,h}=fitCanvas(cTower);
+    const H = parseFloat(HEl.value);
+    ctx.clearRect(0,0,w,h);
+    const shift = G_EARTH*H/(C_EXACT*C_EXACT);     // fractional, for a photon falling H
+
+    const gx = w*0.30, top = 26, bot = h-34;
+    // tower
+    ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(gx-26,bot); ctx.lineTo(gx-26,top); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx+26,bot); ctx.lineTo(gx+26,top); ctx.stroke();
+    ctx.strokeStyle='#8a8d92'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(gx-46,bot); ctx.lineTo(gx+46,bot); ctx.stroke();
+
+    // falling photon, drawn as a wave that tightens very slightly on the way down
+    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2;
+    ctx.beginPath();
+    for(let y=top+6;y<=bot-6;y++){
+      const f = (y-top)/(bot-top);
+      const per = 20*(1-0.30*f);                   // visual exaggeration, stated in the label
+      const x = gx + 9*Math.sin(y/per*2*Math.PI);
+      if(y===top+6) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#5a5d63';
+    ctx.fillText('emitted at the top: ν', gx+40, top+10);
+    ctx.fillStyle='#a4342c';
+    ctx.fillText(`detected at the bottom: ν(1 + gH/c²)`, gx+40, bot-6);
+    ctx.fillStyle='#8a8d92';
+    ctx.fillText(`H = ${fmt(H,1)} m`, gx-96, (top+bot)/2);
+    ctx.fillText('(wavelength change', gx+40, (top+bot)/2 - 7);
+    ctx.fillText('hugely exaggerated)', gx+40, (top+bot)/2 + 8);
+
+    // the actual size of the effect, spelled out
+    ctx.font='12px Helvetica,Arial,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#1c1d20';
+    ctx.fillText(`Δν/ν = gH/c² = ${fmtSci(shift,3)}`, w/2, h-12);
+  }
+
+  function drawStar(){
+    const {ctx,w,h}=fitCanvas(cStar);
+    ctx.clearRect(0,0,w,h);
+    const m={l:62,r:16,t:22,b:36};
+    // log-log: the four objects span ten decades, so a linear axis would pile
+    // Earth and the Sun onto the baseline and show nothing.
+    const lgXmin=0, lgXmax=9;        // R/R_S from 1 to 10^9
+    const lgYmin=-11, lgYmax=0;      // fractional frequency loss
+    const X = x => m.l + (Math.log10(x)-lgXmin)/(lgXmax-lgXmin)*(w-m.l-m.r);
+    const Y = y => h-m.b - (Math.log10(y)-lgYmin)/(lgYmax-lgYmin)*(h-m.b-m.t);
+    const SUP = ['\u2070','\u00b9','\u00b2','\u00b3','\u2074','\u2075','\u2076','\u2077','\u2078','\u2079'];
+    const sup = n => String(Math.abs(n)).split('').map(d=>SUP[+d]).join('');
+    const pow10 = n => n===0 ? '1' : (n===1 ? '10' : '10'+(n<0?'\u207b':'')+sup(n));
+
+    ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif';
+    ctx.strokeStyle='#e7e4dc'; ctx.lineWidth=1; ctx.fillStyle='#8a8d92';
+    for(let e=lgXmin;e<=lgXmax;e++){
+      const px=X(Math.pow(10,e));
+      ctx.beginPath(); ctx.moveTo(px,m.t); ctx.lineTo(px,h-m.b); ctx.stroke();
+      ctx.textAlign='center'; ctx.fillText(pow10(e), px, h-m.b+16);
+    }
+    for(let e=lgYmin;e<=lgYmax;e+=2){
+      const py=Y(Math.pow(10,e));
+      ctx.beginPath(); ctx.moveTo(m.l,py); ctx.lineTo(w-m.r,py); ctx.stroke();
+      ctx.textAlign='right'; ctx.fillText(pow10(e), m.l-8, py+3);
+    }
+    ctx.strokeStyle='#1c1d20'; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.moveTo(m.l,m.t); ctx.lineTo(m.l,h-m.b); ctx.lineTo(w-m.r,h-m.b); ctx.stroke();
+    ctx.fillStyle='#1c1d20'; ctx.textAlign='center';
+    ctx.fillText('R / R\u209b   (radius, in Schwarzschild radii)', m.l+(w-m.l-m.r)/2, h-6);
+    ctx.save(); ctx.translate(14, m.t+(h-m.b-m.t)/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('fractional frequency loss',0,0); ctx.restore();
+    ctx.restore();
+
+    // Beiser Eq 2.29 in these units is exactly 1/(2x); exact GR is 1 - sqrt(1-1/x)
+    function plotLog(fn,color,width,dash){
+      ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=width; if(dash) ctx.setLineDash(dash);
+      ctx.beginPath(); let started=false;
+      for(let lg=lgXmax; lg>=lgXmin; lg-=0.005){
+        const x=Math.pow(10,lg), y=fn(x);
+        if(y==null||!isFinite(y)||y<=0){ started=false; continue; }
+        const py=Y(Math.min(1,y));
+        if(!started){ ctx.moveTo(X(x),py); started=true; } else ctx.lineTo(X(x),py);
+      }
+      ctx.stroke(); ctx.restore();
+    }
+    plotLog(x => x>1 ? 1-Math.sqrt(1-1/x) : null, '#1f6f78', 2.6);
+    plotLog(x => 1/(2*x), '#a4342c', 2, [5,3]);
+
+    // where real objects sit
+    Object.keys(OBJECTS).forEach(k=>{
+      const o=OBJECTS[k];
+      const Rs = 2*G_GRAV*o.M/(C_EXACT*C_EXACT);
+      const x = o.R/Rs, y = 1/(2*x);
+      if(x<1 || x>Math.pow(10,lgXmax) || y<Math.pow(10,lgYmin)) return;
+      const isCur = (k===objEl.value);
+      ctx.fillStyle = isCur ? '#1c1d20' : '#b9b3a4';
+      ctx.beginPath(); ctx.arc(X(x), Y(y), isCur?5.5:3.5, 0, 7); ctx.fill();
+      ctx.font = (isCur?'bold ':'')+'11px Helvetica,Arial,sans-serif';
+      ctx.fillStyle = isCur ? '#1c1d20' : '#8a8d92';
+      ctx.textAlign = X(x) > w*0.62 ? 'right' : 'left';
+      ctx.fillText(o.name, X(x) + (X(x)>w*0.62?-9:9), Y(y)-7);
+    });
+
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='right';
+    ctx.fillStyle='#1f6f78'; ctx.fillText('exact (general relativity)', w-m.r-8, m.t+14);
+    ctx.fillStyle='#a4342c'; ctx.fillText('Beiser Eq. 2.29:  GM/c\u00b2R', w-m.r-8, m.t+30);
+  }
+
+  function draw(){
+    const H = parseFloat(HEl.value); HVal.textContent = fmt(H,1);
+    drawTower(); drawStar();
+    const towerShift = G_EARTH*H/(C_EXACT*C_EXACT);
+    const nuRed = 7.3e14;                       // Beiser's Example 2.8 red light
+    const o = OBJECTS[objEl.value];
+    const Rs = 2*G_GRAV*o.M/(C_EXACT*C_EXACT);
+    const zApprox = G_GRAV*o.M/(C_EXACT*C_EXACT*o.R);
+    const ratio = o.R/Rs;
+    const zExact = ratio>1 ? 1/Math.sqrt(1-1/ratio) - 1 : Infinity;
+    const lam0 = 500;                           // nm, a green line for comparison
+    readout.innerHTML = `
+      <div>tower height H <b>${fmt(H,1)} m</b></div>
+      <div>&Delta;&nu;/&nu; = gH/c&sup2; <b>${fmtSci(towerShift,3)}</b></div>
+      <div>for red light (7.3&times;10&sup1;&#8308; Hz) <b>${fmt(towerShift*nuRed,2)} Hz</b></div>
+      <div>escaping <b>${o.name}</b></div>
+      <div>&Delta;&nu;/&nu; = GM/c&sup2;R <b>${fmtSci(zApprox,3)}</b></div>
+      <div>exact GR red shift z <b>${isFinite(zExact)?fmtSci(zExact,3):'∞'}</b></div>
+      <div>Schwarzschild radius <b>${Rs>1000?fmt(Rs/1000,2)+' km':fmt(Rs*1000,2)+' mm'}</b></div>
+      <div>R / R<sub>S</sub> <b>${fmtSci(ratio,3)}</b></div>
+      <div>a 500 nm line arrives at <b>${fmt(lam0*(1+zApprox),4)} nm</b></div>`;
+  }
+  HEl.addEventListener('input',draw);
+  objEl.addEventListener('change',draw);
+  registerCanvas('gr_canvas',draw);
+  registerCanvas('gr_canvas_star',draw);
 }
