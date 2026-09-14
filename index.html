@@ -118,6 +118,12 @@
     padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:.86rem;
     background:#fff; font-family:var(--sans); color:var(--ink); cursor:pointer;
   }
+  .ctrl button{
+    padding:8px 12px; border:1px solid var(--line); border-radius:8px; font-size:.8rem;
+    background:#fff; font-family:var(--sans); color:var(--ink); cursor:pointer;
+    font-weight:600; letter-spacing:.2px;
+  }
+  .ctrl button:hover{ background:var(--code); border-color:var(--line2); }
   .rowflex{display:flex; gap:22px; flex-wrap:wrap;}
   .colgrow{flex:1; min-width:275px;}
 
@@ -207,7 +213,7 @@
       <button class="chap-btn" data-chapter="ch8" role="tab" aria-selected="false"><span class="n">8</span>Molecules</button>
       <button class="chap-btn" data-chapter="ch9" role="tab" aria-selected="false"><span class="n">9</span>Statistical Mechanics</button>
       <button class="chap-btn" data-chapter="ch10" role="tab" aria-selected="false"><span class="n">10</span>The Solid State</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">11</span>Nuclear Structure</span>
+      <button class="chap-btn" data-chapter="ch11" role="tab" aria-selected="false"><span class="n">11</span>Nuclear Structure</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">12</span>Nuclear Transf.</span>
       <span class="chap-btn soon" title="not built yet"><span class="n">13</span>Elementary Particles</span>
     </nav>
@@ -2624,12 +2630,281 @@
 
   </section>
 
+  <section class="chapter" id="ch11">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Eleven</div>
+      <h1>Nuclear Structure</h1>
+      <p>Everything up to here has been about electrons. The nucleus has been a point charge that holds them in place. It is now the subject: a hundred thousand times smaller than the atom, four hundred trillion times denser than lead, held together by a force so strong it overcomes an electrical repulsion of forty newtons between neighbouring protons &mdash; and understood, even today, only through models that contradict each other and both work.</p>
+      <p style="margin-top:10px">The atomic masses in this chapter are Beiser's own appendix table, 378 nuclides with their measured masses, natural abundances and stability. Every binding energy below is computed from those masses, not looked up.</p>
+    </div>
+
+    <!-- 1. size and density -->
+    <div class="card">
+      <h2>How Big, How Dense, How Repulsive <span class="eqtag">Sec. 11.2, Examples 11.1&ndash;11.2</span></h2>
+      <p class="desc">One formula &mdash; R = 1.2 A<sup>1/3</sup> fm &mdash; contains the single most important fact about nuclear matter: it is incompressible. Every nucleus has the same density, and that density is absurd.</p>
+      <div class="eq">R &asymp; 1.2 A<sup>1/3</sup> fm &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &rho; = m/(4/3)&pi;R&sup3; = constant</div>
+      <div class="controls">
+        <div class="ctrl"><label>Mass number A <span class="val" id="ns_a_val">12</span></label>
+          <input type="range" id="ns_a" min="1" max="250" step="1" value="12"></div>
+        <div class="ctrl"><label>Proton separation (fm) <span class="val" id="ns_sep_val">2.40</span></label>
+          <input type="range" id="ns_sep" min="1" max="8" step="0.05" value="2.4"></div>
+      </div>
+      <canvas id="ns_canvas" height="260"></canvas>
+      <canvas id="ns_profile" height="280"></canvas>
+      <div class="readout" id="ns_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the nucleons of a nucleus of mass number A, packed at the density the formula implies, with a dashed circle showing uranium for scale. Drag A from 1 to 250 and notice how little the radius changes: 250 nucleons fit inside a sphere only about 6.3 times the radius of one. That is the whole content of R &prop; A<sup>1/3</sup> &mdash; volume proportional to the number of nucleons, so each nucleon occupies its own fixed 7.2 fm&sup3; no matter what it is next to.</p>
+        <p>Below: the nucleon density plotted against distance from the centre, the quantity that electron-scattering experiments actually measure. Two things stand out, and both are consequences of that same incompressibility. The interior is <b>flat</b> &mdash; a nucleon deep inside a gold nucleus has the same neighbours as one inside carbon. And the <b>skin is the same thickness</b> in every nucleus, about 2.4 fm from 90 percent density down to 10 percent, whether the nucleus is small or large. R = 1.2 A<sup>1/3</sup> is defined as where the density falls to half its central value.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>A = 12</b>, Beiser's Example 11.1. The radius is 2.7 fm and the density comes out at about <b>2.3 &times; 10<sup>17</sup> kg/m&sup3;</b>. Now drag A anywhere you like and watch that number not move. The readout converts it: roughly <b>four billion tonnes per cubic inch</b>. A teaspoon of nuclear matter outweighs every building in a large city.</p>
+        <p class="tryit">Compare it with the neutron-star line. A neutron star packs 1.4 solar masses into a 10 km ball, reaching about three times nuclear density &mdash; a star is what you get when gravity crushes ordinary matter until the exclusion principle among nucleons is the only thing left holding it up. The two numbers being within a factor of a few is not a coincidence: a neutron star <em>is</em> a nucleus, 10<sup>19</sup> metres too big and held together by gravity instead of the strong force.</p>
+        <p class="tryit">Now the second slider, Beiser's Example 11.2. At <b>2.4 fm</b> &mdash; roughly the separation of two protons inside a nucleus &mdash; the Coulomb repulsion is <b>40 newtons</b>, about 9 pounds. That is a force you could feel in your hand, acting on a particle weighing 1.7 &times; 10<sup>&minus;27</sup> kg. Read the acceleration it implies. Whatever holds the nucleus together against that has to be, at these distances, in a completely different class from electromagnetism.</p>
+
+        <h3>Why the density is constant, and why it matters</h3>
+        <p>If nuclear forces were long-ranged like gravity or electricity, every nucleon would attract every other, the binding energy would go as A&sup2;, and nuclei would collapse to smaller and smaller volumes as they got heavier. They do not. Constant density means each nucleon interacts with only its immediate neighbours &mdash; the force <b>saturates</b>, exactly as chemical bonds in a liquid do. That single observation is the origin of the liquid-drop model two cards from here, and of the volume term a<sub>1</sub>A that dominates the binding energy.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The picture above shows nucleons as little spheres at rest in fixed positions. They are neither. A nucleon confined to a few fermi has, by the uncertainty principle, a momentum corresponding to tens of MeV of kinetic energy &mdash; they are moving at a substantial fraction of c, and the nucleus is better thought of as a seething Fermi gas than as a bag of marbles. The packing here is for scale, not for structure.</p>
+        <p class="catch">R = 1.2 A<sup>1/3</sup> also breaks down at the light end. There is no meaningful radius for A = 1, and for deuterium the two nucleons spend most of their time <em>outside</em> the range of their own attraction &mdash; the deuteron is enormous and barely bound, which is why its binding energy per nucleon is 1.1 MeV against carbon's 7.7.</p>
+      </div>
+    </div>
+
+    <!-- 2. NMR -->
+    <div class="card">
+      <h2>Nuclear Spin, the Magneton, and How an MRI Works <span class="eqtag">Sec. 11.2, Example 11.3</span></h2>
+      <p class="desc">Protons and neutrons are fermions with spin &frac12;, so they have magnetic moments &mdash; tiny ones, 1836 times smaller than an electron's. Putting them in a strong field splits their levels by about a millionth of an electronvolt, and that ridiculous little splitting is the basis of a hospital imaging machine.</p>
+      <div class="eq">&mu;<sub>N</sub> = e&#8463;/2m<sub>p</sub> &nbsp;&nbsp; &Delta;E = 2&mu;<sub>z</sub>B &nbsp;&nbsp; &nu;<sub>L</sub> = &Delta;E/h</div>
+      <div class="controls">
+        <div class="ctrl"><label>Nucleus</label>
+          <select id="nm_nuc">
+            <option value="H1" selected>¹H — the proton</option>
+            <option value="H2">²H — the deuteron</option>
+            <option value="C13">¹³C</option>
+            <option value="N14">¹⁴N</option>
+            <option value="F19">¹⁹F</option>
+            <option value="Na23">²³Na</option>
+            <option value="P31">³¹P</option>
+            <option value="n">the neutron</option>
+          </select></div>
+        <div class="ctrl"><label>Magnetic field (T) <span class="val" id="nm_b_val">1.00</span></label>
+          <input type="range" id="nm_b" min="0" max="12" step="0.05" value="1"></div>
+      </div>
+      <canvas id="nm_canvas" height="300"></canvas>
+      <div class="readout" id="nm_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The magnetic energy of a nucleus as the field is turned up. A nucleus of spin I has 2I + 1 orientations, and each one has a different energy in a field &mdash; the same Zeeman splitting as in Chapter 6, but on the nuclear scale. A spin-&frac12; nucleus gives two levels, spin 1 gives three, spin 3/2 gives four. All the lines are straight because the energy is simply &minus;&mu;<sub>z</sub>B.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take the <b>proton at 1.000 T</b>, Beiser's Example 11.3. &Delta;E is <b>1.761 &times; 10<sup>&minus;7</sup> eV</b> and the Larmor frequency is <b>42.58 MHz</b>. That frequency per tesla is the number every MRI physicist knows by heart, and the field in a clinical scanner is 1.5 or 3 T, so the radio transmitter runs at 64 or 128 MHz &mdash; just below the FM broadcast band. Radio waves of that wavelength pass through a human being as though they were not there, which is the entire reason this works as a medical imaging method and X-rays do not.</p>
+        <p class="tryit">Now select the <b>neutron</b>. It has no charge at all, yet it has a magnetic moment &mdash; and the moment points <em>opposite</em> to its spin, where the proton's points along. Neither fact makes any sense for a structureless particle. Both are direct evidence that nucleons have charged constituents inside them, which is Chapter 13's subject and which no one suspected when these moments were first measured.</p>
+        <p class="tryit">Look at the moment of the proton: <b>2.793 &mu;<sub>N</sub></b>, not 1. A structureless spin-&frac12; particle of charge e should have a moment of exactly one magneton &mdash; the electron's, in Bohr magnetons, is 1.001. The proton is off by a factor of nearly three. That anomaly, and the neutron's &minus;1.913, were measured by Otto Stern in the 1930s and were the first hard evidence that the nucleons are composite.</p>
+        <p class="tryit">Finally, read the last line. At room temperature kT is about <b>150,000 times</b> the splitting, so thermal motion very nearly randomises the spins: only a few nuclei per million end up in the lower state. An MRI image is built from that few-in-a-million excess &mdash; which is why scanners need enormous fields and why a hydrogen-rich sample (i.e. water, i.e. you) is the only thing with enough nuclei to make it work.</p>
+
+        <h3>Why the nuclear magneton is so small</h3>
+        <p>&mu;<sub>N</sub> = e&#8463;/2m<sub>p</sub> differs from the Bohr magneton only in carrying the proton mass instead of the electron mass, so it is smaller by 1836. Nuclear magnetism is therefore about two thousand times weaker than atomic magnetism, which is why the magnetism of ordinary materials is entirely an electron affair and why nuclear resonance needs fields measured in teslas rather than millitesla.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The moments here are measured values, not predictions &mdash; no model gets them right from first principles, and the shell model manages only to bracket them (the Schmidt limits). Also note that not every nucleus is usable: any nucleus with even Z <em>and</em> even N has spin 0 and no moment at all, which rules out <sup>12</sup>C, <sup>16</sup>O and <sup>40</sup>Ca &mdash; the three commonest nuclei in your body after hydrogen. Carbon imaging has to use <sup>13</sup>C, which is 1.1 percent abundant and has a sixth of the proton's sensitivity, and that is why MRI is a hydrogen technique.</p>
+      </div>
+    </div>
+
+    <!-- 3. binding energy -->
+    <div class="card">
+      <h2>The Mass Defect and the Curve That Explains the Universe <span class="eqtag">Sec. 11.4, Examples 11.4&ndash;11.5</span></h2>
+      <p class="desc">Weigh a nucleus and it comes out lighter than its parts. The missing mass is the binding energy, and plotting it against mass number produces a curve with a peak in the middle &mdash; which is why stars shine, why bombs work, and why there is iron in your blood.</p>
+      <div class="eq">E<sub>b</sub> = [Zm(<sup>1</sup>H) + Nm(n) &minus; m(<sup>A</sup><sub>Z</sub>X)] &times; 931.49 MeV/u</div>
+      <div class="controls">
+        <div class="ctrl"><label>Proton number Z <span class="val" id="bc_z_val">26</span></label>
+          <input type="range" id="bc_z" min="1" max="92" step="1" value="26"></div>
+        <div class="ctrl"><label>Mass number A <span class="val" id="bc_a_val">56</span></label>
+          <input type="range" id="bc_a" min="1" max="250" step="1" value="56"></div>
+      </div>
+      <canvas id="bc_canvas" height="330"></canvas>
+      <canvas id="bc_bars" height="300"></canvas>
+      <div class="readout" id="bc_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: binding energy per nucleon against mass number, every point computed from a measured atomic mass. Red points are stable nuclides, grey ones radioactive, and the dashed teal curve is the liquid-drop formula of the next card. Beiser calls this graph the most significant in all of science, and the claim is not obviously wrong: the existence of a peak in the middle is why energy can be released by squeezing light nuclei together <em>and</em> by splitting heavy ones apart, which between them account for the power output of every star and every reactor that has ever existed.</p>
+        <p>Below: what specific reactions actually pay out, each Q value computed by subtracting the measured masses of the products from the measured masses of the reactants. No numbers are quoted from the text here &mdash; they come out of the table.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>Z = 26, A = 56</b>. Iron-56 sits at <b>8.79 MeV per nucleon</b>. Now look at the marked peak: it is not iron-56 at all but <b>nickel-62</b>, at 8.7945 against iron's 8.7903, with iron-58 in between. Beiser says the maximum is at A = 56, and it is very nearly true &mdash; the three are within half a percent &mdash; but the actual champion is <sup>62</sup>Ni. (Iron still wins in the universe, because stellar nucleosynthesis is governed by reaction rates and by what can be built from alpha particles, not by binding energy alone.)</p>
+        <p class="tryit">Set <b>Z = 20, A = 42</b>, Beiser's Example 11.5. The readout gives the energy to remove one neutron as <b>11.48 MeV</b> and one proton as <b>10.28 MeV</b>. The proton is the easier one to remove even though it feels the same strong attraction, because the other 19 protons are pushing it out. That single 1.2 MeV difference, repeated all the way up the periodic table, is why heavy nuclei need far more neutrons than protons.</p>
+        <p class="tryit">Set <b>Z = 1, A = 2</b> and read the mass defect: <b>0.002388 u</b>, which is 2.224 MeV &mdash; a number measured directly by finding the minimum gamma-ray energy that splits a deuteron. Then set <b>Z = 2, A = 4</b>: helium-4's binding energy per nucleon leaps to 7.07, a factor of six above deuterium's, which is why the alpha particle is such a stubbornly stable object and why it is what heavy nuclei emit when they decay.</p>
+        <p class="tryit">Now the last readout line, on any nuclide you like. Nuclear binding is around <b>8 &times; 10<sup>11</sup> kJ/kg</b>. Boiling water costs 2260 kJ/kg and burning petrol releases 4.7 &times; 10<sup>4</sup>. Nuclear binding is <b>seventeen million times</b> more energetic than combustion, per kilogram. That ratio &mdash; not any detail of reactor engineering &mdash; is the whole argument about nuclear energy.</p>
+        <p class="tryit">On the lower chart, compare the two fusion bars with the fission bar. Fission of <sup>235</sup>U releases about 210 MeV against D&ndash;T fusion's 17.6, so fission looks like much the bigger event. Divide by the number of nucleons involved and it inverts: fusion pays <b>3.5 MeV per nucleon</b> and fission <b>0.90</b>. Per kilogram of fuel, fusion is nearly <b>four times</b> better &mdash; which is why it is worth the sixty-year effort. (The fission bar is the binding-energy-curve estimate rather than a mass balance, because real fission fragments are neutron-rich and so are not in a table of stable nuclides. Beiser makes the same estimate a shade more roughly and gets 188 MeV; the accepted total release is about 200.)</p>
+
+        <h3>Where the mass goes</h3>
+        <p>It does not "convert to energy" in any mysterious way. The bound system has less energy than its separated parts, and since energy has mass, it weighs less. The same is true of a hydrogen atom, whose 13.6 eV binding makes it lighter than a free proton and electron by 1.5 &times; 10<sup>&minus;8</sup> u &mdash; far too small to weigh. Nuclear binding is a million times larger, which pushes the mass defect up to about one part in 1000 and makes it the easiest thing in nuclear physics to measure.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The formula uses <em>atomic</em> masses, including electrons, on both sides &mdash; Z hydrogen atoms against one <sup>A</sup><sub>Z</sub>X atom &mdash; so the Z electron masses cancel. This is a convenience, not an approximation, but it is why you must use m(<sup>1</sup>H) = 1.007825 u and never the bare proton mass 1.007276 u. Substituting the proton mass would be an error of 0.000549 u per proton, or half an MeV per proton, which for uranium is 45 MeV.</p>
+        <p class="catch">Strictly the electron binding energies do not quite cancel either, since they differ between a hydrogen atom and a heavy atom. For uranium the discrepancy is of order 0.5 MeV against a binding energy of 1800 &mdash; below the resolution of anything on this page, but not zero.</p>
+      </div>
+    </div>
+
+    <!-- 4. liquid drop -->
+    <div class="card">
+      <h2>The Liquid-Drop Model <span class="eqtag">Sec. 11.5, Example 11.6</span></h2>
+      <p class="desc">Treat the nucleus as a drop of incompressible fluid. Four terms &mdash; volume, surface, electrostatic, and a quantum correction for having unequal numbers of neutrons and protons &mdash; reproduce the binding energy of every nucleus to a fraction of a percent. The five coefficients are the only things fitted.</p>
+      <div class="eq">E<sub>b</sub> = a<sub>1</sub>A &minus; a<sub>2</sub>A<sup>2/3</sup> &minus; a<sub>3</sub>Z(Z&minus;1)/A<sup>1/3</sup> &minus; a<sub>4</sub>(A&minus;2Z)&sup2;/A &plusmn; a<sub>5</sub>/A<sup>3/4</sup></div>
+      <div class="controls">
+        <div class="ctrl"><label>a₁ volume <span class="val" id="ld_a1_val">14.10</span></label>
+          <input type="range" id="ld_a1" min="10" max="18" step="0.05" value="14.1"></div>
+        <div class="ctrl"><label>a₂ surface <span class="val" id="ld_a2_val">13.00</span></label>
+          <input type="range" id="ld_a2" min="0" max="22" step="0.05" value="13"></div>
+        <div class="ctrl"><label>a₃ Coulomb <span class="val" id="ld_a3_val">0.60</span></label>
+          <input type="range" id="ld_a3" min="0" max="1.2" step="0.005" value="0.595"></div>
+        <div class="ctrl"><label>a₄ asymmetry <span class="val" id="ld_a4_val">19.00</span></label>
+          <input type="range" id="ld_a4" min="0" max="32" step="0.1" value="19"></div>
+        <div class="ctrl"><label>a₅ pairing <span class="val" id="ld_a5_val">33.50</span></label>
+          <input type="range" id="ld_a5" min="0" max="60" step="0.5" value="33.5"></div>
+        <div class="ctrl"><label>&nbsp;</label><button id="ld_reset" type="button">reset to Beiser's values</button></div>
+      </div>
+      <canvas id="ld_canvas" height="340"></canvas>
+      <canvas id="ld_resid" height="300"></canvas>
+      <div class="readout" id="ld_readout"></div>
+
+      <div class="explain">
+        <h3>Where each term comes from</h3>
+        <p><b>Volume.</b> If every nucleon had 12 neighbours and each bond were worth U, the total would be 6AU &mdash; proportional to A. This is the term that exists only because the force saturates. It is also the largest, and on its own it would make the binding energy per nucleon a flat 14 MeV line.</p>
+        <p><b>Surface.</b> Nucleons on the outside have fewer neighbours, and their number goes as the surface area, 4&pi;R&sup2; &prop; A<sup>2/3</sup>. Subtracting it turns the flat line into a rising one, because the surface fraction falls as nuclei get bigger. It is exactly surface tension, and it is why nuclei are spherical.</p>
+        <p><b>Coulomb.</b> The Z(Z&minus;1)/2 proton pairs each contribute e&sup2;/4&pi;&epsilon;<sub>0</sub>r, and &lang;1/r&rang; &prop; 1/R &prop; A<sup>&minus;1/3</sup>. This term grows roughly as Z&sup2;/A<sup>1/3</sup>, faster than A, so it eventually overwhelms everything &mdash; and that is what pulls the right-hand end of the curve down and puts a limit on how big a nucleus can be.</p>
+        <p><b>Asymmetry.</b> This one is not fluid mechanics at all; it is the exclusion principle. Neutrons and protons fill separate ladders of levels. Converting protons into neutrons past the point of equality means stacking them into higher levels, and the cost goes as (N&minus;Z)&sup2;/A. It is the term that keeps light nuclei at N &asymp; Z.</p>
+        <p><b>Pairing.</b> Also not fluid mechanics: nucleons of the same kind pair off with opposite spins, so even-even nuclei are extra bound and odd-odd nuclei extra loose. This is the term that produces the zigzag on the next card, and the reason 60 percent of the stable nuclides in the table are even-even (156 of 261) while just four are odd-odd &mdash; <sup>2</sup>H, <sup>6</sup>Li, <sup>10</sup>B and <sup>14</sup>N, to which Beiser adds the exotic <sup>180</sup>Ta.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">With Beiser's coefficients the mean error over every stable nuclide with A &ge; 16 is well under one percent &mdash; from five numbers. Set <b>Z = 30, A = 64</b> on the previous card, Example 11.6: measured 559.1 MeV, formula 561.7, an error of 0.5 percent.</p>
+        <p class="tryit">Now drag <b>a₃ (Coulomb) to zero</b>. The curve stops turning over and rises forever, and the mean error explodes. Without proton repulsion there would be no heaviest element, no fission, and no limit to the periodic table. Put it back and drag <b>a₂ (surface) to zero</b> instead: now the curve is flat from the start, the light nuclei are massively over-bound, and the rise that makes fusion profitable disappears. The shape of the curve &mdash; and therefore the existence of both fusion and fission &mdash; comes from the competition between exactly those two terms.</p>
+        <p class="tryit">Try <b>a₄ (asymmetry) to zero</b> and watch the mean error rise sharply even though the general shape survives. The asymmetry term is worth only a couple of MeV per nucleon, but it is what decides <em>which</em> isobar at each A is the stable one, which is the subject of the next card.</p>
+
+        <h3>Where the model fails, and why that is the interesting part</h3>
+        <p>The lower plot shows measured minus predicted binding energy against neutron number. If the model were complete this would be structureless noise. It is not. The gold line is the local trend, and the red points &mdash; N = 8, 20, 28, 50, 82, 126 &mdash; sit consistently <em>above</em> it, by between half an MeV and three MeV. That is small against a thousand-MeV binding energy, which is why the liquid drop is such a good model. But it is systematic, and it is always in the same direction. Those are the <b>magic numbers</b>, and a smooth fluid model has no way to produce them. The residuals of a good model are where the next model comes from, and in this case they point straight at the shell structure of the card after next.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The coefficients are fitted, not derived &mdash; Beiser gives one set and notes that others have been proposed. Different fitting sets and slightly different functional forms (Z&sup2; instead of Z(Z&minus;1), A<sup>&minus;1/2</sup> instead of A<sup>&minus;3/4</sup> in the pairing term) all do about as well, so no single number here should be read as a measured physical constant.</p>
+        <p class="catch">The formula also fails badly for A &lt; 16, which is why the error figure above excludes them: light nuclei have too few nucleons for "volume" and "surface" to be distinguishable, and their binding is dominated by shell effects and by alpha-particle clustering. The model is a statistical description, and statistics needs a crowd.</p>
+      </div>
+    </div>
+
+    <!-- 5. valley of stability -->
+    <div class="card">
+      <h2>The Valley of Stability <span class="eqtag">Sec. 11.3, Example 11.7</span></h2>
+      <p class="desc">Of the thousands of possible combinations of neutrons and protons, fewer than 300 are stable, and they form a narrow ridge that curves away from N = Z as it climbs. The liquid-drop formula predicts where that ridge runs &mdash; and differentiating it gives the stable isobar at any mass number.</p>
+      <div class="eq">dE<sub>b</sub>/dZ = 0 &nbsp;&rarr;&nbsp; Z = (4a<sub>4</sub>A + a<sub>3</sub>A<sup>2/3</sup>) / (2a<sub>3</sub>A<sup>2/3</sup> + 8a<sub>4</sub>)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Mass number A <span class="val" id="vs_a_val">25</span></label>
+          <input type="range" id="vs_a" min="6" max="238" step="1" value="25"></div>
+      </div>
+      <canvas id="vs_chart" height="340"></canvas>
+      <canvas id="vs_iso" height="320"></canvas>
+      <div class="readout" id="vs_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the chart of the nuclides, N against Z, with every nuclide in Beiser's table plotted. Black points are stable. The dashed grey diagonal is N = Z, and the red curve is the liquid-drop formula's own prediction of where stability should lie &mdash; drawn from the equation above, with nothing fitted to the black points. It threads them.</p>
+        <p>Below: a vertical slice at fixed A. Binding energy against Z for the isobars of that mass number, with the smooth formula (grey dashed), the formula evaluated at integer Z including the pairing term (teal), and the measured values (red if stable, grey if not). A nucleus to the left of the peak has too many neutrons and beta-decays rightward; one to the right has too many protons and decays leftward. Everything rolls downhill into the minimum.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>A = 25</b>, Beiser's Example 11.7. The smooth optimum comes out at <b>Z = 11.7</b>, so Z = 12 should be the stable isobar &mdash; and <sup>25</sup>Mg is indeed the only stable A = 25 nuclide, with <sup>25</sup>Na and <sup>25</sup>Al both radioactive. One derivative of a five-term formula, and it picks the right element out of the periodic table.</p>
+        <p class="tryit">Now step through <b>odd</b> values of A. Every one gives a single clean parabola with one minimum and, almost always, exactly one stable isobar. Then step through <b>even</b> values and watch the curve split into two interleaved parabolas &mdash; one for even-even nuclei sitting high, one for odd-odd sitting low, separated by twice the pairing term. Because an odd-odd nucleus can often beta-decay in <em>either</em> direction to reach an even-even neighbour, and because an even-even nucleus may have no accessible neighbour at all, even-A mass numbers frequently have <b>two or three</b> stable isobars. Try <b>A = 40</b> (argon and calcium), <b>A = 96</b> and <b>A = 124</b> (three each). Across the whole table, <b>53</b> even mass numbers have more than one stable isobar and <b>not a single odd one</b> does. That asymmetry is a direct, visible consequence of one term in the formula.</p>
+        <p class="tryit">Drag A from 6 to 238 and watch the red prediction curve on the chart peel away from the N = Z line. At A = 16 the stable nucleus has 8 neutrons and 8 protons; at A = 208 it has 126 and 82. Extra neutrons add attraction without adding repulsion, so as the Coulomb term grows the nucleus has to buy stability with a neutron excess &mdash; paying for it in asymmetry energy. The whole shape of the valley is those two terms bargaining.</p>
+        <p class="tryit">Take <b>A = 209</b>, bismuth. That is the end of the road: no nucleus heavier than <sup>209</sup>Bi is stable, because by then the Coulomb term has grown faster than any amount of neutron excess can compensate. Everything above it alpha-decays its way back down.</p>
+
+        <h3>Why there is a valley at all</h3>
+        <p>Two terms depend on Z at fixed A and they pull in opposite directions. The asymmetry term &minus;a<sub>4</sub>(A&minus;2Z)&sup2;/A is minimised at Z = A/2 and wants equal numbers. The Coulomb term &minus;a<sub>3</sub>Z(Z&minus;1)/A<sup>1/3</sup> always wants fewer protons. Their sum is a parabola in Z, its minimum sits below A/2, and the heavier the nucleus the further below. Everything about the chart of the nuclides &mdash; its curve, its narrowness, its abrupt end &mdash; falls out of that one competition.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The formula is smooth and the real world is not. It cannot know that <sup>4</sup>He, <sup>16</sup>O and <sup>208</sup>Pb are doubly magic and unusually bound, and it will happily predict a minimum at a Z where the real nucleus is radioactive. Near the magic numbers the measured points (red) and the formula (teal) visibly disagree on the lower plot.</p>
+        <p class="catch">Beta stability is also not the same as stability. Several nuclides sit at the bottom of their isobar parabola and are still radioactive, because they can alpha-decay or fission instead &mdash; routes that change A and so do not appear on this slice at all. And "stable" here means Beiser's table; a few of those, like <sup>209</sup>Bi itself, have since been found to decay with half-lives of 10<sup>19</sup> years, which is a distinction without a practical difference.</p>
+      </div>
+    </div>
+
+    <!-- 6. shell model -->
+    <div class="card">
+      <h2>The Shell Model and the Magic Numbers <span class="eqtag">Sec. 11.6</span></h2>
+      <p class="desc">Nuclei with 2, 8, 20, 28, 50, 82 or 126 nucleons of a kind are conspicuously more stable and more abundant than their neighbours. Reproducing that list defeated everyone for twenty years, until Goeppert-Mayer and Jensen added one ingredient.</p>
+      <div class="eq">&Delta;E<sub>spin&ndash;orbit</sub> &prop; [ j(j+1) &minus; &ell;(&ell;+1) &minus; &frac34; ] / 2, &nbsp; and it is <em>large</em></div>
+      <div class="controls">
+        <div class="ctrl"><label>Spin&ndash;orbit strength <span class="val" id="sm_so_val">1.00</span></label>
+          <input type="range" id="sm_so" min="0" max="1.6" step="0.02" value="1"></div>
+      </div>
+      <canvas id="sm_canvas" height="440"></canvas>
+      <canvas id="sm_abund" height="300"></canvas>
+      <div class="readout" id="sm_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the single-nucleon energy levels, labelled as in Beiser's Fig. 11.17, with the capacity 2j + 1 of each on the right. Drag the spin&ndash;orbit strength to zero and the levels collapse back into their unsplit groups; the shells then close at 2, 8, 20, 40, 70 &mdash; the harmonic-oscillator numbers, which match the data for the first three and then fail completely. Turn it back up and watch the high-j levels dive downward until the closures land on the observed list.</p>
+        <p>Below: the evidence that the magic numbers are real. For each nucleon number, how many stable nuclides have that many neutrons (teal) or that many protons (red). The spikes sit on the magic numbers. Tin, at the magic Z = 50, has <b>ten</b> stable isotopes and calcium at Z = 20 has <b>six</b>; N = 82 has seven stable isotones and N = 50 has five. The typical non-magic value manages two.</p>
+
+        <h3>The one ingredient that was missing</h3>
+        <p>Atoms have spin&ndash;orbit coupling too, and in atoms it is a small correction &mdash; the sodium D lines are split by 0.6 nm out of 589, about one part in a thousand. In nuclei the same interaction is enormous, comparable to the level spacing itself. When it is that strong, a level of high &ell; splits so far that the j = &ell; + &frac12; member drops right out of its own group and into the one below. Watch the 5g<sub>9/2</sub> level (capacity 10) do exactly this as you drag the slider: it falls out of its shell and joins the one beneath, turning what would have been a closure at 40 into one at 50. The same manoeuvre by 6h<sub>11/2</sub> makes 82, and by 7i<sub>13/2</sub> makes 126.</p>
+        <p>That is the whole trick, and it is worth appreciating how unsatisfying it looked at the time. There was no derivation &mdash; the strength was chosen to fit the data, and the justification came only later from the structure of the nucleon&ndash;nucleon force. Goeppert-Mayer and Jensen shared the 1963 Nobel Prize for what was, in essence, a very good guess supported by a great deal of evidence.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set the strength to <b>0</b>. The closures become 2, 8, 20, 40, 70 &mdash; correct up to 20 and wrong thereafter. This is exactly where the field was stuck before 1949, and it is why so many people concluded that the nucleus simply could not have shell structure.</p>
+        <p class="tryit">Now go to <b>1.00</b> and read the running totals: all seven magic numbers, in order. Then push past it to <b>1.4</b> and watch the list start to break again as levels overshoot. The strength is not a free parameter that can be anything; there is one value that works.</p>
+        <p class="tryit">On the residual plot of the previous card, the red points marked the magic N values. Compare the two plots: the same numbers that show up as extra binding energy in the liquid-drop residuals show up here as the shell closures, and as abundance spikes below. Three independent kinds of evidence, one explanation.</p>
+
+        <h3>Two models that contradict each other and both work</h3>
+        <p>The liquid drop says nucleons collide constantly with their neighbours, like molecules in a fluid. The shell model says each nucleon orbits independently in an average field, without colliding at all. They cannot both be literally true &mdash; and the reconciliation is the exclusion principle again. In a nucleus in its ground state every low-lying level is full. For one nucleon to lose energy in a collision, another must gain it, and the receiving nucleon has nowhere to go: every state it could be scattered into is occupied. So collisions are <b>forbidden</b>, even in a tightly packed nucleus, and the independent-particle picture is justified precisely by how crowded the nucleus is. The same argument, made about electrons, is why the free-electron model of a metal works in Chapter 10.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The level energies plotted here are schematic &mdash; the real ordering depends on A and on the exact potential, and the diagram is drawn for a mid-weight nucleus. Beiser's own figure is explicitly "not to scale", and his n-labelling differs from the standard spectroscopic one (he writes 2p where most references write 1p). What is <em>not</em> schematic is the capacities, the ordering of closures, and the resulting magic numbers.</p>
+        <p class="catch">The model also assumes a spherical potential, which fails badly for nuclei in between the magic numbers: those are deformed, sometimes into shapes twice as long as they are wide, and describing them needs the collective model of Aage Bohr and Mottelson, which grafts liquid-drop rotations and vibrations onto shell-model states.</p>
+      </div>
+    </div>
+
+    <!-- 7. Yukawa -->
+    <div class="card">
+      <h2>Yukawa: Weighing a Particle Nobody Had Seen <span class="eqtag">Sec. 11.7</span></h2>
+      <p class="desc">In 1935 Yukawa argued that if nucleons hold each other by tossing a particle back and forth, then the range of the force fixes the mass of the particle. He knew the range. He got a mass, predicted a particle, and twelve years later it turned up.</p>
+      <div class="eq">&Delta;E &Delta;t &asymp; &#8463;, &nbsp; &Delta;E = mc&sup2;, &nbsp; &Delta;t = r/c &nbsp;&rarr;&nbsp; m &asymp; &#8463;/rc</div>
+      <div class="controls">
+        <div class="ctrl"><label>Range of the nuclear force (fm) <span class="val" id="yk_r_val">1.70</span></label>
+          <input type="range" id="yk_r" min="0.5" max="4" step="0.02" value="1.7"></div>
+      </div>
+      <canvas id="yk_canvas" height="320"></canvas>
+      <div class="readout" id="yk_readout"></div>
+
+      <div class="explain">
+        <h3>The argument</h3>
+        <p>A nucleon emits a pion and does not get lighter. That is a straightforward violation of energy conservation &mdash; except that the uncertainty principle permits a violation of size &Delta;E provided it is repaired within a time &#8463;/&Delta;E, which is short enough that no measurement could in principle detect it. The pion is <b>virtual</b>: it exists only on borrowed energy, and the loan must be repaid before anyone can check the books.</p>
+        <p>That sets the range. The particle can travel at most c &times; &Delta;t = &#8463;c/mc&sup2; before it has to be reabsorbed. A heavy exchanged particle gives a short-range force; a light one a long-range force; a massless one an infinite-range force. Run the logic backwards from the observed 1.7 fm range of the nuclear force and you get a mass of a couple of hundred electron masses &mdash; between the electron and the nucleon, hence "meson", the middle-weight.</p>
+
+        <h3>What you're looking at</h3>
+        <p>The Yukawa potential &minus;g&sup2;e<sup>&minus;r/r<sub>0</sub></sup>/r against the plain &minus;1/r it would be if the exchanged particle were massless, both normalised to the same depth at 1 fm, with the proton&ndash;proton Coulomb repulsion for comparison. The exponential is the entire difference between a nuclear force and an electromagnetic one, and it comes from the single fact that the pion has mass. Drag the range and watch how sharply the potential cuts off &mdash; at 3 fm the nuclear attraction is essentially gone while the Coulomb repulsion has barely noticed.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave the range at <b>1.7 fm</b>, Beiser's figure. The estimate gives about <b>2 &times; 10<sup>&minus;28</sup> kg</b>, roughly 230 electron masses. The pion turns out to weigh 273, so the estimate is low by about 17 percent &mdash; from an argument with no free parameters, made before the particle existed as far as anyone knew. Then run it the other way: the readout shows that the measured pion mass implies a range of <b>1.41 fm</b>, which is the number nuclear physicists actually use.</p>
+        <p class="tryit">Drag the range up and watch the mass fall. Set it to <b>4 fm</b> and the required mass drops below a hundred electron masses; imagine extending the slider to infinity and the mass would go to zero. That limit is not hypothetical &mdash; it is electromagnetism. The photon is massless, so the Coulomb force has infinite range, and the 1/r&sup2; law you learned in school is a statement about the photon's rest mass being exactly zero. The same logic covers the weak force: the W and Z weigh about 90 GeV, and their range is accordingly 0.002 fm, which is why the weak interaction appears to act only on contact.</p>
+        <p class="tryit">Note the conversion in the last readout line: <b>&#8463;c = 197 MeV&middot;fm</b>. Range in fermis times mass in MeV is always about 200. It is the most-used number in particle physics and it is nothing but this argument, written once.</p>
+
+        <h3>The sequel, which is a good story</h3>
+        <p>In 1936 Carl Anderson found a particle in cosmic rays with almost exactly the predicted mass, and everyone concluded Yukawa had been vindicated. He had not: that particle passed straight through nuclei without interacting strongly, which was precisely the wrong behaviour for the carrier of the strong force. It was the <b>muon</b> &mdash; a heavy electron, nothing to do with nuclei at all. The real pion was found by Powell in 1947, decaying into the muon that had been confusing everybody for a decade. Yukawa got the Nobel Prize in 1949, the first awarded to a Japanese scientist.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The estimate is dimensional analysis, not a calculation: it assumes the pion travels at c (it does not), ignores its kinetic energy entirely, and uses &Delta;E&Delta;t &asymp; &#8463; rather than &#8463;/2. Getting within 17 percent from that is as much luck as insight, and the argument establishes the <em>scale</em> rather than the value.</p>
+        <p class="catch">More deeply, pion exchange is no longer the fundamental story. The strong interaction is now understood as acting between quarks via gluons, and the nuclear force between nucleons is a residual effect &mdash; a leakage, analogous to the van der Waals force between neutral atoms in Chapter 10. Pion exchange remains an excellent effective description at nuclear distances, in the same way that the van der Waals force remains an excellent description of argon without anyone pretending it is fundamental.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
 <footer>Built from Beiser, <em>Concepts of Modern Physics</em>, 6th ed. All plots computed live from the equations shown &mdash; nothing here is pre-baked data.</footer>
 
 <script src="app.js"></script>
+<script src="nuclides.js"></script>
 <script src="ch01.js"></script>
 <script src="ch02.js"></script>
 <script src="ch03.js"></script>
@@ -2640,5 +2915,6 @@
 <script src="ch08.js"></script>
 <script src="ch09.js"></script>
 <script src="ch10.js"></script>
+<script src="ch11.js"></script>
 </body>
 </html>

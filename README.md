@@ -94,7 +94,19 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Brillouin zones (bands from diagonalising the nearly-free-electron Hamiltonian, and the two standing waves that make the gap)
 - Superconductivity (critical field, the BCS gap equation solved numerically, Cooper pairs, the flux quantum)
 
+## Chapter 11 — Nuclear Structure
+- How big, how dense, how repulsive (R = 1.2A⅓, the Woods–Saxon profile, 2.3×10¹⁷ kg/m³, 40 N between two protons)
+- Nuclear spin, the magneton, and how an MRI works (Larmor frequencies, and the few-per-million population excess an image is built from)
+- The mass defect and the binding-energy curve (every point from a measured atomic mass; fusion and fission Q values)
+- The liquid-drop model (five terms you can drag, fitted against every stable nuclide, and residuals that point at the shells)
+- The valley of stability (the chart of the nuclides, and the isobar parabola that picks the stable element at each A)
+- The shell model and the magic numbers (spin–orbit strength as a slider, all seven closures, and the abundance spikes)
+- Yukawa (ΔEΔt ≈ ℏ, the pion's mass from the range of the force, and the Yukawa potential against a plain 1/r)
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
+Chapter 11's atomic masses are the one exception: `nuclides.js` holds Beiser's own appendix
+table, 378 nuclides with measured masses, abundances and stability. Every binding energy is
+computed from those.
 
 ## Layout
 
@@ -110,6 +122,8 @@ Every number on screen is computed live from the chapter's formulas — nothing 
     ch08.js
     ch09.js
     ch10.js
+    ch11.js
+    nuclides.js  atomic-mass table for Chapter 11
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
