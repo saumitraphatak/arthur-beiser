@@ -103,10 +103,20 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - The shell model and the magic numbers (spin–orbit strength as a slider, all seven closures, and the abundance spikes)
 - Yukawa (ΔEΔt ≈ ℏ, the pion's mass from the range of the force, and the Yukawa potential against a plain 1/r)
 
+## Chapter 12 — Nuclear Transformations
+- Five kinds of decay, and which one a nucleus picks (decay arrows on the chart of the nuclides, every Q from measured masses)
+- The decay law (half-life vs mean life, activity in Bq and Ci, and why two half-lives leave a quarter)
+- Radiometric dating (six clocks on one log-time axis, from radiocarbon to rubidium–strontium)
+- Alpha decay by tunnelling (the Gamow integral reproducing 17 decades of half-life, and recovering R₀ = 1.2 fm from decay rates alone)
+- Beta decay and the neutrino (the Fermi spectrum, the Kurie plot, and where neutrino mass hides)
+- Cross section (attenuation, mean free path, reaction rate, and why a slow neutron sees a nucleus 20,000× its size)
+- Fission (the deformation barrier, and the one pairing term that separates ²³⁵U from ²³⁸U)
+- Fusion (the Gamow peak, pp vs CNO and their T⁴ and T²⁰ laws, and the Lawson criterion)
+
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
-Chapter 11's atomic masses are the one exception: `nuclides.js` holds Beiser's own appendix
-table, 378 nuclides with measured masses, abundances and stability. Every binding energy is
-computed from those.
+The atomic data in Chapters 11 and 12 is the one exception: `nuclides.js` holds Beiser's own
+appendix table — 378 nuclides with measured masses, natural abundances, stability and half-lives.
+Every binding energy, Q value and decay constant is computed from those.
 
 ## Layout
 
@@ -123,7 +133,8 @@ computed from those.
     ch09.js
     ch10.js
     ch11.js
-    nuclides.js  atomic-mass table for Chapter 11
+    ch12.js
+    nuclides.js  atomic masses and half-lives, for Chapters 11-12
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

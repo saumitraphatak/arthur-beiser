@@ -214,7 +214,7 @@
       <button class="chap-btn" data-chapter="ch9" role="tab" aria-selected="false"><span class="n">9</span>Statistical Mechanics</button>
       <button class="chap-btn" data-chapter="ch10" role="tab" aria-selected="false"><span class="n">10</span>The Solid State</button>
       <button class="chap-btn" data-chapter="ch11" role="tab" aria-selected="false"><span class="n">11</span>Nuclear Structure</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">12</span>Nuclear Transf.</span>
+      <button class="chap-btn" data-chapter="ch12" role="tab" aria-selected="false"><span class="n">12</span>Nuclear Transf.</button>
       <span class="chap-btn soon" title="not built yet"><span class="n">13</span>Elementary Particles</span>
     </nav>
   </div>
@@ -2898,6 +2898,326 @@
 
   </section>
 
+  <section class="chapter" id="ch12">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Twelve</div>
+      <h1>Nuclear Transformations</h1>
+      <p>The previous chapter asked what a nucleus is. This one asks what it does. Unstable nuclei change into other nuclei on a schedule nothing can alter — not heat, not pressure, not chemistry — and that indifference is what makes them clocks. The same physics splits uranium, lights the sun, and dates the Earth.</p>
+      <p style="margin-top:10px">Masses, abundances and half-lives below all come from Beiser's own appendix table: 378 nuclides, 108 of them with a listed half-life. Every Q value, decay constant and activity is computed from those.</p>
+    </div>
+
+    <!-- 1. five kinds of decay -->
+    <div class="card">
+      <h2>Five Kinds of Decay, and Which One a Nucleus Picks <span class="eqtag">Secs. 12.1, 12.3, Example 12.1</span></h2>
+      <p class="desc">A nucleus off the valley floor has a choice of routes back. Which routes are open is not a matter of opinion — it is arithmetic on measured masses, and the arithmetic picks out exactly one.</p>
+      <div class="eq">Q = (m<sub>initial</sub> &minus; m<sub>final</sub>)c&sup2; &nbsp;&nbsp; decay happens only when Q &gt; 0</div>
+      <div class="controls">
+        <div class="ctrl"><label>Proton number Z <span class="val" id="dm_z_val">2</span></label>
+          <input type="range" id="dm_z" min="1" max="92" step="1" value="2"></div>
+        <div class="ctrl"><label>Mass number A <span class="val" id="dm_a_val">6</span></label>
+          <input type="range" id="dm_a" min="2" max="238" step="1" value="6"></div>
+      </div>
+      <canvas id="dm_canvas" height="360"></canvas>
+      <div class="readout" id="dm_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A close-up of the chart of the nuclides around whichever nuclide you have selected, with the four decay moves drawn as arrows. Solid arrows are routes with Q &gt; 0 and are therefore open; dashed ones are energetically forbidden. Each decay is a fixed move on this lattice: beta-minus goes one step right and one down (a neutron becomes a proton), positron emission and electron capture go the other way, and alpha decay goes two down and two left.</p>
+        <p>Notice that the nucleus is not choosing intelligently. It has no idea where the valley floor is. All that is happening is that some final states weigh less than the initial one, and those are the ones it can reach.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Set <b>Z = 2, A = 6</b> — Beiser's Example 12.1. Helium-6 has four neutrons where the stable <sup>4</sup>He has two, so it sits well above the valley. The readout shows Q(β⁻) positive and everything else negative: it must become <sup>6</sup>Li, and it does, in 0.8 seconds.</p>
+        <p class="tryit">Now set <b>Z = 6, A = 11</b>. Carbon-11 is on the <em>other</em> side — too few neutrons — and both β⁺ and electron capture open up while β⁻ closes. Compare the two Q values. Positron emission always costs <b>1.022 MeV</b> more than capture, because the nucleus has to conjure an entire electron rest mass out of nothing in addition to flipping the proton. When the mass difference is smaller than that, capture is the only route, which is why the heavy proton-rich nuclei capture rather than emit.</p>
+        <p class="tryit">Drag Z and A up to the top right — say <b>Z = 92, A = 234</b>. Now alpha decay opens, with Q = 4.86 MeV. It stays closed for light nuclei not because alphas are hard to make but because for A below about 150 the mass arithmetic simply does not work: the alpha's own binding energy of <b>28.3 MeV</b>, remarkably high for four nucleons, is what tips the balance once the parent is heavy enough.</p>
+        <p class="tryit">Finally, walk Z along a fixed A — try <b>A = 40</b> and step Z from 18 to 20. Argon-40 has every route closed and calcium-40 does too, but <b>potassium-40</b> sits between them with Q(β⁻) = 1.31 MeV <em>and</em> Q(EC) = 1.50 MeV both positive. It is the rare nuclide that decays in both directions at once — 89% one way, 11% the other — and it is the reason your own body is mildly radioactive, and the reason potassium–argon dating works at all.</p>
+
+        <h3>Why Q &gt; 0 is the whole rule</h3>
+        <p>Radioactive decay is spontaneous, so it cannot borrow energy. If the products weigh more than the parent, the decay is simply not available, no matter how far from stability the nucleus sits. This is why some badly unbalanced nuclei are nonetheless stable: <sup>50</sup>V and <sup>180</sup>Ta are both odd-odd and both look precarious, but every route out of them is uphill.</p>
+        <p>One route is not shown here because it changes nothing on this chart: gamma decay. An excited nucleus drops to its ground state by emitting a photon, with Z and N unchanged. It is the exact nuclear analogue of an atom emitting light, at a million times the energy.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Q &gt; 0 says a decay is <em>allowed</em>, not that it happens quickly. Alpha decay is energetically open for every nucleus above about A = 150, yet most of them are perfectly stable in practice because the tunnelling rate is unimaginably slow — the subject of the fourth card. <sup>209</sup>Bi has a positive alpha Q and a half-life of 10<sup>19</sup> years. "Allowed" and "observed" are separated here by many orders of magnitude.</p>
+        <p class="catch">The atomic-mass bookkeeping also has a trap. Using atomic masses, the Z electrons cancel automatically for β⁻ and for capture, but β⁺ leaves two electron masses uncancelled — hence the explicit 2m<sub>e</sub> in that Q value. Forget it and every positron emitter looks 1.022 MeV more likely than it is.</p>
+      </div>
+    </div>
+
+    <!-- 2. decay law -->
+    <div class="card">
+      <h2>The Decay Law: Half-Life, Mean Life, Activity <span class="eqtag">Sec. 12.2, Examples 12.2&ndash;12.4</span></h2>
+      <p class="desc">One assumption — that every nucleus has the same fixed chance of decaying per second, regardless of its age — produces the entire mathematics of radioactivity, and it is the assumption that makes dating possible.</p>
+      <div class="eq">N = N<sub>0</sub>e<sup>&minus;&lambda;t</sup>, &nbsp; T<sub>1/2</sub> = ln2/&lambda;, &nbsp; R = &lambda;N</div>
+      <div class="controls">
+        <div class="ctrl"><label>Nuclide</label>
+          <select id="dl_nuc"></select></div>
+        <div class="ctrl"><label>Sample mass (mg) <span class="val" id="dl_mass_val">1.00</span></label>
+          <input type="range" id="dl_mass" min="0.01" max="10" step="0.01" value="1"></div>
+        <div class="ctrl"><label>Elapsed time (half-lives) <span class="val" id="dl_t_val">1.00</span></label>
+          <input type="range" id="dl_t" min="0" max="6" step="0.01" value="1"></div>
+        <div class="ctrl"><label><input type="checkbox" id="dl_log" style="width:auto; margin-right:6px;">logarithmic vertical axis</label></div>
+      </div>
+      <canvas id="dl_canvas" height="300"></canvas>
+      <div class="readout" id="dl_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The fraction of nuclei remaining, with the halving staircase drawn in. The dropdown holds every nuclide in Beiser's table with a listed half-life, sorted from fastest to slowest — they span from milliseconds to tens of billions of years, and the same single curve describes all of them once time is measured in half-lives.</p>
+        <p>Tick the logarithmic axis. The curve becomes a straight line, and that is the actual content of the word "exponential": a constant <em>fractional</em> loss per unit time. If you ever plot activity against time and get a straight line on a log axis, you are looking at a single decaying species; if you get a curve, you have a mixture or a chain.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>Rn-222</b> at <b>1.00 mg</b>, Beiser's Example 12.3. The readout gives a decay constant of 2.1&times;10<sup>&minus;6</sup> s<sup>&minus;1</sup>, about 2.7&times;10<sup>18</sup> nuclei, and an initial activity near <b>5.7 TBq</b> — some <b>154 curies</b>. One milligram. The curie was originally defined as the activity of a gram of radium, and a milligram of radon nearly matches 150 grams of it, because activity depends on the decay constant as much as the amount.</p>
+        <p class="tryit">Now drag time to <b>1.83 half-lives</b> (seven days for radon), Example 12.4. The activity has fallen to about <b>43 Ci</b>. This is why radon is a health problem in basements and not in the open: it is continuously resupplied from uranium in the rock, and it decays fast enough that what accumulates indoors is genuinely concentrated.</p>
+        <p class="tryit">Read the <b>mean life</b> line. It is <b>1.44&times;</b> the half-life, never equal to it, and the factor is 1/ln2. The half-life is the median lifetime; the mean is dragged up by the long tail of nuclei that survive many half-lives. Both are used, in different fields, and confusing them is a 44% error.</p>
+        <p class="tryit">Set the time to <b>2</b> and read the fraction left: 25%, not 0%. This is the single most common misunderstanding about half-lives. A nucleus does not age. Having survived one half-life, it faces exactly the same 50% chance over the next one as it did over the first — so two half-lives leave a quarter, three leave an eighth, and nothing ever fully decays.</p>
+
+        <h3>Where the exponential comes from</h3>
+        <p>Assume each nucleus has a constant probability λ per second of decaying. Then in a sample of N nuclei, dN = &minus;λN dt, and integrating gives N = N<sub>0</sub>e<sup>&minus;λt</sup>. That is the whole derivation. What is remarkable is not the mathematics but that λ really is constant: it does not depend on temperature, pressure, chemical state, or how long the nucleus has already existed. The decay is a quantum tunnelling event with no memory, and it is that memorylessness that makes radioactivity the most trustworthy clock in science.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The exponential law is statistical. It describes what a large ensemble does, not what any individual nucleus will do, and in a small sample the fluctuations are large — with 100 atoms you will see roughly 50 ± 5 decay in a half-life, not exactly 50. The law is also only exactly right when the daughter is stable; in a decay chain the intermediate members build up and then follow the <em>parent's</em> decay constant, which is the secular-equilibrium result Beiser uses in Example 12.6 to measure the half-life of <sup>238</sup>U from its ratio to <sup>234</sup>U.</p>
+        <p class="catch">And λ is not quite absolutely constant. Electron capture depends on the electron density at the nucleus, so its rate shifts by a fraction of a percent with chemical environment or extreme pressure — <sup>7</sup>Be is the standard example. The effect is real, tiny, and irrelevant to everything on this page.</p>
+      </div>
+    </div>
+
+    <!-- 3. dating -->
+    <div class="card">
+      <h2>Radiometric Dating <span class="eqtag">Sec. 12.2, Example 12.5</span></h2>
+      <p class="desc">Because λ cannot be altered by anything a rock or a mummy goes through, the ratio of parent to daughter is a stopwatch that started when the sample formed. Different nuclides cover different eras, and between them they reach from last century to the birth of the solar system.</p>
+      <div class="eq">t = (1/&lambda;) ln(N<sub>0</sub>/N) = (T<sub>1/2</sub>/ln2) ln(N<sub>0</sub>/N)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Method</label>
+          <select id="dt_method">
+            <option value="C14" selected>radiocarbon, ¹⁴C → ¹⁴N</option>
+            <option value="K40">potassium–argon, ⁴⁰K → ⁴⁰Ar</option>
+            <option value="U235">uranium–lead, ²³⁵U → ²⁰⁷Pb</option>
+            <option value="U238">uranium–lead, ²³⁸U → ²⁰⁶Pb</option>
+            <option value="Th232">thorium–lead, ²³²Th → ²⁰⁸Pb</option>
+            <option value="Rb87">rubidium–strontium, ⁸⁷Rb → ⁸⁷Sr</option>
+          </select></div>
+        <div class="ctrl"><label>Parent still remaining <span class="val" id="dt_frac_val">0.813</span></label>
+          <input type="range" id="dt_frac" min="0.02" max="0.99" step="0.001" value="0.813"></div>
+      </div>
+      <canvas id="dt_canvas" height="360"></canvas>
+      <div class="readout" id="dt_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Age against the surviving fraction of the parent, on a logarithmic time axis, with all six clocks drawn together and a few landmarks for scale. Each curve has the same shape; they are simply displaced vertically by the ratio of their half-lives. The steep part in the middle is where a method is precise: when 90% of the parent is left you are measuring a small difference between two large numbers, and when 2% is left you are measuring a trace against a background.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave it on <b>radiocarbon</b> and set the fraction to <b>0.813</b> — that is 13 counts per minute against 16 for living wood, Beiser's Example 12.5. The age comes out at about <b>1700 years</b>. Now drag the fraction down and watch the age climb; by 0.01 you are past 38,000 years and the counting statistics have become hopeless. That is why radiocarbon stops at around <b>50,000 years</b>, roughly nine half-lives, and it is a hard wall.</p>
+        <p class="tryit">Switch to <b>potassium–argon</b>. The identical curve now reaches back past the oldest rocks on Earth. And switch again to <b>rubidium–strontium</b>, whose half-life of 49 billion years is more than three times the age of the universe — which is precisely what makes it useful, because almost none of it has decayed and the measurement is of a tiny daughter excess in a very old rock.</p>
+        <p class="tryit">Compare <b>²³⁵U</b> and <b>²³⁸U</b>. The two clocks run in the same mineral grain, from the same element, at rates differing by a factor of six — so they can be checked against each other. If both give the same age, nothing has leaked in or out. That cross-check is what makes uranium–lead the most trusted method in geochronology, and it is why the age of the solar system is known to better than one percent.</p>
+
+        <h3>Why radiocarbon works at all</h3>
+        <p>Cosmic-ray neutrons hit atmospheric nitrogen and make <sup>14</sup>C, which oxidises into CO₂ and enters every living thing through photosynthesis and then the food chain. While an organism lives, its <sup>14</sup>C is topped up to the atmospheric ratio. When it dies the topping-up stops and the clock starts. What makes the method work is that a 5,700-year half-life is absurdly short compared with the age of the Earth — every atom of it now present was made in the last few tens of thousands of years, and the world's entire stock is about 90 tonnes.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Every method above assumes two things that are not guaranteed: that the sample started with a known amount of parent and none of the daughter, and that neither has entered or left since. Argon is a gas and leaks from heated rock, so a K–Ar age can mean "when this last cooled" rather than "when this formed". Lead is mobile in groundwater. The isochron technique exists precisely to test these assumptions rather than assume them.</p>
+        <p class="catch">Radiocarbon has its own problem: the atmospheric <sup>14</sup>C level has <em>not</em> been constant. It varies with solar activity and the Earth's magnetic field, it was diluted by fossil-fuel burning from about 1890 (the Suess effect), and it was roughly doubled by atmospheric bomb testing in the 1950s. Real radiocarbon dates are therefore calibrated against tree rings and corals rather than read straight off this curve — which is why published dates carry both a "radiocarbon age" and a calibrated one.</p>
+      </div>
+    </div>
+
+    <!-- 4. alpha decay -->
+    <div class="card">
+      <h2>Alpha Decay: Tunnelling Out <span class="eqtag">Secs. 12.4, Example 12.7, Appendix</span></h2>
+      <p class="desc">An alpha particle with 5 MeV sits inside a barrier 25 MeV high. Classically it can never leave, and yet it does. Gamow's 1928 calculation of how fast was one of the first real triumphs of quantum mechanics — and it still works, across seventeen decades of half-life.</p>
+      <div class="eq">&gamma; = (2/&#8463;)&radic;(2mE)&thinsp;R[arccos&radic;x &minus; &radic;(x(1&minus;x))], &nbsp; x = R<sub>0</sub>/R, &nbsp; &lambda; = &nu;e<sup>&minus;&gamma;</sup></div>
+      <div class="controls">
+        <div class="ctrl"><label>Alpha emitter</label>
+          <select id="ad_nuc"></select></div>
+        <div class="ctrl"><label>Nuclear radius constant R₀ (fm) <span class="val" id="ad_r0_val">1.18</span></label>
+          <input type="range" id="ad_r0" min="1.00" max="1.60" step="0.01" value="1.18"></div>
+      </div>
+      <canvas id="ad_canvas" height="330"></canvas>
+      <canvas id="ad_gn" height="330"></canvas>
+      <div class="readout" id="ad_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: the potential energy of an alpha particle against its distance from the nuclear centre. Inside R₀ it is in a deep well held by the strong force. Outside, it feels only the Coulomb repulsion of the daughter's charge, falling off as 1/r. The dashed red line is its actual energy — Q, computed from the measured masses — and the shaded region is the barrier it has to pass <em>through</em>, because it can certainly not go over.</p>
+        <p>Below: the Geiger–Nuttall relation. Red points are measured half-lives plotted against Z/√Q; the teal line is what the tunnelling model predicts, with no fitting except the single radius constant R₀. Both axes are logarithmic in half-life and the points span seventeen decades, from 160 microseconds to two million years.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Select <b>Po-210</b>, Beiser's Example 12.7. Q comes out at <b>5.42 MeV</b> from the mass table, of which the alpha carries 5.32 and the recoiling <sup>206</sup>Pb nucleus takes the rest. The barrier top is around <b>27 MeV</b> — the alpha is <b>21 MeV short</b> — and the transmission probability comes out near 10<sup>&minus;27</sup>. It rattles against the wall some 10<sup>21</sup> times a second and still takes months to get out: roughly 10<sup>27</sup> attempts per escape.</p>
+        <p class="tryit">Now compare <b>Th-230</b> (Q = 4.77 MeV) with <b>Po-214</b> (Q = 7.83 MeV). The energy differs by a factor of 1.6. The half-life differs by a factor of <b>10<sup>16</sup></b>. That extraordinary sensitivity is the signature of tunnelling: γ sits in an exponent, so a modest change in Q moves the rate by many orders of magnitude. It is the same steepness that makes the tunnel current in an STM a measure of distance to within a hundredth of a nanometre.</p>
+        <p class="tryit">Now the real payoff. Drag <b>R₀</b> and watch the teal line slide up and down against the measured points. It lands on them at about <b>1.18 fm</b> — and the mean miss over all the emitters bottoms out there at well under one decade. That number was not put in. It came out of <em>decay rates</em>, and it agrees with the 1.2 fm that Chapter 11 got from electron scattering, which is a completely independent measurement of the size of a nucleus. Beiser makes exactly this point about his Fig. 12.9: the position of the line tells you the nuclear radius.</p>
+        <p class="tryit">Push R₀ to <b>1.5 fm</b> and the predictions run three decades fast; pull it to <b>1.0</b> and they run two decades slow. The method is sensitive because γ depends on R₀ through the barrier width, and the barrier width sits in an exponent.</p>
+
+        <h3>Why an alpha and not a proton</h3>
+        <p>Because the alpha particle is so extraordinarily well bound — 28.3 MeV for four nucleons, 7.07 MeV each, far above its neighbours on the binding-energy curve. That binding is what makes Q positive. For <sup>232</sup>U, emitting an alpha releases 5.4 MeV; emitting a proton would <em>cost</em> 6.1 MeV and emitting a <sup>3</sup>He nucleus would cost 9.6 MeV. The alpha is the only fragment light enough to assemble and tightly bound enough to pay for its own escape.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The model above is deliberately crude and the readout says so: it assumes the alpha already exists as a unit inside the nucleus (the preformation probability is really 10<sup>&minus;2</sup> or so, not 1), it uses a sharp-edged potential where the real one has a diffuse surface, and it ignores angular momentum entirely. An alpha emitted with ℓ &gt; 0 faces an extra centrifugal barrier and is hindered, sometimes by two or three decades — which is why <b>Cf-251</b> sits so far off the line, and why <b>Ac-227</b> does too, though for a different reason: it mostly beta-decays, so its tabulated half-life is not its alpha half-life at all.</p>
+        <p class="catch">What survives all that is the <em>slope</em>. The model reproduces how the half-life varies with Q across seventeen decades, which is the part that matters, while the absolute normalisation absorbs everything it left out.</p>
+      </div>
+    </div>
+
+    <!-- 5. beta decay -->
+    <div class="card">
+      <h2>Beta Decay and the Invention of the Neutrino <span class="eqtag">Sec. 12.5</span></h2>
+      <p class="desc">Beta decay appeared to violate conservation of energy, of momentum, and of angular momentum, all at once. Pauli's response in 1930 was to propose an undetectable particle. It took twenty-six years to find it.</p>
+      <div class="eq">n &rarr; p + e<sup>&minus;</sup> + &nu;&#772; &nbsp;&nbsp; N(KE) &prop; pE(Q&minus;KE)&sup2;F(Z,E)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Decay energy Q (MeV) <span class="val" id="bd_q_val">1.17</span></label>
+          <input type="range" id="bd_q" min="0.1" max="4" step="0.01" value="1.17"></div>
+        <div class="ctrl"><label>Daughter charge Z <span class="val" id="bd_z_val">84</span></label>
+          <input type="range" id="bd_z" min="1" max="92" step="1" value="84"></div>
+        <div class="ctrl"><label>Mode</label>
+          <select id="bd_mode">
+            <option value="minus" selected>β⁻ — electron</option>
+            <option value="plus">β⁺ — positron</option>
+          </select></div>
+        <div class="ctrl"><label>Neutrino mass (keV) <span class="val" id="bd_mnu_val">0</span></label>
+          <input type="range" id="bd_mnu" min="0" max="200" step="1" value="0"></div>
+      </div>
+      <canvas id="bd_canvas" height="300"></canvas>
+      <canvas id="bd_kurie" height="300"></canvas>
+      <div class="readout" id="bd_readout"></div>
+
+      <div class="explain">
+        <h3>The scandal</h3>
+        <p>A nucleus of definite mass turns into a daughter of definite mass and emits an electron. That is a two-body decay, and a two-body decay has exactly one possible electron energy — a sharp line, like the alpha particles of the previous card. What was measured instead is the broad smear above: electrons come out with <em>every</em> energy from zero up to a maximum, and the maximum is what the mass difference predicts. Only a handful of electrons get it. The rest of the energy is simply gone.</p>
+        <p>Two more failures came with it. The electron and the recoiling nucleus are almost never emitted back-to-back, so momentum does not balance. And a neutron (spin ½) turning into a proton (½) and an electron (½) cannot conserve angular momentum: you cannot make two halves out of one. Bohr was prepared to abandon energy conservation in the nucleus. Pauli instead wrote to a conference in Tübingen apologising for a "desperate remedy" — an unseen, uncharged, spin-½ particle of negligible mass carrying away the balance of all three.</p>
+
+        <h3>What you're looking at</h3>
+        <p>Above: the electron energy spectrum from Fermi's 1934 theory, which is essentially a counting argument — the number of ways the available energy can be shared between two particles rather than given entirely to one. The black line marks where the single sharp peak <em>would</em> be if there were no neutrino. The distribution is pushed around by the daughter's charge: in β⁻ decay the receding electron is pulled back by the positive daughter, which piles up the low-energy end, while in β⁺ decay the positron is pushed away and the low end is emptied.</p>
+        <p>Below: the Kurie plot, the standard way of testing the theory. Divide the measured spectrum by pEF and take the square root, and Fermi's shape becomes a <b>straight line</b> hitting zero exactly at Q. This is a stringent test — a wrong theory does not accidentally straighten — and it passes.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">The defaults are <b>Q = 1.17 MeV, Z = 84</b>, which is the <sup>210</sup>Bi decay of Beiser's Fig. 12.10. Read the mean electron energy: it is roughly a third of Q. So on average the neutrino walks off with about <b>two-thirds</b> of the energy released — in a reactor, that is about 5% of the total output leaving the building at the speed of light and never coming back.</p>
+        <p class="tryit">Switch to <b>β⁺</b> and watch the low-energy end collapse. Then drop Z to 5 and back to 92 in either mode: the Coulomb distortion is the difference between the plain phase-space shape and what is actually measured, and getting it right is what the Fermi function F(Z,E) is for.</p>
+        <p class="tryit">Now the important one. Set <b>Q to 0.2 MeV</b> to zoom in, and drag the <b>neutrino mass</b> up from 0. The spectrum's endpoint pulls back and — look at the Kurie plot — the straight line bends downward and meets the axis early. That bend is the <em>entire experimental signature</em> of neutrino mass. Every experiment ever built to weigh the neutrino, from the 1950s to KATRIN today, is a machine for measuring the shape of the last few electronvolts of a beta spectrum.</p>
+        <p class="tryit">Then consider the scale. The slider goes to 200 keV; the real limit is below <b>1 eV</b>. On this plot that bend would be invisible at any zoom you could draw. That is why tritium is used — its Q of 18.6 keV is the smallest available, so the fraction of decays landing in the sensitive last sliver is as large as it can be made.</p>
+
+        <h3>How it was finally caught</h3>
+        <p>By running the reaction backwards. An antineutrino striking a proton can produce a neutron and a positron — inverse beta decay — and although the cross section is around 10<sup>&minus;19</sup> barns, a nuclear reactor produces enough antineutrinos to compensate. Reines and Cowan did it in 1956 beside the Savannah River reactor, detecting the positron annihilation and the neutron capture in coincidence. Pauli, who had bet a case of champagne that his particle would never be found, paid up.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The Fermi function used here is the simple non-relativistic form, which captures the Coulomb distortion's shape but not its exact magnitude for heavy nuclei; the real one is a relativistic expression involving gamma functions. The spectrum shape also assumes an "allowed" transition — decays where the electron and neutrino carry off no orbital angular momentum. Forbidden transitions have extra energy-dependent factors and visibly different shapes, which is how the degree of forbiddenness is measured.</p>
+        <p class="catch">And the physics has moved on in a way the chapter predates. Neutrinos do have mass — that is now established from oscillation experiments, which show that the three neutrino flavours mix — but oscillations measure mass <em>differences</em>, not masses. The absolute scale is still unknown, and the endpoint of this curve remains one of the few ways to get at it.</p>
+      </div>
+    </div>
+
+    <!-- 6. cross section -->
+    <div class="card">
+      <h2>Cross Section: How Likely Is a Nuclear Reaction? <span class="eqtag">Sec. 12.7, Examples 12.8&ndash;12.10</span></h2>
+      <p class="desc">A nucleus presents a target area of about one barn. Some nuclei present a quarter of a million. The difference is not geometry — it is the wave nature of a slow neutron.</p>
+      <div class="eq">N = N<sub>0</sub>e<sup>&minus;n&sigma;x</sup>, &nbsp; &lambda;<sub>mfp</sub> = 1/n&sigma;, &nbsp; rate = &phi;&sigma;n</div>
+      <div class="controls">
+        <div class="ctrl"><label>Absorber</label>
+          <select id="cs_mat">
+            <option value="Cd" selected>cadmium — 2×10⁴ b</option>
+            <option value="Gd">gadolinium — 2.5×10⁵ b</option>
+            <option value="B">boron — 3840 b</option>
+            <option value="Li">lithium — 940 b</option>
+            <option value="U235">uranium-235 — 582 b</option>
+            <option value="Au">gold — 99 b</option>
+            <option value="Fe">iron — 2.6 b</option>
+            <option value="C">graphite — 0.0035 b</option>
+          </select></div>
+        <div class="ctrl"><label>Thickness (mm) <span class="val" id="cs_x_val">0.10</span></label>
+          <input type="range" id="cs_x" min="0.01" max="1.0" step="0.01" value="0.1"></div>
+        <div class="ctrl"><label>Neutron flux (m⁻²s⁻¹) <span class="val" id="cs_flux_val">10^16.3</span></label>
+          <input type="range" id="cs_flux" min="12" max="20" step="0.1" value="16.3"></div>
+      </div>
+      <canvas id="cs_canvas" height="330"></canvas>
+      <div class="readout" id="cs_readout"></div>
+
+      <div class="explain">
+        <h3>What a cross section is</h3>
+        <p>Not an area, despite the units. It is a probability dressed as an area: σ is defined so that a beam passing through a slab containing n nuclei per cubic metre is attenuated as e<sup>&minus;nσx</sup>. The unit is the barn, 10<sup>&minus;28</sup> m², chosen because it is roughly the geometric cross-section of a nucleus — and named, according to the story, because to a slow neutron a large nucleus is as easy to hit as the side of a barn.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Take <b>cadmium at 0.10 mm</b>, Beiser's Example 12.8. About <b>67%</b> of a thermal-neutron beam is absorbed by a sheet you could cut with scissors, and <b>0.41 mm</b> stops 99%. The mean free path is <b>0.089 mm</b>, Example 12.9. This is why cadmium and boron are what reactor control rods are made of: a few millimetres of them is an absolute wall to slow neutrons.</p>
+        <p class="tryit">Now read the first two readout lines together. Cadmium's geometric cross-section πR² is about <b>1.05 barns</b> — Beiser quotes 1.06. Its absorption cross-section for thermal neutrons is <b>20,000</b>. The nucleus is presenting a target nearly <b>twenty thousand times</b> its own size — which is nonsense for a particle and perfectly ordinary for a wave. A thermal neutron has a de Broglie wavelength of about 0.18 nm, some thirty thousand times the nuclear radius, so it is not a bullet being aimed at a target; it is a wave washing over a region vastly larger than the nucleus, and σ measures how strongly that region scatters it.</p>
+        <p class="tryit">Switch to <b>graphite</b> and watch the curve go almost flat. Carbon barely absorbs neutrons at all — 0.0035 barns — while still being light enough to slow them down efficiently in elastic collisions. That combination is exactly what a <b>moderator</b> is, and it is why the first reactor Fermi built under the stands at Chicago was a pile of graphite bricks.</p>
+        <p class="tryit">Select <b>gold</b> and set the flux to <b>10<sup>16.3</sup></b> ≈ 2×10<sup>16</sup>. That is Example 12.10: a 10 mg foil reaching 200 µCi of <sup>198</sup>Au takes about <b>410 seconds</b> of exposure (at a flat 10<sup>16</sup> it would be 820). Neutron-activation analysis works exactly this way, and it is sensitive enough to find parts per billion of an element in a sample without destroying it.</p>
+
+        <h3>Why slow neutrons are the useful ones</h3>
+        <p>A fast neutron has a short wavelength and behaves like a particle: its cross-section is roughly geometric. As it slows, its wavelength grows, the interaction region grows with it, and σ rises — typically as 1/v, which is why "thermal" neutrons at 0.025 eV are so much more reactive than the MeV neutrons that fission actually produces. Slowing neutrons down is therefore not a side effect in a reactor; it is the entire design problem, and the next card is about why.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">A single number σ hides a great deal. Cross-sections depend strongly on energy and are not smooth: they have sharp <b>resonances</b> where the incident energy matches an excited state of the compound nucleus. <sup>113</sup>Cd has one at 0.176 eV, and the 20,000 barns quoted here is the value at thermal energy near that resonance, not a constant. A reactor designer needs the whole curve, not a number.</p>
+        <p class="catch">Also, "cross-section" is always cross-section <em>for a specified reaction</em>. The figures here are for capture, except uranium's, which is for fission. The same nucleus has different cross-sections for scattering, capture, fission and everything else, and they add.</p>
+      </div>
+    </div>
+
+    <!-- 7. fission -->
+    <div class="card">
+      <h2>Fission: Why Uranium-235 and Not Uranium-238 <span class="eqtag">Secs. 12.9&ndash;12.10</span></h2>
+      <p class="desc">Both isotopes are enormous, both are a hair from instability, and both release around 200 MeV if they split. Only one of them will do it when a slow neutron wanders in, and the reason comes down to a single term in the liquid-drop formula.</p>
+      <div class="eq">&Delta;E(&epsilon;) = (2/5)E<sub>s</sub>&epsilon;&sup2; &minus; (1/5)E<sub>c</sub>&epsilon;&sup2; &nbsp;&rarr;&nbsp; unstable when Z&sup2;/A &gt; 2a<sub>2</sub>/a<sub>3</sub></div>
+      <div class="controls">
+        <div class="ctrl"><label>Proton number Z <span class="val" id="fs_z_val">92</span></label>
+          <input type="range" id="fs_z" min="20" max="110" step="1" value="92"></div>
+        <div class="ctrl"><label>Mass number A <span class="val" id="fs_a_val">235</span></label>
+          <input type="range" id="fs_a" min="50" max="270" step="1" value="235"></div>
+      </div>
+      <canvas id="fs_canvas" height="320"></canvas>
+      <canvas id="fs_cmp" height="330"></canvas>
+      <div class="readout" id="fs_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: what happens to a liquid drop when you stretch it. Stretching increases the surface area, which costs energy — that is surface tension, and it is what makes the drop spring back. But stretching also moves the protons further apart on average, which <em>releases</em> Coulomb energy. The two effects both go as ε² to leading order, so which one wins is a fixed property of the nucleus: the drop is stable against any small stretch only while Z²/A stays below 2a₂/a₃.</p>
+        <p>Below: the actual question. When a nucleus swallows a neutron, the binding energy released goes into exciting the compound nucleus. If that excitation exceeds the fission barrier, it splits immediately. The teal bars are that excitation energy, computed from the liquid-drop formula; the red bars are the measured fission barriers, which the model cannot supply.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Look at the bottom chart. <b>²³⁵U + n</b> releases about <b>7 MeV</b> against a barrier of 5.7 — it fissions on a neutron of any energy at all, including one that has been slowed to room temperature. <b>²³⁸U + n</b> releases only <b>5.6 MeV</b> against a barrier of 6.2 — it falls short, and needs a neutron already carrying about an MeV of kinetic energy.</p>
+        <p class="tryit">Now read the label under each bar. The compound nucleus <sup>236</sup>U is <b>even-even</b>; <sup>239</sup>U is not. That is the whole difference. The pairing term in the semi-empirical formula is worth <b>&plusmn;0.56 MeV</b> here; because <sup>236</sup>U collects the bonus and <sup>238</sup>U gave one up to become <sup>239</sup>U, the swing between the two cases is <b>1.11 MeV</b> — which is 79% of the whole 1.41 MeV gap, and the difference between a fuel and an inert diluent. Natural uranium is 99.3% <sup>238</sup>U, so the entire nuclear industry exists in the 0.7% gap opened by one term in an empirical fit.</p>
+        <p class="tryit">Check <b>²³⁹Pu</b> on the same chart: even-even compound, thermally fissile, which is why it is a weapons material and why breeder reactors make it from <sup>238</sup>U. Then <b>²³²Th</b>: odd compound, not thermally fissile — but it breeds to <sup>233</sup>U, which is, and that is the basis of every thorium reactor proposal you have read about.</p>
+        <p class="tryit">On the top chart, drag <b>Z</b> up towards 110 at fixed A. Watch the total curve tip over and go negative: past Z²/A ≈ 44 on these coefficients, any stretch at all releases energy and the nucleus comes apart spontaneously. That is the real ceiling on the periodic table — not chemistry, but the point at which a drop of nuclear fluid can no longer hold itself together.</p>
+
+        <h3>Where 200 MeV comes from</h3>
+        <p>Straight off the binding-energy curve of Chapter 11. Uranium is bound at 7.6 MeV per nucleon and the fragments at about 8.5, so splitting 235 nucleons releases roughly 0.9 &times; 235 ≈ 200 MeV. About 83% of that appears immediately as kinetic energy of the two fragments flying apart under their own electrostatic repulsion; the rest arrives as neutrons, prompt gammas, and the beta decays of the fragments over the following minutes and years. That last part is why a shut-down reactor still needs cooling, and why spent fuel is a long-term problem.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The ε² expansion above is only the leading term, valid for small deformations. It tells you whether a nucleus is stable against a <em>small</em> stretch but cannot produce the actual barrier height, which requires the full Bohr–Wheeler treatment with higher-order shape terms — which is why the barriers on the lower chart are measured values rather than computed ones. The real fission path also passes through a doubly-humped barrier with a shape-isomeric well in between, a feature the liquid drop knows nothing about and which comes from shell effects in the deformed nucleus.</p>
+        <p class="catch">Fission is also not symmetric, which the liquid drop gets flatly wrong. It predicts a split down the middle; what actually happens is a lopsided division peaking near mass 95 and 140, with symmetric splits suppressed by a factor of several hundred. The asymmetry is a shell effect — the heavy fragment is pulled towards the doubly-magic <sup>132</sup>Sn — and it took decades to explain.</p>
+      </div>
+    </div>
+
+    <!-- 8. fusion -->
+    <div class="card">
+      <h2>Fusion: In Stars, and the Sixty-Year Attempt to Do It Here <span class="eqtag">Secs. 12.11&ndash;12.12</span></h2>
+      <p class="desc">The centre of the sun is fifteen million degrees, which sounds like a lot until you work out the Coulomb barrier between two protons. It is a thousand times too cold. Fusion happens anyway, and only because of tunnelling.</p>
+      <div class="eq">rate &prop; T<sup>&minus;2/3</sup>e<sup>&minus;3(E<sub>G</sub>/4kT)<sup>1/3</sup></sup>, &nbsp; E<sub>G</sub> = 2&mu;c&sup2;(&pi;&alpha;Z<sub>1</sub>Z<sub>2</sub>)&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Stellar core temperature (10⁷ K) <span class="val" id="fu_t_val">1.50</span></label>
+          <input type="range" id="fu_t" min="0.4" max="4.5" step="0.01" value="1.5"></div>
+        <div class="ctrl"><label>Reactor plasma temperature (keV) <span class="val" id="fu_kt_val">20</span></label>
+          <input type="range" id="fu_kt" min="4" max="40" step="1" value="20"></div>
+        <div class="ctrl"><label>Confinement quality n&tau; (s/m³) <span class="val" id="fu_nt_val">10^19.30</span></label>
+          <input type="range" id="fu_nt" min="19" max="21.5" step="0.05" value="19.3"></div>
+      </div>
+      <canvas id="fu_canvas" height="320"></canvas>
+      <canvas id="fu_peak" height="320"></canvas>
+      <canvas id="fu_lawson" height="320"></canvas>
+      <div class="readout" id="fu_readout"></div>
+
+      <div class="explain">
+        <h3>The problem, in one number</h3>
+        <p>Two protons must approach to about 2 fm for the strong force to grab them. At that distance the Coulomb repulsion is around <b>0.7 MeV</b>. At the centre of the sun, kT is <b>1.3 keV</b>. The barrier is more than <b>five hundred times</b> the typical thermal energy, and the Maxwell–Boltzmann factor e<sup>&minus;E/kT</sup> at that ratio is around 10<sup>&minus;242</sup>. Classically the sun would be dark.</p>
+        <p>Two things rescue it, and the second plot shows them meeting. The Maxwell distribution has a tail, so a few pairs are much faster than typical. And those pairs do not need to clear the barrier — they can tunnel, exactly as the alpha particle did two cards ago, only inward. The tail is falling steeply with energy while the tunnelling probability is rising steeply, and their product is a narrow peak at an energy several times kT: the <b>Gamow peak</b>. Every fusion reaction in the universe happens inside that window.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave the star at <b>1.5&times;10⁷ K</b>, the sun's core. On the first plot the proton–proton chain dominates. Drag up to <b>1.8&times;10⁷ K</b> and the two curves cross; above that the <b>CNO cycle</b> takes over, which is why heavier, hotter stars burn hydrogen by a completely different route using carbon and nitrogen as catalysts.</p>
+        <p class="tryit">Read the two exponents in the readout as you drag. At the sun's temperature the pp rate goes as about <b>T<sup>4</sup></b> and the CNO rate as about <b>T<sup>20</sup></b>. Those are the textbook numbers, and neither was put in — they fall out of the Gamow energies, which depend only on the charges and reduced masses of the colliding nuclei. Nitrogen has seven protons, so its barrier is far higher, so its rate is far more temperature-sensitive. A CNO star is a hair-trigger; a pp star is a slow, stable furnace, and that stability is why the sun has managed four and a half billion years of near-constant output.</p>
+        <p class="tryit">On the middle plot, note where the Gamow peak sits: several times kT, well out in the tail. Then note how narrow it is. The sun's power output is set by a sliver of its proton population that is neither typical nor extreme.</p>
+        <p class="tryit">On the bottom plot, drag the reactor temperature and the confinement quality. The measured best from a tokamak — <b>30 keV</b> and nτ = <b>2&times;10<sup>19</sup></b> — is marked, and it sits just to the left of the breakeven curve: short by a factor of about <b>1.6</b>. Sixty years of work, and the plasma still produces slightly less than it consumes. Ignition, where the alpha particles alone keep the reaction going, needs another factor of five on top.</p>
+
+        <h3>Why the sun is slow, and why that is fortunate</h3>
+        <p>The first step of the pp chain is p + p → d + e⁺ + ν, and it requires one of the two protons to beta-decay into a neutron <em>during the collision</em>. That is a weak-interaction process, and the weak interaction is feeble: the average proton in the sun's core waits about <b>10<sup>10</sup> years</b> for it. The sun's luminosity per unit mass is about a fifth of a human body's metabolic output. It is bright only because it is enormous — and it is long-lived precisely because the bottleneck reaction is so reluctant.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The rate curves here carry the correct temperature <em>shape</em> from the Gamow formula but not absolute magnitudes: the nuclear physics of each reaction enters through an S-factor, and the CNO rate also scales with a star's carbon and nitrogen content, so the crossing temperature depends on composition. The two curves have been normalised to cross at Beiser's 1.8&times;10⁷ K.</p>
+        <p class="catch">The D–T reactivity used for the Lawson plot is a standard fit to the Gamow form, good to about 25% below 25 keV. Above that it drifts, because the real D–T cross-section has a strong resonance and peaks near 65 keV. Real reactor design also has to account for bremsstrahlung losses, which rise with temperature and set a hard floor below which ignition is impossible in a hydrogen plasma at all.</p>
+        <p class="catch">One thing has changed since the book was written. Magnetic confinement still has not reached breakeven, but in December 2022 the National Ignition Facility got there by the <em>other</em> route — inertial confinement, 192 lasers on a peppercorn-sized capsule — releasing more fusion energy than the laser light delivered to the target. That is ignition in the sense defined above, though not yet in the sense of a power station: the lasers themselves consume about a hundred times more electricity than the shot produces.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
@@ -2916,5 +3236,6 @@
 <script src="ch09.js"></script>
 <script src="ch10.js"></script>
 <script src="ch11.js"></script>
+<script src="ch12.js"></script>
 </body>
 </html>
