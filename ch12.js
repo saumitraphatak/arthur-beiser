@@ -701,9 +701,16 @@ function setupCrossSection(){
 function setupFission(){
   const barCanvas=document.getElementById('fs_canvas');
   const cmpCanvas=document.getElementById('fs_cmp');
+  const shapeCanvas=document.getElementById('fs_shape');
+  const shapeCap=document.getElementById('fs_shape_cap');
+  const playBtn=document.getElementById('fs_play');
   const zEl=document.getElementById('fs_z'), zVal=document.getElementById('fs_z_val');
   const aEl=document.getElementById('fs_a'), aVal=document.getElementById('fs_a_val');
   const readout=document.getElementById('fs_readout');
+  // a schematic sphere -> dumbbell -> two-fragment animation, played on demand.
+  // Whether it springs back or runs away is decided by the same Z^2/A vs the
+  // critical fissility computed below — this is illustration, not a new model.
+  let stage='idle', stageT=0, playing=false, unstable=false, lastFrame=performance.now();
 
   // A liquid drop stretched into a prolate spheroid of eccentricity parameter eps
   // gains surface area and loses Coulomb energy, to leading order:
@@ -744,6 +751,80 @@ function setupFission(){
                  w-m.r-8, m.t+14);
     ctx.restore();
   }
+
+  function drawShape(){
+    if(!shapeCanvas) return;
+    const {ctx,w,h}=fitCanvas(shapeCanvas);
+    ctx.clearRect(0,0,w,h);
+    const cx=w/2, cy=h/2, R0=Math.min(w,h)*0.16;
+    ctx.fillStyle='#a4342c'; ctx.strokeStyle='#5a2620'; ctx.lineWidth=1.4;
+    function lobe(x,y,a,b){ ctx.beginPath(); ctx.ellipse(x,y,a,b,0,0,Math.PI*2); ctx.fill(); ctx.stroke(); }
+
+    if(stage==='idle'){
+      lobe(cx,cy,R0,R0);
+    } else if(stage==='stretch'){
+      const u=stageT, aMax=unstable?R0*2.0:R0*1.35;
+      const a=R0+(aMax-R0)*u, b=(R0*R0)/a;
+      lobe(cx,cy,a,b);
+    } else if(stage==='pinch'){
+      const u=stageT, a=unstable?R0*2.0:R0*1.35, b=(R0*R0)/a;
+      const sep=b*0.4+u*(a*1.1), lobeR=b*(1-0.1*u);
+      const neckW=(1-u)*b*0.85;
+      if(neckW>0.6) ctx.fillRect(cx-sep*0.5, cy-neckW/2, sep, neckW);
+      lobe(cx-sep*0.5,cy,lobeR*1.1,lobeR); lobe(cx+sep*0.5,cy,lobeR*1.1,lobeR);
+    } else if(stage==='split'){
+      const u=stageT, a=R0*2.0, b=(R0*R0)/a;
+      const sep=a*1.15+u*R0*1.5;
+      lobe(cx-sep*0.5,cy,b*1.05,b*1.05); lobe(cx+sep*0.5,cy,b*1.05,b*1.05);
+      if(u<0.15){
+        ctx.save(); ctx.globalAlpha=1-u/0.15; ctx.fillStyle='#f4d35e';
+        ctx.beginPath(); ctx.arc(cx,cy,R0*0.55,0,Math.PI*2); ctx.fill(); ctx.restore();
+      }
+    } else if(stage==='springback'){
+      const u=stageT, aMax=R0*1.35;
+      const osc=Math.exp(-3*u)*Math.cos(2*Math.PI*1.6*u);
+      const a=R0+(aMax-R0)*osc, b=(R0*R0)/Math.max(a,0.4*R0);
+      lobe(cx,cy,a,b);
+    }
+    if(shapeCap){
+      shapeCap.textContent =
+        stage==='idle' ? 'the drop, at rest — press Play' :
+        stage==='stretch' ? 'stretching under a nudge…' :
+        stage==='pinch' ? 'a neck pinches inward…' :
+        stage==='split' ? 'scission — two fragments fly apart' :
+        stage==='springback' ? 'surface tension wins — it springs back' : '';
+    }
+  }
+
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch12') && document.getElementById('ch12').classList.contains('active');
+    if(playing && active){
+      const DUR = stage==='stretch' ? (unstable?1.6:1.2) : stage==='pinch' ? 1.2 : stage==='split' ? 1.4 : 1.4;
+      stageT += dt/DUR;
+      if(stageT>=1){
+        if(stage==='stretch'){ stage = unstable?'pinch':'springback'; stageT=0; }
+        else if(stage==='pinch'){ stage='split'; stageT=0; }
+        else { stageT=1; playing=false; playBtn.textContent='↺ Replay'; playBtn.classList.remove('playing'); }
+      }
+      drawShape();
+    }
+    requestAnimationFrame(loop);
+  }
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    const Z=parseInt(zEl.value,10), A=parseInt(aEl.value,10);
+    unstable = (Z*Z/A) > CRIT;
+    if(prefersReducedMotion()){
+      stage = unstable ? 'split' : 'idle'; stageT=1; drawShape();
+      return;
+    }
+    if(!playing){
+      stage='stretch'; stageT=0; playing=true; lastFrame=performance.now();
+      playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      playing=false; playBtn.textContent='▶ Nudge the drop and watch'; playBtn.classList.remove('playing');
+    }
+  });
 
   // why U-235 fissions on a thermal neutron and U-238 needs a fast one.
   // The neutron separation energy is computed from the liquid-drop formula; the
@@ -815,10 +896,20 @@ function setupFission(){
       <div>that single term is why ²³⁵U runs a reactor on slow neutrons and ²³⁸U — 99.3% of natural
         uranium — does not</div>`;
   }
-  zEl.addEventListener('input',draw);
-  aEl.addEventListener('input',draw);
+  zEl.addEventListener('input',()=>{
+    stage='idle'; stageT=0; playing=false;
+    if(playBtn){ playBtn.textContent='▶ Nudge the drop and watch'; playBtn.classList.remove('playing'); }
+    draw(); drawShape();
+  });
+  aEl.addEventListener('input',()=>{
+    stage='idle'; stageT=0; playing=false;
+    if(playBtn){ playBtn.textContent='▶ Nudge the drop and watch'; playBtn.classList.remove('playing'); }
+    draw(); drawShape();
+  });
   registerCanvas('fs_canvas',draw);
   registerCanvas('fs_cmp',draw);
+  registerCanvas('fs_shape',drawShape);
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

@@ -14,7 +14,7 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Length contraction
 - Relativistic velocity addition
 - Relativistic Doppler effect / cosmological redshift (Hubble's law)
-- Twin paradox with spacetime diagram
+- Twin paradox with spacetime diagram (animated — press Play to watch both ages tick as Dick flies out and back)
 - Relativistic vs. classical kinetic energy & momentum
 - Minkowski spacetime diagram (boosted axes, relativity of simultaneity)
 
@@ -57,7 +57,7 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 ## Chapter 6 — Quantum Theory of the Hydrogen Atom
 - Three dimensions, three quantum numbers (every state, and where each restriction comes from)
 - Where the electron actually is (radial probability, most probable radius vs ⟨r⟩)
-- Orbital shapes (|ψ|² density slices computed from the wave functions)
+- Orbital shapes (|ψ|² density slices computed from the wave functions, with an animated electron-cloud overlay — dots sampled live from the density, so the smooth plot is visibly what a great many measurements would actually build up)
 - Angular momentum cannot point anywhere (|L| = √(ℓ(ℓ+1))ℏ vs L_z = m_ℓℏ)
 - Selection rules (Δℓ = ±1 and why it is angular-momentum conservation)
 - The Zeeman effect (normal splitting, Example 6.4)
@@ -75,7 +75,7 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Electron sharing in H₂⁺ (bonding vs antibonding, and why one binds)
 - Rotational energy levels and spectra (measuring bond length from line spacing)
 - Vibrational energy levels (force constants, anharmonicity, Example 8.3)
-- The vibration–rotation band (P and R branches, the missing centre line)
+- The vibration–rotation band (P and R branches, the missing centre line, plus an animated inset of the molecule actually stretching and tumbling at once)
 - Three energy scales, four decades apart
 
 ## Chapter 9 — Statistical Mechanics
@@ -90,7 +90,7 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - What holds an ionic crystal together (Madelung sums, the exclusion-principle repulsion, cohesive energy against measurement)
 - The van der Waals bond (Lennard-Jones, the fcc lattice sums, and all five bond types compared against their melting points)
 - Free electrons, drift and Ohm's law (animated; drift velocity, Fermi velocity, mean free path in ion spacings)
-- How a level becomes a band (a chain of N atoms solved exactly, and what happens as N grows)
+- How a level becomes a band (a chain of N atoms solved exactly, and what happens as N grows — press Play to watch the discrete levels smear into a band in real time)
 - Conductor, semiconductor, insulator (Fermi–Dirac tails on a log scale, intrinsic carriers, the Arrhenius plot)
 - Doping and the p–n junction (band bending under bias, np = n_i², the diode equation, 60 mV per decade)
 - Brillouin zones (bands from diagonalising the nearly-free-electron Hamiltonian, and the two standing waves that make the gap)
@@ -102,7 +102,7 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - The mass defect and the binding-energy curve (every point from a measured atomic mass; fusion and fission Q values)
 - The liquid-drop model (five terms you can drag, fitted against every stable nuclide, and residuals that point at the shells)
 - The valley of stability (the chart of the nuclides, and the isobar parabola that picks the stable element at each A)
-- The shell model and the magic numbers (spin–orbit strength as a slider, all seven closures, and the abundance spikes)
+- The shell model and the magic numbers (spin–orbit strength as a slider, all seven closures, the abundance spikes, and a fill animation that stacks nucleons onto the ladder one at a time, pausing on every magic number)
 - Yukawa (ΔEΔt ≈ ℏ, the pion's mass from the range of the force, and the Yukawa potential against a plain 1/r)
 
 ## Chapter 12 — Nuclear Transformations
@@ -112,13 +112,25 @@ Every module carries an explanation beneath it in the same four-part shape: how 
 - Alpha decay by tunnelling (the Gamow integral reproducing 17 decades of half-life, and recovering R₀ = 1.2 fm from decay rates alone)
 - Beta decay and the neutrino (the Fermi spectrum, the Kurie plot, and where neutrino mass hides)
 - Cross section (attenuation, mean free path, reaction rate, and why a slow neutron sees a nucleus 20,000× its size)
-- Fission (the deformation barrier, and the one pairing term that separates ²³⁵U from ²³⁸U)
+- Fission (the deformation barrier, the one pairing term that separates ²³⁵U from ²³⁸U, and a sphere-to-dumbbell-to-scission animation driven by the same stability criterion)
 - Fusion (the Gamow peak, pp vs CNO and their T⁴ and T²⁰ laws, and the Lawson criterion)
+
+## Chapter 13 — Elementary Particles
+- The four interactions, thirty-nine decades apart (strong, electromagnetic, weak and gravity on one log-force plot, derived from an actual Yukawa potential rather than a schematic)
+- The particle zoo, sorted (mass and lifetime plots that sort leptons, quarks, mesons, baryons and bosons on their own; press Play to watch a chosen particle decay, on a clock scaled to its own mean life)
+- Antimatter (the Dirac sea, pair production and annihilation, and the energy released compared with the space shuttle's orbit)
+- Is this reaction allowed? (a live ledger of charge, baryon number, the three lepton numbers and strangeness, checked against any reaction you build)
+- Building hadrons out of quarks (the baryon octet and decuplet, and the meson multiplets, assembled from up, down and strange)
+- Why you cannot have one quark (confinement, the linear potential, and why pulling a quark out just makes a pair of mesons)
+- Field bosons, and why the weak force looks weak (the photon, gluons, W/Z and the electroweak unification scale)
+- The history of the universe (the thermal epochs from the Planck time to today, and where each of the four interactions froze out)
 
 Every number on screen is computed live from the chapter's formulas — nothing is pre-baked data.
 The atomic data in Chapters 11 and 12 is the one exception: `nuclides.js` holds Beiser's own
 appendix table — 378 nuclides with measured masses, natural abundances, stability and half-lives.
-Every binding energy, Q value and decay constant is computed from those.
+Every binding energy, Q value and decay constant is computed from those. Chapter 13's particle
+and quark properties (`P13`, `QUARKS` in `ch13.js`) are the same kind of measured table, taken
+from Beiser's own particle-physics tables.
 
 ## Layout
 
@@ -136,7 +148,8 @@ Every binding energy, Q value and decay constant is computed from those.
     ch10.js
     ch11.js
     ch12.js
-    nuclides.js  atomic masses and half-lives, for Chapters 11-12
+    ch13.js
+    nuclides.js   atomic masses, abundances and half-lives, for Chapters 11-12
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

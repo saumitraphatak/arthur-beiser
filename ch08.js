@@ -421,9 +421,50 @@ function setupVibrational(){
    ===================================================================== */
 function setupVibRot(){
   const canvas=document.getElementById('vr_canvas');
+  const molCanvas=document.getElementById('vr_mol_canvas');
   const molEl=document.getElementById('vr_mol');
   const tEl=document.getElementById('vr_t'), tVal=document.getElementById('vr_t_val');
   const readout=document.getElementById('vr_readout');
+  let vibPhase=0, rotPhase=0, lastFrame=performance.now();
+  let vibRate=3, rotRate=0.6; // rad/s — visual rates only, but set from the real k and J below
+
+  function drawMolecule(){
+    if(!molCanvas) return;
+    const {ctx,w,h}=fitCanvas(molCanvas);
+    ctx.clearRect(0,0,w,h);
+    const cx=w/2, cy=h*0.44;
+    const armBase=Math.min(w,h)*0.30;
+    const stretch=1+0.22*Math.sin(vibPhase);          // vibration, exaggerated so it's visible
+    const arm=armBase*stretch;
+    const dx=Math.cos(rotPhase)*arm, dy=Math.sin(rotPhase)*arm*0.55;   // tumbling, viewed at a tilt
+    const x1=cx-dx, y1=cy-dy, x2=cx+dx, y2=cy+dy;
+
+    // bond drawn as a little spring so the stretching reads clearly
+    const nx0=-(y2-y1), ny0=(x2-x1); const nl=Math.hypot(nx0,ny0)||1;
+    const nx=nx0/nl, ny=ny0/nl;
+    ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=2.2; ctx.beginPath(); ctx.moveTo(x1,y1);
+    const N=7;
+    for(let i=1;i<N;i++){
+      const t=i/N, px=x1+(x2-x1)*t, py=y1+(y2-y1)*t, perp=(i%2===0?1:-1)*4;
+      ctx.lineTo(px+nx*perp, py+ny*perp);
+    }
+    ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x1,y1,9,0,7); ctx.fillStyle='#a4342c'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x2,y2,7,0,7); ctx.fillStyle='#1f6f78'; ctx.fill();
+    ctx.font='10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='center';
+    ctx.fillText('stretch & spin exaggerated, not to scale', cx, h-8);
+  }
+
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch8') && document.getElementById('ch8').classList.contains('active');
+    if(active && !prefersReducedMotion()){
+      vibPhase += dt*vibRate;
+      rotPhase += dt*rotRate;
+      drawMolecule();
+    }
+    requestAnimationFrame(loop);
+  }
 
   function draw(){
     const {ctx,w,h}=fitCanvas(canvas);
@@ -485,10 +526,18 @@ function setupVibRot(){
       <div>lines per eV of band <b>${fmt(1/(2*B),0)}</b></div>
       <div>most populated J <b>${Jmax}</b></div>
       <div>h&nu;&#8320; / 2B <b>${fmt(hv/(2*B),0)}</b> — rotational structure is ${fmt(hv/(2*B),0)}&times; finer</div>`;
+
+    // drive the little vibrating/tumbling inset from the same molecule and
+    // temperature: stiffer bonds wiggle faster, more populated J spins faster.
+    vibRate = 2.4 + 2.8*Math.min(1, md.k/2200);
+    rotRate = 0.3 + 0.22*Jmax;
+    drawMolecule();
   }
   molEl.addEventListener('change',draw);
   tEl.addEventListener('input',draw);
   registerCanvas('vr_canvas',draw);
+  registerCanvas('vr_mol_canvas',drawMolecule);
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

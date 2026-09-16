@@ -691,6 +691,10 @@ function setupShellModel(){
   const abCanvas=document.getElementById('sm_abund');
   const soEl=document.getElementById('sm_so'), soVal=document.getElementById('sm_so_val');
   const readout=document.getElementById('sm_readout');
+  const playBtn=document.getElementById('sm_play');
+  // fillN = how many nucleons have been "placed" so far, lowest level first —
+  // this is what the play button animates, from empty up to every level full.
+  let fillN=0, playing=false, holdT=0, lastFrame=performance.now();
 
   /* Beiser's Fig. 11.17 level sequence. Each entry: label, l, j, capacity 2j+1.
      The shells close at the large gaps, and the running totals are the magic
@@ -728,6 +732,14 @@ function setupShellModel(){
     return lv.E0 - strength*ls*(lv.l?1:0);
   }
 
+  function getRows(){
+    const s=parseFloat(soEl.value);
+    const rows=LEVELS.map(lv=>({...lv, E:energy(lv,s)})).sort((a,b)=>a.E-b.E);
+    let run=0;
+    rows.forEach(r=>{ run+=r.cap; r.total=run; r.closes=MAGIC.indexOf(run)>=0; });
+    return rows;
+  }
+
   function draw(){
     const {ctx,w,h}=fitCanvas(canvas);
     const s=parseFloat(soEl.value);
@@ -735,9 +747,7 @@ function setupShellModel(){
     ctx.fillStyle='#fbfaf7'; ctx.fillRect(0,0,w,h);
     const m={l:64,r:190,t:26,b:34};
 
-    const rows=LEVELS.map(lv=>({...lv, E:energy(lv,s)})).sort((a,b)=>a.E-b.E);
-    let run=0;
-    rows.forEach(r=>{ run+=r.cap; r.total=run; r.closes=MAGIC.indexOf(run)>=0; });
+    const rows=getRows();
 
     const emin=Math.min(...rows.map(r=>r.E))-2, emax=Math.max(...rows.map(r=>r.E))+2;
     const Y=e=>h-m.b-((e-emin)/(emax-emin))*(h-m.b-m.t);
@@ -782,6 +792,18 @@ function setupShellModel(){
         ctx.fillStyle='#a4342c'; ctx.font='bold 11px Helvetica,Arial,sans-serif';
         ctx.fillText(`shell closes — ${r.total}`, x1+28, y+3);
       }
+      // nucleons "placed" so far by the fill animation, as beads along the level
+      const start=r.total-r.cap;
+      const filled=Math.max(0, Math.min(r.cap, Math.round(fillN)-start));
+      if(filled>0){
+        const seg=(x1-8)-(x0+8);
+        ctx.fillStyle=r.closes?'#a4342c':'#1f6f78';
+        for(let k=0;k<filled;k++){
+          const fx=r.cap===1?(x0+x1)/2:(x0+8)+seg*(k/(r.cap-1||1));
+          ctx.beginPath(); ctx.arc(fx,y,3.4,0,7); ctx.fill();
+          ctx.lineWidth=1; ctx.strokeStyle='#fbfaf7'; ctx.stroke();
+        }
+      }
       ctx.restore();
     });
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63'; ctx.textAlign='left';
@@ -794,13 +816,18 @@ function setupShellModel(){
 
     const got=rows.filter(r=>r.closes).map(r=>r.total);
     const missing=MAGIC.filter(M=>got.indexOf(M)<0);
+    const nf=Math.round(fillN);
+    const fillLine = nf<=0
+      ? `<div>press <b>Fill the shells</b> to watch nucleons stack up the ladder, lowest level first</div>`
+      : `<div>nucleons placed so far <b>${nf}</b>${MAGIC.indexOf(nf)>=0 ? ' — a magic number: the shell directly below just closed' : ''}</div>`;
     readout.innerHTML = `
       <div>spin–orbit strength <b>×${fmt(s,2)}</b> of the value that reproduces the data</div>
       <div>running totals that land on a magic number: <b>${got.join(', ')||'none'}</b></div>
       <div>missed: <b>${missing.join(', ')||'none — all seven'}</b></div>
       <div>the splitting is <b>ΔE ∝ [j(j+1) − ℓ(ℓ+1) − ¾]/2</b>, and the j = ℓ + ½ level always drops</div>
       <div>with no spin–orbit coupling at all the closures come out 2, 8, 20, 40, 70, 112 — the harmonic-oscillator numbers, and wrong above 20</div>
-      <div>states per shell in Beiser's sequence: <b>2, 6, 12, 8, 22, 32, 44</b> → 2, 8, 20, 28, 50, 82, 126</div>`;
+      <div>states per shell in Beiser's sequence: <b>2, 6, 12, 8, 22, 32, 44</b> → 2, 8, 20, 28, 50, 82, 126</div>
+      ${fillLine}`;
   }
 
   // natural abundance really does spike at the magic numbers
@@ -838,9 +865,48 @@ function setupShellModel(){
     ctx.restore();
   }
 
-  soEl.addEventListener('input',draw);
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch11') && document.getElementById('ch11').classList.contains('active');
+    if(playing && active){
+      const rows=getRows();
+      const TOTAL=rows[rows.length-1].total;
+      if(holdT>0){ holdT-=dt; }
+      else{
+        const prev=fillN;
+        fillN=Math.min(TOTAL, fillN+dt*16); // ~16 nucleons/sec baseline
+        const crossed=MAGIC.find(M=>prev<M && fillN>=M);
+        if(crossed!==undefined){ fillN=crossed; holdT=0.7; } // pause on every magic number
+      }
+      if(fillN>=TOTAL){ playing=false; playBtn.textContent='↺ Replay: fill the shells'; playBtn.classList.remove('playing'); }
+      draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    const TOTAL=getRows().slice(-1)[0].total;
+    if(prefersReducedMotion()){
+      fillN = fillN>0 ? 0 : TOTAL;
+      draw();
+      return;
+    }
+    if(!playing){
+      if(fillN>=TOTAL-1e-9) fillN=0;
+      playing=true; holdT=0; lastFrame=performance.now();
+      playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      playing=false; playBtn.textContent='▶ Fill the shells, one nucleon at a time'; playBtn.classList.remove('playing');
+    }
+  });
+
+  soEl.addEventListener('input',()=>{
+    fillN=0; playing=false;
+    if(playBtn){ playBtn.textContent='▶ Fill the shells, one nucleon at a time'; playBtn.classList.remove('playing'); }
+    draw();
+  });
   registerCanvas('sm_canvas',draw);
   registerCanvas('sm_abund',draw);
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

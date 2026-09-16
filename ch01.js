@@ -450,6 +450,12 @@ function setupTwinParadox(){
   const distEl=document.getElementById('tw_dist'), distVal=document.getElementById('tw_dist_val');
   const ageEl=document.getElementById('tw_age'), ageVal=document.getElementById('tw_age_val');
   const readout=document.getElementById('tw_readout');
+  const live=document.getElementById('tw_live');
+  const playBtn=document.getElementById('tw_play');
+  let simT=0, playing=false, lastFrame=performance.now();
+
+  function getTearth(){ return 2*parseFloat(distEl.value)/parseFloat(betaEl.value); }
+
   function draw(){
     const {ctx,w,h}=fitCanvas(canvas);
     const beta=parseFloat(betaEl.value), D=parseFloat(distEl.value), age0=parseFloat(ageEl.value);
@@ -480,6 +486,16 @@ function setupTwinParadox(){
     ctx.fillText(`reunion: Jane ${fmt(age0+Tearth,1)} yr old`, X(0)-8, Y(Tearth)-8);
     ctx.fillText(`Dick ${fmt(age0+Ttrav,1)} yr old`, X(0)-8, Y(Tearth)+8);
 
+    // moving markers: Dick's position bends at the star, Jane's just climbs the ct axis.
+    if(simT>0){
+      const t=Math.min(simT,Tearth);
+      const dickX = t<=D/beta ? beta*t : 2*D-beta*t;
+      dotAt(ctx,X,Y,0,t,'#1f6f78',6.5);
+      dotAt(ctx,X,Y,dickX,t,'#a4342c',6.5);
+      ctx.beginPath(); ctx.arc(X(dickX),Y(t),10,0,7);
+      ctx.strokeStyle='rgba(164,52,44,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+
     readout.innerHTML = `
       <div>&gamma; <b>${fmt(gamma,3)}</b></div>
       <div>Earth-frame trip time <b>${fmt(Tearth,2)} yr</b></div>
@@ -487,9 +503,54 @@ function setupTwinParadox(){
       <div>Age difference on return <b>${fmt(Tearth-Ttrav,2)} yr</b></div>
       <div>Jane's final age <b>${fmt(age0+Tearth,1)}</b></div>
       <div>Dick's final age <b>${fmt(age0+Ttrav,1)}</b></div>`;
+
+    if(simT>0){
+      const t=Math.min(simT,Tearth);
+      const janeAge = age0+t, dickAge = age0+t/gamma;
+      live.innerHTML = `
+        <div style="color:#1f6f78">Jane's age right now <b>${fmt(janeAge,2)}</b></div>
+        <div style="color:#a4342c">Dick's age right now <b>${fmt(dickAge,2)}</b></div>
+        <div>gap so far <b>${fmt(janeAge-dickAge,2)} yr</b></div>`;
+    } else {
+      live.innerHTML = `<div style="color:var(--sub)">Press Play to watch both ages tick as Dick flies out, turns around, and comes home.</div>`;
+    }
   }
-  [betaEl,distEl,ageEl].forEach(el=>el.addEventListener('input',draw));
+
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch1') && document.getElementById('ch1').classList.contains('active');
+    if(playing && active){
+      const Tearth=getTearth();
+      simT += dt*(Tearth/7); // the whole round trip animates over ~7 real seconds
+      if(simT>=Tearth){ simT=Tearth; playing=false; playBtn.textContent='↺ Replay'; playBtn.classList.remove('playing'); }
+      draw();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    if(prefersReducedMotion()){
+      // Respect reduced-motion: jump straight to the finished trip instead of animating it.
+      simT = simT>0 ? 0 : getTearth();
+      playBtn.textContent = simT>0 ? '↺ Replay' : '▶ Play the trip';
+      draw();
+      return;
+    }
+    if(!playing){
+      if(simT<=0 || simT>=getTearth()-1e-9) simT=0;
+      playing=true; lastFrame=performance.now(); playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      playing=false; playBtn.textContent='▶ Play the trip'; playBtn.classList.remove('playing');
+    }
+  });
+
+  [betaEl,distEl,ageEl].forEach(el=>el.addEventListener('input',()=>{
+    simT=0; playing=false;
+    if(playBtn){ playBtn.textContent='▶ Play the trip'; playBtn.classList.remove('playing'); }
+    draw();
+  }));
   registerCanvas('tw_canvas',draw);
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

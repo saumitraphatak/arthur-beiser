@@ -385,6 +385,9 @@ function setupBandFormation(){
   const nEl=document.getElementById('bf_n'), nVal=document.getElementById('bf_n_val');
   const aEl=document.getElementById('bf_a'), aVal=document.getElementById('bf_a_val');
   const readout=document.getElementById('bf_readout');
+  const playBtn=document.getElementById('bf_play');
+  const N_MIN=parseInt(nEl.min,10), N_MAX=parseInt(nEl.max,10);
+  let playing=false, playT=0, lastFrame=performance.now();
 
   // A chain of N identical atoms, nearest-neighbour coupling t. The eigenvalues
   // of that Hamiltonian are exactly E_j = E0 + 2t cos(j*pi/(N+1)), j = 1..N.
@@ -478,10 +481,46 @@ function setupBandFormation(){
     ctx.restore();
   }
 
-  nEl.addEventListener('input',draw);
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch10') && document.getElementById('ch10').classList.contains('active');
+    if(playing && active){
+      playT+=dt;
+      const DUR=6.5;
+      const u=Math.min(1,playT/DUR);
+      // eased so most of the animation's time is spent in the interesting low-N
+      // regime, where each extra atom visibly changes the picture, rather than
+      // wasted once the band width has already converged.
+      const N=Math.round(N_MIN+(N_MAX-N_MIN)*Math.pow(u,2.3));
+      nEl.value=N;
+      draw();
+      if(u>=1){ playing=false; playBtn.textContent='↺ Replay: watch the band form'; playBtn.classList.remove('playing'); }
+    }
+    requestAnimationFrame(loop);
+  }
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    if(prefersReducedMotion()){
+      nEl.value = (parseInt(nEl.value,10)>=N_MAX) ? N_MIN : N_MAX;
+      draw();
+      return;
+    }
+    if(!playing){
+      playT=0; nEl.value=N_MIN; playing=true; lastFrame=performance.now();
+      playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      playing=false; playBtn.textContent='▶ Watch the band form'; playBtn.classList.remove('playing');
+    }
+  });
+
+  nEl.addEventListener('input',()=>{
+    playing=false;
+    if(playBtn){ playBtn.textContent='▶ Watch the band form'; playBtn.classList.remove('playing'); }
+    draw();
+  });
   aEl.addEventListener('input',draw);
   registerCanvas('bf_canvas',draw);
   registerCanvas('bf_wide',draw);
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

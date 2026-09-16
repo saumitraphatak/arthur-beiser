@@ -239,22 +239,37 @@ function setupOrbitalShapes(){
   const NX=224, NY=224;   // square grid drawn into a square box, so no aspect distortion
   const off=document.createElement('canvas'); off.width=NX; off.height=NY;
   const offCtx=off.getContext('2d');
+  let vals=new Float64Array(NX*NY), peak=1, span=6;
+  let n=1,l=0,ml=0;
+  // "electron detections": a handful of dots that pop in at random points sampled
+  // from |psi|^2 and fade out again, so the smooth density plot is visibly what it
+  // actually is — where a great many individual measurements would land, not a
+  // little orbiting ball.
+  const dots=[];
+  const MAX_DOTS=42;
 
-  function draw(){
-    const {ctx,w,h}=fitCanvas(canvas);
-    const n=parseInt(nEl.value,10);
+  function sampleGridPoint(){
+    // rejection sampling straight off the density grid already computed for the heatmap
+    for(let tries=0;tries<60;tries++){
+      const i=Math.floor(Math.random()*NX), j=Math.floor(Math.random()*NY);
+      if(Math.random() < vals[j*NX+i]/peak) return {i,j};
+    }
+    return {i:Math.floor(NX/2), j:Math.floor(NY/2)};
+  }
+
+  function compute(){
+    n=parseInt(nEl.value,10);
     lEl.max=n-1;
-    let l=Math.min(parseInt(lEl.value,10), n-1); lEl.value=l;
+    l=Math.min(parseInt(lEl.value,10), n-1); lEl.value=l;
     mEl.max=l; mEl.min=-l;
-    let ml=Math.max(-l, Math.min(parseInt(mEl.value,10), l)); mEl.value=ml;
+    ml=Math.max(-l, Math.min(parseInt(mEl.value,10), l)); mEl.value=ml;
     nVal.textContent=n; lVal.textContent=`${l} (${ORB[l]})`; mVal.textContent=ml;
-    ctx.clearRect(0,0,w,h);
 
-    const span=Math.max(6, 2.4*n*n);              // half-width in units of a0
+    span=Math.max(6, 2.4*n*n);              // half-width in units of a0
     const img=offCtx.createImageData(NX,NY);
     const d=img.data;
-    let peak=0;
-    const vals=new Float64Array(NX*NY);
+    peak=0;
+    vals=new Float64Array(NX*NY);
     for(let j=0;j<NY;j++){
       const z=span*(1-2*j/(NY-1));                 // z runs down the screen
       for(let i=0;i<NX;i++){
@@ -278,11 +293,37 @@ function setupOrbitalShapes(){
       d[k*4]=R; d[k*4+1]=G; d[k*4+2]=B; d[k*4+3]=255;
     }
     offCtx.putImageData(img,0,0);
+    dots.length=0;
+  }
+
+  function draw(){
+    const {ctx,w,h}=fitCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
     const side=Math.min(w*0.62, h-54);
     const x0=(w-side)/2 - w*0.14, y0=(h-side)/2 - 6;
     ctx.imageSmoothingEnabled=true;
     ctx.drawImage(off, x0, y0, side, side);
     ctx.strokeStyle='#e0dbd0'; ctx.lineWidth=1; ctx.strokeRect(x0,y0,side,side);
+
+    // electron-detection dots, sampled from the same density grid as the heatmap
+    const reduced=prefersReducedMotion();
+    if(!reduced){
+      if(dots.length<MAX_DOTS && Math.random()<0.55){
+        const p=sampleGridPoint();
+        dots.push({i:p.i, j:p.j, age:0, maxAge:40+Math.random()*55});
+      }
+      for(let k=dots.length-1;k>=0;k--){
+        const dt=dots[k]; dt.age++;
+        if(dt.age>dt.maxAge){ dots.splice(k,1); continue; }
+        const u=dt.age/dt.maxAge;
+        const fade = u<0.25 ? u/0.25 : (u>0.75 ? (1-u)/0.25 : 1);
+        const cx=x0+side*dt.i/(NX-1), cy=y0+side*dt.j/(NY-1);
+        ctx.beginPath(); ctx.arc(cx,cy,2.6,0,7);
+        ctx.fillStyle=`rgba(31,111,120,${0.75*fade})`;
+        ctx.fill();
+        ctx.lineWidth=1; ctx.strokeStyle=`rgba(255,255,255,${0.6*fade})`; ctx.stroke();
+      }
+    }
 
     // the z axis, which is the direction m_l is measured against
     ctx.strokeStyle='rgba(31,111,120,0.5)'; ctx.lineWidth=1.4; ctx.setLineDash([4,3]);
@@ -304,6 +345,10 @@ function setupOrbitalShapes(){
     ctx.fillStyle='#8a8d92';
     ctx.fillText('a slice through the atom,', bx, y0+130);
     ctx.fillText('containing the z axis', bx, y0+146);
+    if(!reduced){
+      ctx.fillText('teal dots: where a single', bx, y0+168);
+      ctx.fillText('measurement would land', bx, y0+184);
+    }
 
     readout.innerHTML = `
       <div>orbital <b>${orbitalName(n,l)}</b></div>
@@ -315,8 +360,18 @@ function setupOrbitalShapes(){
       <div>angular nodes <b>${l-Math.abs(ml)}</b></div>
       <div>total nodes <b>${n-1}</b> — always n&minus;1</div>`;
   }
-  [nEl,lEl,mEl].forEach(el=>el.addEventListener('input',draw));
-  registerCanvas('os_canvas',draw);
+
+  function fullRedraw(){ compute(); draw(); }
+  [nEl,lEl,mEl].forEach(el=>el.addEventListener('input',fullRedraw));
+  registerCanvas('os_canvas',fullRedraw);
+
+  function loop(){
+    const active=document.getElementById('ch6') && document.getElementById('ch6').classList.contains('active');
+    if(active && !prefersReducedMotion()) draw();
+    requestAnimationFrame(loop);
+  }
+  compute();
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

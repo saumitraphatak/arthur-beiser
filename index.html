@@ -124,6 +124,7 @@
     font-weight:600; letter-spacing:.2px;
   }
   .ctrl button:hover{ background:var(--code); border-color:var(--line2); }
+  .ctrl button.playing{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .rowflex{display:flex; gap:22px; flex-wrap:wrap;}
   .colgrow{flex:1; min-width:275px;}
 
@@ -420,8 +421,10 @@
           <input type="range" id="tw_dist" min="1" max="50" step="1" value="20"></div>
         <div class="ctrl"><label>Starting age (both) <span class="val" id="tw_age_val">20</span></label>
           <input type="range" id="tw_age" min="0" max="60" step="1" value="20"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="tw_play">&#9654; Play the trip</button></div>
       </div>
       <canvas id="tw_canvas" height="320"></canvas>
+      <div class="readout" id="tw_live"></div>
       <div class="readout" id="tw_readout"></div>
 
       <div class="explain">
@@ -2048,7 +2051,13 @@
         <div class="ctrl"><label>Temperature (K) <span class="val" id="vr_t_val">300</span></label>
           <input type="range" id="vr_t" min="50" max="900" step="10" value="300"></div>
       </div>
-      <canvas id="vr_canvas" height="300"></canvas>
+      <div class="rowflex">
+        <div class="colgrow" style="min-width:400px;"><canvas id="vr_canvas" height="300"></canvas></div>
+        <div class="colgrow" style="max-width:190px; min-width:150px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <canvas id="vr_mol_canvas" height="180"></canvas>
+          <p style="font-size:.68rem; color:var(--sub); text-align:center; margin:0; font-family:var(--sans);">vibrating <em>and</em> tumbling — the two never happen alone</p>
+        </div>
+      </div>
       <div class="readout" id="vr_readout"></div>
 
       <div class="explain">
@@ -2435,6 +2444,7 @@
           <input type="range" id="bf_n" min="2" max="160" step="1" value="2"></div>
         <div class="ctrl"><label>Internuclear distance (nm) <span class="val" id="bf_a_val">0.367</span></label>
           <input type="range" id="bf_a" min="0.20" max="1.00" step="0.002" value="0.367"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="bf_play">&#9654; Watch the band form</button></div>
       </div>
       <canvas id="bf_canvas" height="300"></canvas>
       <canvas id="bf_wide" height="280"></canvas>
@@ -2835,6 +2845,7 @@
       <div class="controls">
         <div class="ctrl"><label>Spin&ndash;orbit strength <span class="val" id="sm_so_val">1.00</span></label>
           <input type="range" id="sm_so" min="0" max="1.6" step="0.02" value="1"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="sm_play">&#9654; Fill the shells, one nucleon at a time</button></div>
       </div>
       <canvas id="sm_canvas" height="440"></canvas>
       <canvas id="sm_abund" height="300"></canvas>
@@ -3153,8 +3164,15 @@
           <input type="range" id="fs_z" min="20" max="110" step="1" value="92"></div>
         <div class="ctrl"><label>Mass number A <span class="val" id="fs_a_val">235</span></label>
           <input type="range" id="fs_a" min="50" max="270" step="1" value="235"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="fs_play">&#9654; Nudge the drop and watch</button></div>
       </div>
-      <canvas id="fs_canvas" height="320"></canvas>
+      <div class="rowflex">
+        <div class="colgrow" style="min-width:380px;"><canvas id="fs_canvas" height="320"></canvas></div>
+        <div class="colgrow" style="max-width:190px; min-width:150px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <canvas id="fs_shape" height="200"></canvas>
+          <p style="font-size:.68rem; color:var(--sub); text-align:center; margin:0; font-family:var(--sans);" id="fs_shape_cap">the drop, stretched by &epsilon;</p>
+        </div>
+      </div>
       <canvas id="fs_cmp" height="330"></canvas>
       <div class="readout" id="fs_readout"></div>
 
@@ -3267,9 +3285,16 @@
           <select id="pz_sel"></select></div>
         <div class="ctrl"><label>Lorentz factor &gamma; <span class="val" id="pz_gamma_val">20</span></label>
           <input type="range" id="pz_gamma" min="1" max="100" step="1" value="20"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="pz_play">&#9654; Watch it decay</button></div>
       </div>
       <canvas id="pz_canvas" height="300"></canvas>
       <canvas id="pz_life" height="330"></canvas>
+      <div class="rowflex">
+        <div class="colgrow" style="max-width:520px; min-width:260px;">
+          <canvas id="pz_decay" height="110"></canvas>
+          <p style="font-size:.68rem; color:var(--sub); text-align:center; margin:2px 0 0; font-family:var(--sans);" id="pz_decay_cap">pick a particle with a known decay and press Play</p>
+        </div>
+      </div>
       <div class="readout" id="pz_readout"></div>
 
       <div class="explain">

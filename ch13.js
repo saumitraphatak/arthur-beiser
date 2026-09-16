@@ -152,12 +152,33 @@ function setupInteractions(){
 /* =====================================================================
    2. THE PARTICLE ZOO
    ===================================================================== */
+// A few common decays, for the "watch it decay" animation — dominant mode
+// only, just enough particles to span eleven decades of mean life.
+const DECAY_OF = {
+  n:    {out:['p','e-','anue']},
+  'mu-':{out:['e-','anue','numu']},
+  'mu+':{out:['e+','nue','anumu']},
+  'pi+':{out:['mu+','numu']},
+  'pi-':{out:['mu-','anumu']},
+  'K+' :{out:['mu+','numu']},
+  L0:   {out:['p','pi-']},
+  'S+' :{out:['p','pi0']},
+  'S-' :{out:['n','pi-']},
+  'X-' :{out:['L0','pi-']},
+  X0:   {out:['L0','pi0']},
+  'O-' :{out:['X0','pi-']}
+};
+
 function setupParticleZoo(){
   const massCanvas=document.getElementById('pz_canvas');
   const lifeCanvas=document.getElementById('pz_life');
+  const decayCanvas=document.getElementById('pz_decay');
+  const decayCap=document.getElementById('pz_decay_cap');
+  const playBtn=document.getElementById('pz_play');
   const selEl=document.getElementById('pz_sel');
   const gamEl=document.getElementById('pz_gamma'), gamVal=document.getElementById('pz_gamma_val');
   const readout=document.getElementById('pz_readout');
+  let elapsed=0, decayAtU=0, decayed=false, playing=false, lastFrame=performance.now();
 
   P13_KEYS.filter(k=>P13[k].m>0).sort((a,b)=>P13[a].m-P13[b].m).forEach(k=>{
     const o=document.createElement('option');
@@ -239,6 +260,90 @@ function setupParticleZoo(){
     ctx.restore();
   }
 
+  function drawDecay(){
+    if(!decayCanvas) return;
+    const {ctx,w,h}=fitCanvas(decayCanvas);
+    ctx.clearRect(0,0,w,h);
+    const key=selEl.value, p=P13[key], dk=DECAY_OF[key];
+    const m={l:28,r:28,t:16,b:24};
+    const X=u=>m.l+(u/3)*(w-m.l-m.r);
+    const base=h-m.b, top=m.t+8;
+    const curveY=u=>base-(1-Math.exp(-u))*(base-top);
+
+    ctx.beginPath();
+    for(let u=0;u<=3;u+=0.05){ const yy=curveY(u); if(u===0) ctx.moveTo(X(u),yy); else ctx.lineTo(X(u),yy); }
+    ctx.lineTo(X(3),base); ctx.lineTo(X(0),base); ctx.closePath();
+    ctx.fillStyle='rgba(31,111,120,0.10)'; ctx.fill();
+    ctx.strokeStyle='#d8d3c6'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(m.l,base); ctx.lineTo(w-m.r,base); ctx.stroke();
+    ctx.font='10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='center';
+    [0,1,2,3].forEach(u=>{
+      ctx.beginPath(); ctx.moveTo(X(u),base); ctx.lineTo(X(u),base+4); ctx.strokeStyle='#c7c2b5'; ctx.stroke();
+      ctx.fillText(u===0?'0':u+'τ', X(u), base+15);
+    });
+
+    if(!dk){
+      ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='center';
+      ctx.fillText(`no simple listed decay for ${p.sym} — try μ, π, K⁺, Λ, Σ, Ξ, Ω or the neutron`, w/2, (top+base)/2);
+      decayCap.textContent='pick a particle with a known decay and press Play';
+      return;
+    }
+
+    if(!decayed){
+      const u=Math.min(elapsed,3);
+      const cy=curveY(u)-10;
+      ctx.beginPath(); ctx.arc(X(u),cy,9,0,7); ctx.fillStyle=COL[p.cls]||'#5a5d63'; ctx.fill();
+      ctx.font='bold 11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1c1d20'; ctx.textAlign='center';
+      ctx.fillText(p.sym, X(u), cy-13);
+      decayCap.textContent = (elapsed<=0)
+        ? `${p.sym} at rest — press Play; the clock runs in units of its own mean life τ = ${fmtSci(p.tau,2)} s`
+        : `waiting… t = ${fmt(u,2)}τ of up to 3τ`;
+    } else {
+      const u=decayAtU, cy=curveY(u)-10;
+      const spread=Math.min(1,(elapsed-decayAtU)/0.8);
+      const n=dk.out.length;
+      dk.out.forEach((k,i)=>{
+        const q=P13[k];
+        const dx=(i-(n-1)/2)*24*spread, dy=-11*spread;
+        const px=X(u)+dx, py=cy+dy;
+        ctx.beginPath(); ctx.arc(px,py,7,0,7); ctx.fillStyle=COL[q.cls]||'#5a5d63'; ctx.fill();
+        ctx.font='10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1c1d20'; ctx.textAlign='center';
+        ctx.fillText(q.sym, px, py-10);
+      });
+      decayCap.textContent = `decayed at t = ${fmt(decayAtU,2)}τ — ${p.sym} → ${dk.out.map(k=>P13[k].sym).join(' + ')}`;
+    }
+  }
+
+  function loopDecay(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch13') && document.getElementById('ch13').classList.contains('active');
+    if(playing && active){
+      elapsed += dt*(3/4.5);   // the 0-3τ sweep always takes about 4.5 real seconds
+      if(!decayed && elapsed>=decayAtU) decayed=true;
+      if(elapsed>=decayAtU+0.8 && (decayed || elapsed>=3)){
+        playing=false; playBtn.textContent='↺ Replay'; playBtn.classList.remove('playing');
+      }
+      drawDecay();
+    }
+    requestAnimationFrame(loopDecay);
+  }
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    const key=selEl.value;
+    if(!DECAY_OF[key]){ drawDecay(); return; }
+    if(prefersReducedMotion()){
+      decayAtU=Math.min(2.9,-Math.log(1-Math.random())); elapsed=decayAtU+0.8; decayed=true; drawDecay();
+      return;
+    }
+    if(!playing){
+      let u=-Math.log(1-Math.random()), tries=0;
+      while(u>=2.9 && tries<8){ u=-Math.log(1-Math.random()); tries++; }
+      decayAtU=Math.min(u,2.9);
+      elapsed=0; decayed=false; playing=true; lastFrame=performance.now();
+      playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      playing=false; playBtn.textContent='▶ Watch it decay'; playBtn.classList.remove('playing');
+    }
+  });
+
   function draw(){
     const p=P13[selEl.value];
     const gam=parseFloat(gamEl.value);
@@ -263,10 +368,16 @@ function setupParticleZoo(){
       <div>heavier than the electron by <b>${fmtSci(p.m/0.511,3)}×</b>;
         ${p.m>938?'heavier':'lighter'} than a proton</div>`;
   }
-  selEl.addEventListener('change',draw);
+  selEl.addEventListener('change',()=>{
+    elapsed=0; decayed=false; playing=false;
+    if(playBtn){ playBtn.textContent='▶ Watch it decay'; playBtn.classList.remove('playing'); }
+    draw(); drawDecay();
+  });
   gamEl.addEventListener('input',draw);
   registerCanvas('pz_canvas',draw);
   registerCanvas('pz_life',draw);
+  registerCanvas('pz_decay',drawDecay);
+  requestAnimationFrame(loopDecay);
 }
 
 /* =====================================================================
