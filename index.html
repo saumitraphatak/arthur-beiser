@@ -200,8 +200,9 @@
 <div class="masthead">
   <div class="masthead-inner">
     <div class="brand"><b>Concepts of Modern Physics</b><span>Interactive companion &middot; Beiser, 6th ed.</span></div>
-    <!-- To add a chapter: build chNN.js, add its <section class="chapter" id="chNN">,
-         add a <script> tag at the foot, and promote its pill from .soon to a button. -->
+    <!-- All thirteen chapters are built. To add anything further: write chNN.js,
+         add its <section class="chapter" id="chNN"> and a <script> tag at the foot,
+         and add a pill here. app.js never changes. -->
     <nav class="chapnav" role="tablist">
       <button class="chap-btn" data-chapter="ch1" role="tab" aria-selected="false"><span class="n">1</span>Relativity</button>
       <button class="chap-btn" data-chapter="ch2" role="tab" aria-selected="false"><span class="n">2</span>Particle Properties</button>
@@ -215,7 +216,7 @@
       <button class="chap-btn" data-chapter="ch10" role="tab" aria-selected="false"><span class="n">10</span>The Solid State</button>
       <button class="chap-btn" data-chapter="ch11" role="tab" aria-selected="false"><span class="n">11</span>Nuclear Structure</button>
       <button class="chap-btn" data-chapter="ch12" role="tab" aria-selected="false"><span class="n">12</span>Nuclear Transf.</button>
-      <span class="chap-btn soon" title="not built yet"><span class="n">13</span>Elementary Particles</span>
+      <button class="chap-btn" data-chapter="ch13" role="tab" aria-selected="false"><span class="n">13</span>Elementary Particles</button>
     </nav>
   </div>
 </div>
@@ -3218,10 +3219,302 @@
 
   </section>
 
+  <section class="chapter" id="ch13">
+    <div class="chapter-head">
+      <div class="kicker">Chapter Thirteen</div>
+      <h1>Elementary Particles</h1>
+      <p>Twelve chapters of this book were built on three particles. This one asks what those three are made of, and the answer turns out to be six quarks, six leptons, and a handful of particles whose only job is to carry forces between them. It is the deepest layer anyone has reached — and the chapter ends by pointing out how much of it is still guesswork.</p>
+      <p style="margin-top:10px">Particle masses, lifetimes and quantum numbers below are Beiser's Tables 13.2 to 13.4. Every conservation check, mass prediction, range and density is computed live from those.</p>
+    </div>
+
+    <!-- 1. four interactions -->
+    <div class="card">
+      <h2>Four Interactions, Thirty-Nine Decades Apart <span class="eqtag">Sec. 13.1</span></h2>
+      <p class="desc">Everything that has ever happened anywhere is one of four interactions doing its work. They differ in strength by a factor of 10<sup>39</sup> and in range by a factor of 10<sup>18</sup> — and which one matters depends entirely on how far apart you are looking.</p>
+      <div class="eq">F<sub>em</sub>/F<sub>grav</sub> = ke&sup2;/Gm&sup2; &nbsp;&nbsp; range = &#8463;c/mc&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Separation of two protons (m) <span class="val" id="in_r_val">10^-15.0</span></label>
+          <input type="range" id="in_r" min="-19" max="-9" step="0.1" value="-15"></div>
+      </div>
+      <canvas id="in_canvas" height="340"></canvas>
+      <div class="readout" id="in_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>All four forces between two protons, as a function of how far apart they are, on a log-log plot spanning from well inside a nucleus out to a thousand atomic diameters. The point of the plot is the <em>crossings</em>. Inside about 1 fm the strong interaction is overwhelming. Beyond about 2 fm it has vanished entirely and the electromagnetic repulsion takes over. Gravity is a flat 10<sup>36</sup> below the electric force at every separation and never catches up — and the weak interaction is off the bottom of the chart almost everywhere.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Read the electromagnetic-over-gravitational line. Between two protons it is <b>1.2 &times; 10<sup>36</sup></b>; between two electrons, <b>4.2 &times; 10<sup>42</sup></b>. Both forces fall as 1/r&sup2;, so that ratio is a pure number — it does not depend on distance at all. Here is one way to feel how absurd it is. Take the hydrogen atom of Chapter 4 and replace the electrical attraction between proton and electron with their gravitational attraction, changing nothing else. The Bohr radius becomes &#8463;&sup2;/Gm<sub>e</sub>&sup2;m<sub>p</sub>, which works out to <b>1.2 &times; 10<sup>29</sup> m</b> — about <b>270 times the radius of the observable universe</b>. A gravitationally bound atom would not fit in everything there is.</p>
+        <p class="tryit">Then ask the obvious question: if gravity is 10<sup>36</sup> times weaker, why is it the force that shapes the universe? Because it is the only one that cannot be cancelled. Matter in bulk is electrically neutral, so the electromagnetic force sums to nothing over a planet; the strong and weak forces die within a nucleus. Gravity has only one sign, so it adds up, and over a large enough pile of matter it wins by default. The four forces are not competing on the same field.</p>
+        <p class="tryit">Slide to <b>10<sup>&minus;15</sup> m</b>, about the size of a nucleon. The strong force is around <b>10<sup>3</sup> N</b> — a hundred kilograms of weight, between two objects weighing 10<sup>&minus;27</sup> kg each. Now slide out to <b>10<sup>&minus;14</sup> m</b>, ten times further. The strong force has fallen by a factor of <b>13,000</b>, and it dropped below the electric repulsion somewhere around 4 fm. That one decade of distance is the whole reason nuclei have a maximum size: past a few fermis the binding stops arriving and only the repulsion is left.</p>
+
+        <h3>Why the ranges are what they are</h3>
+        <p>Chapter 11's Yukawa argument does all the work. An interaction carried by a particle of mass m has range &#8463;/mc, so a massless carrier gives infinite range and a heavy one gives almost none. The photon is massless, so electromagnetism reaches across the universe. The W and Z weigh 80 and 91 GeV, so the weak interaction reaches 0.0025 fm — a thousandth of a proton, which is why it behaves as though it acts only on contact. The pion at 140 MeV gives 1.4 fm, which is the size of a nucleus. The one exception is the strong interaction between quarks: its carrier, the gluon, is massless and ought to have infinite range, but the force is short-ranged anyway for a completely different reason. That is the subject of the sixth card.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">"Force" is the wrong language for the strong and weak interactions, and those two curves should be read as scale comparisons rather than as calculations. Both are drawn as the force from a Yukawa potential — exponential falloff with the range set by the mediator mass, 1.4 fm for the pion and 0.0025 fm for the W — normalised to 10<sup>3</sup> N at 1 fm, which is what 8 MeV of nuclear binding spread over 2 fm amounts to. The shapes are right and the crossings are in the right place; the absolute heights carry a normalisation, not a derivation. The electromagnetic and gravitational curves are exact.</p>
+        <p class="catch">The relative strengths quoted in the text (1, 10<sup>&minus;2</sup>, 10<sup>&minus;5</sup>, 10<sup>&minus;39</sup>) are also not fixed constants. Coupling strengths <em>run</em> with energy: the electromagnetic coupling grows and the strong one shrinks as collisions get more violent, which is exactly why unification at very high energy is plausible at all.</p>
+      </div>
+    </div>
+
+    <!-- 2. particle zoo -->
+    <div class="card">
+      <h2>The Particle Zoo, Sorted <span class="eqtag">Secs. 13.2&ndash;13.3, Tables 13.2&ndash;13.3</span></h2>
+      <p class="desc">Hundreds of particles have been found and almost all of them fall apart within a fraction of a microsecond. But there is a great deal of order in the list, and two plots bring most of it out.</p>
+      <div class="eq">leptons feel no strong force &nbsp;|&nbsp; hadrons do &nbsp;|&nbsp; baryons = qqq, mesons = q&#772;q</div>
+      <div class="controls">
+        <div class="ctrl"><label>Particle</label>
+          <select id="pz_sel"></select></div>
+        <div class="ctrl"><label>Lorentz factor &gamma; <span class="val" id="pz_gamma_val">20</span></label>
+          <input type="range" id="pz_gamma" min="1" max="100" step="1" value="20"></div>
+      </div>
+      <canvas id="pz_canvas" height="300"></canvas>
+      <canvas id="pz_life" height="330"></canvas>
+      <div class="readout" id="pz_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: every particle with a rest mass, laid out on one logarithmic axis and sorted into lanes. It covers about six decades, from the electron at half an MeV to the top quark at 174 GeV — a single quark heavier than a gold nucleus. Notice how tightly the baryons cluster and how the mesons spread.</p>
+        <p>Below: mean life against mass. This is the plot that does real work, because the lifetimes are not scattered — they fall into <b>bands</b>, and each band is an interaction. Anything that decays in 10<sup>&minus;23</sup> s is coming apart by the strong interaction. Anything near 10<sup>&minus;16</sup> to 10<sup>&minus;19</sup> s is electromagnetic. Anything that survives 10<sup>&minus;10</sup> s or longer is being taken apart by the weak interaction, because nothing faster is available to it. You can read a particle's decay mechanism off its lifetime without knowing anything else about it.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Compare <b>π⁰</b> at 8.4 &times; 10<sup>&minus;17</sup> s with <b>π⁺</b> at 2.6 &times; 10<sup>&minus;8</sup> s. Same particle family, nearly the same mass, and their lifetimes differ by <b>nine orders of magnitude</b>. The neutral pion can decay into two photons — electromagnetic, fast. The charged pion cannot; it has to change a quark's flavour, which only the weak interaction can do, and so it lives a hundred million times longer.</p>
+        <p class="tryit">Select the <b>muon</b> and read the cτ line: <b>659 m</b>. Cosmic-ray muons are created about 15 km up, so classically almost none should reach the ground — 15 km is more than twenty decay lengths. Now drag <b>γ</b> to 20 and read the dilated distance: <b>13 km</b>. This is Chapter 1's time dilation, and the muons arriving at sea level are its most direct everyday confirmation. The experiment is usually the first thing a particle-physics course does, and the answer is simply that a fast muon's clock runs slow.</p>
+        <p class="tryit">Look for the <b>neutron</b> on the lifetime plot. It is fifteen orders of magnitude off to the right of everything else — 879 seconds, nearly fifteen minutes, when the next-longest-lived unstable hadron manages 10<sup>&minus;8</sup> s. The reason is that the neutron is barely heavier than the proton: only <b>1.3 MeV</b> separates them, and after paying for the electron there is almost no energy left to drive the decay. A weak decay with almost no energy release is extraordinarily slow, and that slowness is why free neutrons survive long enough to be useful in reactors.</p>
+        <p class="tryit">Finally, note the <b>Ω⁻</b> at 1672 MeV. It is a baryon with three strange quarks, and it survives 10<sup>&minus;11</sup> s — an eternity for something that heavy. It cannot decay strongly, because that would need strangeness to change, and the strong interaction is forbidden to do that. It is stuck waiting for the weak interaction, which is the subject of the next card.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The book's Table 13.2 prints the tau's mean life as 2.9 &times; 10<sup>&minus;23</sup> s. That is a typographical slip — the tau lives 2.9 &times; 10<sup>&minus;13</sup> s, ten orders of magnitude longer, and it has to, because it decays weakly like the muon. The value used here is the correct one; the printed one would put the tau in the strong-decay band, which is impossible for a lepton that feels no strong force at all.</p>
+        <p class="catch">Neutrino masses are listed as "very small" and treated as zero throughout. They are not zero — oscillation experiments established that after the book was written — but they are below about 1 eV, some six orders of magnitude under the electron, so nothing on these plots changes.</p>
+      </div>
+    </div>
+
+    <!-- 3. antimatter -->
+    <div class="card">
+      <h2>Antimatter <span class="eqtag">Sec. 13.2</span></h2>
+      <p class="desc">Dirac's equation had solutions with negative energy, which looked like a fatal flaw. His way out of it — that all the negative states are already full, and a hole in them is a particle of opposite charge — predicted the positron four years before anyone saw one.</p>
+      <div class="eq">E = &plusmn;&radic;(m&sup2;c&#8308; + p&sup2;c&sup2;) &nbsp;&nbsp; h&nu; &ge; 2mc&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Pair</label>
+          <select id="an_p">
+            <option value="e" selected>electron–positron</option>
+            <option value="mu">muon pair</option>
+            <option value="pi">charged pion pair</option>
+            <option value="p">proton–antiproton</option>
+          </select></div>
+        <div class="ctrl"><label>Photon energy, in units of mc² <span class="val" id="an_e_val">2.20</span></label>
+          <input type="range" id="an_e" min="0.5" max="6" step="0.02" value="2.2"></div>
+      </div>
+      <canvas id="an_canvas" height="300"></canvas>
+      <canvas id="an_bars" height="300"></canvas>
+      <div class="readout" id="an_readout"></div>
+
+      <div class="explain">
+        <h3>The problem Dirac had</h3>
+        <p>The relativistic energy relation E&sup2; = m&sup2;c&#8308; + p&sup2;c&sup2; has two roots, and there is no honest way to throw one away. But if negative energies down to &minus;∞ are available, every electron in the universe should cascade into them and no atom would be stable. Dirac's answer was pure exclusion principle: all the negative states <em>are</em> occupied, one electron each, and Pauli forbids any more from joining. What we call the vacuum is a filled sea.</p>
+        <p>Then a photon of more than 2mc&sup2; can lift one electron out of the sea into a positive-energy state. What is left behind is a <em>hole</em> in the sea, and a hole in a sea of negative charge behaves in every respect like a particle of positive charge — exactly as a hole in a semiconductor valence band does, in Chapter 10. Dirac initially hoped the hole was the proton. It is the positron, and Anderson found it in cosmic rays in 1932.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">With the <b>electron–positron</b> pair selected, drag the photon energy through 2. Below <b>1.022 MeV</b> nothing happens at all — no partial promotion, no half a pair. Above it, a pair appears and the excess goes into their kinetic energy. This is the pair production of Chapter 2, seen from the other side.</p>
+        <p class="tryit">Switch to <b>proton–antiproton</b> and read the threshold: <b>1877 MeV</b>. That is why the antiproton was not found until 1955, twenty-three years after the positron — it took the Bevatron, a machine built more or less for the purpose, to reach the energy.</p>
+        <p class="tryit">Now the lower chart. Annihilation releases <b>c&sup2; = 9 &times; 10<sup>16</sup> J</b> per kilogram, which is <b>21.5 megatons of TNT</b> — it converts <em>all</em> of the mass, where fission converts about a thousandth of it and chemistry about a billionth. Beiser's illustration is that a postage stamp of antimatter meeting a postage stamp of matter would put the space shuttle in orbit; at 50 mg each that is 9 &times; 10<sup>12</sup> J against the shuttle's 3 &times; 10<sup>12</sup> J of orbital kinetic energy, so the claim survives checking with a factor of three to spare.</p>
+
+        <h3>The missing antimatter</h3>
+        <p>Every particle has an antiparticle, the laws look almost perfectly symmetric between them, and the Big Bang should have made equal amounts. It did not — or if it did, essentially all of it annihilated. We see no annihilation gamma rays from the boundaries between matter and antimatter regions, and no antiparticles in the cosmic rays. The universe appears to be made entirely of one kind.</p>
+        <p>The best current account is that the decays of the heavy bosons in the first 10<sup>&minus;35</sup> s were very slightly asymmetric, leaving an excess of matter of perhaps <b>one part in 30 billion</b>. Everything else annihilated into photons, and those photons are the cosmic microwave background of the last card. Every atom in your body is a leftover from a rounding error.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The Dirac sea is a picture, not the modern theory, and it does not survive contact with bosons — there is no exclusion principle to fill a sea of negative-energy pions, yet antipions exist. Quantum field theory replaces it: particles and antiparticles are excitations of the same field, and neither is more fundamental. The sea is worth knowing because it is how the prediction was actually made, and because the hole analogy is genuinely the same mathematics as a hole in a semiconductor.</p>
+        <p class="catch">Note also that a lone photon in empty space cannot make a pair however energetic it is — momentum cannot be conserved. Pair production always happens near a nucleus, which takes up the recoil, and that is why the threshold quoted here is the lower bound rather than the exact requirement.</p>
+      </div>
+    </div>
+
+    <!-- 4. conservation -->
+    <div class="card">
+      <h2>Is This Reaction Allowed? <span class="eqtag">Sec. 13.4, Example 13.1</span></h2>
+      <p class="desc">Particle physics has remarkably few rules, and they are all bookkeeping. Add up a handful of numbers before and after; if any of them changed, the reaction does not happen, no matter how much energy you throw at it.</p>
+      <div class="eq">Q, B, L<sub>e</sub>, L<sub>&mu;</sub>, L<sub>&tau;</sub> always conserved &nbsp;|&nbsp; S conserved except in weak decays, where &Delta;S = &plusmn;1</div>
+      <div class="controls">
+        <div class="ctrl" style="min-width:320px"><label>Try one of these</label>
+          <select id="cn_preset"></select></div>
+      </div>
+      <div class="controls">
+        <div class="ctrl"><label>In</label><select id="cn_a"></select></div>
+        <div class="ctrl"><label>and</label><select id="cn_b"></select></div>
+        <div class="ctrl"><label>Out</label><select id="cn_c"></select></div>
+        <div class="ctrl"><label>and</label><select id="cn_d"></select></div>
+        <div class="ctrl"><label>and</label><select id="cn_e"></select></div>
+      </div>
+      <canvas id="cn_canvas" height="300"></canvas>
+      <div class="readout" id="cn_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>A ledger. Pick particles going in and coming out, and every conserved quantity is summed on both sides. Nothing here is a judgement call: either the columns match or they do not, and the verdict at the bottom follows mechanically.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start with <b>n → p + e⁻ + ν̄ₑ</b>. Charge balances, baryon number balances (1 → 1 + 0 + 0), and electron number balances only because the antineutrino carries L<sub>e</sub> = &minus;1 against the electron's +1. Now delete the antineutrino using the preset <b>n → p + e⁻</b>. Charge and baryon number are still fine, and the reaction still looks perfectly reasonable — but electron number goes 0 → 1 and the whole thing is forbidden. This is precisely the bookkeeping that forced the neutrino into existence.</p>
+        <p class="tryit">Try <b>μ⁻ → e⁻ + ν̄ₑ + ν_μ</b>, Beiser's Example 13.1. Two different lepton numbers have to balance separately, and they do — the muon number is carried away by the muon-neutrino and the electron number by the pair. Then try replacing the ν̄ₑ with a ν_e and watch L<sub>e</sub> go to +2. The muon cannot simply turn into an electron; the generations are bookkept one by one.</p>
+        <p class="tryit">Now the strangeness cases. <b>Ξ⁻ → Λ⁰ + π⁻</b> changes S from &minus;2 to &minus;1: allowed, but only weakly, so it is slow — 10<sup>&minus;10</sup> s rather than 10<sup>&minus;23</sup>. Then try <b>Ξ⁻ → n + π⁻</b>, which would change S by 2 in one step, and it is flatly forbidden. This is why the heavy strange baryons come apart in a <b>cascade</b>, one unit of strangeness at a time, rather than dropping straight to a nucleon — and it is why the Ξ was called the cascade particle before anyone knew why it behaved that way.</p>
+        <p class="tryit">Try <b>p + π⁻ → Λ⁰ + K⁰</b>. Two strange particles appear together, with S = &minus;1 and S = +1, summing to zero. Strange particles are always made in pairs in strong interactions, because the strong interaction cannot change the total strangeness — which was the observation that made Gell-Mann invent the quantum number in the first place.</p>
+        <p class="tryit">Finally, <b>p → e⁺ + π⁰</b>. Charge balances, all three lepton numbers balance, energy is available, and the products are lighter. Only baryon number stops it: 1 → 0. That is the sole reason the proton is stable and therefore the sole reason atoms exist. Experiments have watched enormous tanks of water for decades and set a lower limit on the proton lifetime of about <b>10<sup>32</sup> years</b>, against a universe some 10<sup>10</sup> years old.</p>
+
+        <h3>Why conservation laws exist at all</h3>
+        <p>Emmy Noether's theorem, proved in 1918, says that every conservation law corresponds to a symmetry. Invariance under translation in space gives conservation of momentum; under translation in time, conservation of energy; under rotation, angular momentum. Conservation of charge follows from a more abstract symmetry, gauge invariance. The laws in the ledger above — baryon number, the lepton numbers, strangeness — are believed to reflect symmetries of the same kind, though for some of them the symmetry is not yet identified, which is a polite way of saying we do not know why they hold.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Strangeness is the weakest of these rules and the ledger treats it accordingly. It is not a true conservation law — the weak interaction breaks it, by one unit at a time — and its real content is that the quark flavours can only be changed by one particular interaction. Baryon number is thought to be only approximately conserved too: every grand unified theory predicts proton decay, which is why those tanks of water are still being watched.</p>
+        <p class="catch">And a ledger that balances only tells you a reaction is <em>not forbidden</em>. It says nothing about the rate, which depends on which interaction mediates it and on the available phase space. A reaction that barely clears the energy threshold can be allowed and still essentially never happen.</p>
+      </div>
+    </div>
+
+    <!-- 5. quark model -->
+    <div class="card">
+      <h2>Building Hadrons Out of Quarks <span class="eqtag">Sec. 13.5, Tables 13.4&ndash;13.5</span></h2>
+      <p class="desc">Three fractionally charged objects, combined in every way the rules allow, reproduce the entire list of baryons — their charges, their strangeness, their spins, and to within a few percent their masses.</p>
+      <div class="eq">baryon = qqq, &nbsp; meson = q&#772;q, &nbsp; Q = I<sub>3</sub> + (B+S)/2</div>
+      <div class="controls">
+        <div class="ctrl"><label>Type</label>
+          <select id="qm_type">
+            <option value="baryon" selected>baryon — three quarks</option>
+            <option value="meson">meson — quark and antiquark</option>
+          </select></div>
+        <div class="ctrl"><label>First</label><select id="qm_q1"></select></div>
+        <div class="ctrl"><label>Second</label><select id="qm_q2"></select></div>
+        <div class="ctrl"><label>Third</label><select id="qm_q3"></select></div>
+      </div>
+      <canvas id="qm_canvas" height="300"></canvas>
+      <canvas id="qm_lattice" height="340"></canvas>
+      <div class="readout" id="qm_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: whatever you have built, with its quantum numbers added up from its constituents and matched against the table of known hadrons. Below: the two families that made the model convincing, generated from the quantum numbers rather than drawn. Each particle is placed by its strangeness (vertically) and its third component of isospin (horizontally), which is just a rearrangement of the charge formula Q = I<sub>3</sub> + (B+S)/2.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Start with <b>u u d</b>. The charges +2/3, +2/3 and &minus;1/3 add to exactly <b>+1</b>, baryon number to 1, strangeness to 0 — that is the proton. Swap to <b>u d d</b> and you get the neutron, at charge 0. Nothing about the individual quark charges is a whole number; every allowed combination of them is.</p>
+        <p class="tryit">Now read the mass line. The proton's constituent quarks add to <b>900 MeV</b> against a measured 938 — under 5% out. Try <b>u d s</b> (Λ⁰, 1100 against 1116), <b>u s s</b> (Ξ⁰, 1300 against 1315), <b>s s s</b> (Ω⁻, 1500 against 1672). Adding three numbers gets the whole baryon spectrum right to within about 5% on average. That is a startling amount of physics for arithmetic that a child could do.</p>
+        <p class="tryit">Then switch to <b>meson</b> and build <b>u d̄</b>. The charge comes out at +1, correctly — but the mass prediction is <b>600 MeV</b> against the pion's actual <b>140</b>, a factor of four too heavy. Try <b>c d̄</b> instead: 1800 against a measured 1870, back to a few percent. The simple additive rule works beautifully for baryons and for heavy mesons and fails catastrophically for the pion. That failure is not a small correction — it is a sign that the pion is a fundamentally different kind of object, nearly massless for a reason the quark model cannot express.</p>
+        <p class="tryit">Finally, look at the decuplet on the right of the lower plot and read the caption. The rows are <b>evenly spaced in mass</b>: 1232, 1385, 1533, and then the bottom corner. When Gell-Mann drew this diagram in 1962 the bottom corner was <em>empty</em>. He read off the spacing, predicted a particle of strangeness &minus;3, charge &minus;1 and mass about 1680 MeV, and told the experimentalists to go and find it. They found the Ω⁻ two years later at <b>1672</b>. It is one of the cleanest predictions in the history of physics, and it is visible on this plot as a straightedge exercise.</p>
+
+        <h3>Why fractional charges were so hard to accept</h3>
+        <p>Nothing else in nature has them. Every free particle ever observed carries a charge that is a whole multiple of e, and Millikan's oil-drop experiment had been finding exactly that since 1909. Gell-Mann himself was cautious about whether quarks were real objects or only a bookkeeping device. The evidence that settled it came from firing very high-energy electrons at protons, where the scattering pattern showed the charge inside a proton to be concentrated at <b>three</b> point-like centres — the same experiment Rutherford had done on the atom, one layer deeper.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The "constituent" quark masses in Beiser's Table 13.4 are effective values that already include most of the binding energy of the hadron, which is why simply adding them works at all. The <em>current</em> quark masses that appear in the underlying theory are far smaller — a few MeV for u and d, not 300 — and on that accounting more than 98% of the mass of a proton is not the mass of its quarks at all but the energy of the colour field holding them together. You are made almost entirely of binding energy.</p>
+        <p class="catch">The model as stated also has a glaring problem that the chapter mentions only in passing. The Ω⁻ is three strange quarks, all spin-up, all in the same state — a flat violation of the exclusion principle for identical fermions. The fix is <b>colour</b>: each quark carries one of three colour charges, so the three s quarks are not identical after all. Colour was invented to rescue the exclusion principle and turned out to be the charge of the strong interaction itself.</p>
+      </div>
+    </div>
+
+    <!-- 6. confinement -->
+    <div class="card">
+      <h2>Why You Cannot Have One Quark <span class="eqtag">Sec. 13.5</span></h2>
+      <p class="desc">Every other force in physics gets weaker as things move apart. The colour force does the opposite — and that single reversed sign means a quark can never be taken out of a hadron, no matter how hard you pull.</p>
+      <div class="eq">V(r) = &minus;(4/3)&alpha;<sub>s</sub>&#8463;c/r + kr</div>
+      <div class="controls">
+        <div class="ctrl"><label>Quark separation (fm) <span class="val" id="cf_r_val">0.50</span></label>
+          <input type="range" id="cf_r" min="0.05" max="2.2" step="0.01" value="0.5"></div>
+        <div class="ctrl"><label>String tension k (GeV/fm) <span class="val" id="cf_k_val">1.00</span></label>
+          <input type="range" id="cf_k" min="0.2" max="2" step="0.02" value="1"></div>
+      </div>
+      <canvas id="cf_canvas" height="330"></canvas>
+      <div class="readout" id="cf_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The potential energy between two quarks. At short range it looks ordinary — a 1/r attraction much like the Coulomb one, which is why quarks inside a hadron rattle around almost freely. At long range there is a second term that grows <em>linearly</em> with separation, as though the two quarks were joined by a spring that never yields. The colour field between them does not spread out the way an electric field does; it collapses into a narrow tube, and the energy stored in that tube is proportional to its length.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Read the string tension in newtons. At 1 GeV/fm it is about <b>1.6 &times; 10<sup>5</sup> N</b> — sixteen tonnes of force, between two point particles, and it does not weaken with distance. This is the strongest force in nature by an enormous margin, and it is why the word "strong" was available.</p>
+        <p class="tryit">Now drag the separation outward and watch the stored energy climb. At about <b>0.28 fm</b> it crosses the line marked 2m<sub>π</sub>c&sup2; — the rest energy of two pions. Past that point, pulling the quarks further apart costs more energy than it takes to simply <em>create a new quark–antiquark pair</em> out of the vacuum, so that is what happens. The string snaps, and the two new quarks cap off the broken ends.</p>
+        <p class="tryit">The result is worth sitting with. You started with one hadron and pulled on it. You end up with <b>two hadrons</b>, and never a free quark. Pull harder and you get more hadrons. Beiser's analogy is the right one: breaking a magnet in half does not give you an isolated north pole, it gives you two magnets. Try dragging the separation to 2 fm and read how many pairs the stored energy would buy.</p>
+        <p class="tryit">Drop the string tension to <b>0.2 GeV/fm</b> and watch the breaking distance stretch out. If the tension were small enough, quarks would separate freely and we would have found them in 1964. That we have not, after sixty years of looking, is the strongest evidence that the tension is real — and the theory is falsifiable in an unusual direction: finding a free quark would <em>disprove</em> quantum chromodynamics rather than confirm it.</p>
+
+        <h3>Asymptotic freedom, the other half of the story</h3>
+        <p>The short-range part of that curve is just as strange. Because the colour force strengthens with distance, it must <em>weaken</em> at short distance — and it does, to the point where quarks very close together behave almost as if free. This is why the electron-scattering experiments could see three sharp point-like charges inside a proton at all: at the short distances a high-energy electron probes, the quarks are barely interacting. The discovery that the strong coupling runs to zero at high energy, called asymptotic freedom, is what made a quantum field theory of the strong interaction possible, and it won the 2004 Nobel Prize.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The Cornell potential plotted here is a phenomenological form — it fits the observed spectra of heavy quark–antiquark bound states extremely well, and it is what lattice simulations of the theory produce, but it is not derived on this page. The string tension of about 1 GeV/fm and the coupling α<sub>s</sub> ≈ 0.3 are measured inputs.</p>
+        <p class="catch">The breaking condition is also a simplification. In practice a snapping string produces a spray of hadrons rather than one tidy pion pair, and what an experiment actually sees is a narrow <b>jet</b> of particles heading in the direction the quark was going. Jets are how quarks are observed: not as particles, but as the shrapnel of trying to remove one.</p>
+      </div>
+    </div>
+
+    <!-- 7. field bosons -->
+    <div class="card">
+      <h2>Field Bosons, and Why the Weak Force Looks Weak <span class="eqtag">Sec. 13.6</span></h2>
+      <p class="desc">The weak interaction is not intrinsically feeble. Its coupling is roughly the same size as electromagnetism's. It appears weak for one reason only — its carriers are eighty times heavier than a proton.</p>
+      <div class="eq">range = &#8463;c/mc&sup2; &nbsp;&nbsp; strength &prop; [q&sup2;/(q&sup2; + M<sub>W</sub>&sup2;c&#8308;)]&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Collision energy (GeV) <span class="val" id="fb_e_val">0.0010</span></label>
+          <input type="range" id="fb_e" min="0.001" max="500" step="0.001" value="0.001"></div>
+      </div>
+      <canvas id="fb_canvas" height="300"></canvas>
+      <canvas id="fb_ew" height="320"></canvas>
+      <div class="readout" id="fb_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: range against mediator mass, which is a single straight line because range &times; mass = &#8463;c = 197 MeV&middot;fm, always. Every force carrier sits on that line. The photon and gluon are massless and so fall off the left-hand end at infinite range; the W and Z sit far to the right at 0.0025 fm.</p>
+        <p>Below: the weak interaction's strength relative to the electromagnetic one, as a function of collision energy. At the energies of beta decay it is down by twenty orders of magnitude. As the energy climbs it rises steeply, and at around <b>80 GeV</b> — where a collision can finally produce a <em>real</em> W rather than a fleeting virtual one — the two curves meet.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave the energy at <b>1 MeV</b>, the scale of nuclear beta decay. The weak interaction is about <b>10<sup>&minus;20</sup></b> of the electromagnetic, which is why beta decays take minutes rather than 10<sup>&minus;16</sup> seconds. Now drag the energy up and watch the gap close. By 10 GeV the suppression is only 10<sup>&minus;4</sup>; by 200 GeV it is essentially gone.</p>
+        <p class="tryit">This is what "unification" concretely means, and it is worth being precise about it. The two interactions do not become equal because one of them gets stronger. They were always the same strength. What changes is that at low energy the exchanged W has to borrow 80 GeV of rest energy it does not have, and the uncertainty principle only permits that for 10<sup>&minus;26</sup> s, which makes the exchange fantastically improbable. Give the collision 80 GeV and there is nothing to borrow. <b>The weak force is electromagnetism with a heavy photon.</b></p>
+        <p class="tryit">Read the W range: <b>0.0025 fm</b>. Compare it with the pion's 1.4 fm and the proton's radius of about 0.8 fm. The weak interaction operates over a distance three hundred times smaller than a proton, which is as close to a contact interaction as physics gets, and it is why Fermi's original 1934 theory — which treated it as literally pointlike — worked so well for so long.</p>
+
+        <h3>Where the masses come from</h3>
+        <p>An electroweak theory with four massless carriers is mathematically beautiful and observably wrong: three of the four have to be heavy. The resolution is the <b>Higgs field</b>, which fills all of space and which the W and Z interact with strongly, acquiring what we measure as mass, while the photon does not interact with it at all and stays massless. The picture Beiser offers is a viscous drag, and the drag is what we call inertia. Since a field has a particle, the Higgs field has a Higgs boson, and finding it was the main reason for building the Large Hadron Collider.</p>
+        <p>The chapter was written while that machine was still being planned — Beiser writes that it "is planned to be operating in 2005" and that the Higgs mass "cannot be predicted, but is thought to be substantial, perhaps as much as 1 TeV". The LHC started up in 2008 and announced the Higgs boson on 4 July 2012, at <b>125 GeV</b> — an eighth of the upper guess, and the last missing piece of the Standard Model.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The suppression curve is the propagator factor alone, which captures the energy dependence but not the couplings; a real calculation also carries the weak mixing angle and the running of both couplings with energy. The meeting point is genuinely near the W mass, but the two interactions are not described by a single coupling constant even above it — electroweak unification means they are two aspects of one structure, not that they become numerically identical.</p>
+        <p class="catch">The gluon is the awkward case for this whole way of thinking. It is massless, so the line above says its range should be infinite, and the strong interaction between quarks does in a sense have unlimited range — that is exactly what the previous card's linear potential says. What is short-ranged is the residual force <em>between colour-neutral hadrons</em>, which is a leakage effect carried by pions, in the same way that the van der Waals force between neutral atoms is a leakage of electromagnetism.</p>
+      </div>
+    </div>
+
+    <!-- 8. cosmology -->
+    <div class="card">
+      <h2>The History of the Universe <span class="eqtag">Secs. 13.8&ndash;13.9</span></h2>
+      <p class="desc">Particle physics and cosmology turn out to be the same subject read at different times. The early universe was hot enough to be a particle accelerator, and everything in this chapter happened in the first second.</p>
+      <div class="eq">&rho;<sub>c</sub> = 3H&sup2;/8&pi;G &nbsp;&nbsp; &lambda;<sub>P</sub> = &radic;(Gh/c&sup3;) &nbsp;&nbsp; t<sub>P</sub> = &radic;(Gh/c&#8309;)</div>
+      <div class="controls">
+        <div class="ctrl"><label>Time since the Big Bang (s) <span class="val" id="co_t_val">10^0.0</span></label>
+          <input type="range" id="co_t" min="-43" max="18" step="0.1" value="0"></div>
+        <div class="ctrl"><label>Hubble parameter (km/s per Mly) <span class="val" id="co_h_val">21</span></label>
+          <input type="range" id="co_h" min="10" max="35" step="1" value="21"></div>
+        <div class="ctrl"><label>Density &rho;/&rho;<sub>c</sub> <span class="val" id="co_d_val">1.00</span></label>
+          <input type="range" id="co_d" min="0.2" max="3" step="0.02" value="1"></div>
+      </div>
+      <canvas id="co_canvas" height="340"></canvas>
+      <canvas id="co_fate" height="300"></canvas>
+      <div class="readout" id="co_readout"></div>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>Above: temperature against time, on a plot spanning sixty decades of each. The line is T &prop; t<sup>&minus;½</sup>, which is what a radiation-dominated expanding universe does, and the marked events are the moments when each interaction "froze out" — when the typical collision could no longer create the particle that carried it, so that interaction simply stopped mattering. Below: the three possible futures, decided by a single number.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Slide to <b>t = 1 second</b>. The temperature is 10<sup>10</sup> K and kT is about <b>1 MeV</b> — comparable to the electron's rest energy and to nuclear binding energies. That is not a coincidence; it is why this particular second matters. Neutrinos stopped interacting, neutrons stopped being replenished, and the ones that survived got locked into helium over the next few minutes. The universe came out of it about <b>24% helium by mass</b>, and that is what we still measure everywhere we look. No star, gas cloud or galaxy has ever been found with less.</p>
+        <p class="tryit">Slide further left, to <b>10<sup>&minus;10</sup> s</b>. kT is now around 100 GeV, which is the W mass — this is the moment from the previous card, read backwards. Before it, the weak and electromagnetic interactions were one thing. After it, they are two, and they have been ever since. Then go to <b>10<sup>&minus;35</sup> s</b>, where the strong interaction separates in turn. The whole visible universe was then about a millimetre across.</p>
+        <p class="tryit">Now the left-hand wall. Read the Planck time in the readout: <b>1.35 &times; 10<sup>&minus;43</sup> s</b>, built out of nothing but G, h and c. It matters because below the corresponding Planck length the quantum fluctuations permitted by the uncertainty principle tear up the smooth spacetime that general relativity requires. Both of our best theories fail there simultaneously, and no experiment can reach it. Everything to the left of that line on the plot is blank not because it is unknown but because there is currently no framework in which the question can be asked.</p>
+        <p class="tryit">Now the lower plot and the density slider. Set <b>ρ/ρ<sub>c</sub></b> below 1 and the universe expands forever; above 1 and it recollapses. The critical density itself comes out at about <b>9 &times; 10<sup>&minus;27</sup> kg/m&sup3;</b> — <b>five hydrogen atoms per cubic metre</b>, which is a far better vacuum than any laboratory has ever produced. The fate of everything turns on whether space is emptier or fuller than that.</p>
+        <p class="tryit">Drag the Hubble parameter and watch ρ<sub>c</sub> move as H&sup2;, and the age estimate 1/H move as 1/H. At Beiser's 21 km/s per million light-years the age comes out near <b>14 billion years</b>, which is close to the modern figure of 13.8 — and 1/H is only a rough estimate, since it assumes the expansion rate has never changed.</p>
+
+        <h3>Three pieces of evidence</h3>
+        <p>The Big Bang is not inferred from one observation. Three independent things point at it: the <b>uniform expansion</b> (Hubble's law, from Chapter 1), the <b>helium abundance</b> of 24% which no stellar process can account for, and the <b>cosmic microwave background</b> — a 2.7 K blackbody filling the sky in every direction, which is the light released when the universe cooled enough for atoms to form and went transparent. Those photons have been travelling unimpeded ever since, stretched by the expansion from visible light down to a millimetre wavelength. It is the oldest thing anyone has ever seen, and it is a better blackbody than anything ever built in a laboratory.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">The thermal-history line is a single power law, which is right for the radiation era but not afterwards; once matter dominates, the exponent changes. The epoch markers are placed at their accepted times rather than derived.</p>
+        <p class="catch">And the fate plot is now known to be wrong in an important way. The chapter presents three futures set by the density alone, which is correct for a universe containing only matter. Since 1998 the expansion has been measured to be <b>accelerating</b>, which needs a fourth possibility the chapter does not draw: a universe with a large dark-energy component that expands forever and ever faster, regardless of its density. The current accounting is roughly 5% ordinary matter, 27% dark matter, 68% dark energy — so the chapter's dark-matter discussion is about a quarter of the story, and the largest term in it had not yet been discovered when the book was written.</p>
+      </div>
+    </div>
+
+  </section>
+
 </main>
 </div>
 
-<footer>Built from Beiser, <em>Concepts of Modern Physics</em>, 6th ed. All plots computed live from the equations shown &mdash; nothing here is pre-baked data.</footer>
+<footer>All thirteen chapters of Beiser, <em>Concepts of Modern Physics</em>, 6th ed. &mdash; 91 interactive modules. Every plot and every number is computed live from the equations shown; the only stored data are measured quantities the equations are checked against (ionization energies, atomic masses and half-lives, particle properties), and those are the book’s own tables. Verified at devicePixelRatio 1, 2 and 3.</footer>
 
 <script src="app.js"></script>
 <script src="nuclides.js"></script>
@@ -3237,5 +3530,6 @@
 <script src="ch10.js"></script>
 <script src="ch11.js"></script>
 <script src="ch12.js"></script>
+<script src="ch13.js"></script>
 </body>
 </html>

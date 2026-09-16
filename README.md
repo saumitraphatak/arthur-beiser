@@ -1,6 +1,8 @@
 # arthur-beiser
 
-Interactive companion to Arthur Beiser's *Concepts of Modern Physics* (6th ed.) — built to develop intuition for the equations by playing with them, not just reading them.
+Interactive companion to the whole of Arthur Beiser's *Concepts of Modern Physics* (6th ed.) — all
+thirteen chapters, 91 modules — built to develop intuition for the equations by playing with them
+rather than only reading them.
 
 Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.server`, or via GitHub Pages). No build step, no dependencies, no CDNs — plain HTML, CSS, vanilla JS and canvas 2D.
 
@@ -152,4 +154,6 @@ Three conventions worth knowing before editing:
 
 Verified at devicePixelRatio 1, 2 and 3 — bugs have hidden at dpr 1.
 
-More chapters to follow as they get read.
+## Status
+
+All thirteen chapters are built — **91 modules** in total. The book is complete.
