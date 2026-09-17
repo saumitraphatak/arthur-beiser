@@ -8,7 +8,7 @@ Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.s
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
-Five things make ninety-one modules navigable:
+Six things make ninety-one modules navigable:
 
 - **Search** in the sidebar, across every module's title, equation and prose at once, from
   whichever chapter you happen to be in. `/` focuses it, Enter jumps to the first hit.
@@ -23,6 +23,15 @@ Five things make ninety-one modules navigable:
   the page it came from. Every wrong option is a specific named mistake — dividing by γ instead of
   multiplying, counting `2n` states where the closed shell holds `n²` — and picking it says which
   mistake it was rather than just "incorrect".
+- **The whole book, to scale** — three logarithmic rulers, energy, size and time, carrying 37 real
+  quantities from the book, every one computed here from the same constants and tables the modules
+  use. The reason they are on the same page is the tie between them: an energy fixes a length and a
+  time on its own, through ℓ = ħc/E and t = ħ/E, so hovering any mark drops a marker at the matching
+  place on the other two rulers. Sometimes that lands on the physics — the pion's rest energy gives
+  1.41 fm, which is the mark already sitting there for the range of the nuclear force, to the pixel,
+  and that is exactly the argument by which Yukawa predicted a particle nobody had seen. Sometimes
+  the miss is the physics: hydrogen's 13.6 eV gives 14.5 nm, 270 times the size of the atom, and
+  that factor is 2/α — a bound state sits at ħc/E only when it is relativistic.
 - A **concept map** of 45 ideas and the 57 dependencies between them, laid out chapter by chapter.
   Hovering an idea lights up everything it rests on, in one colour, and everything that rests on it
   in another — and says so in words ("rests on 10 earlier ideas, and 2 later ones rest on it").
@@ -181,6 +190,7 @@ from Beiser's own particle-physics tables.
     nuclides.js   atomic masses, abundances and half-lives, for Chapters 11-12
     quiz.js       per-chapter question banks, each generated fresh from live constants
     conceptmap.js the 45-idea dependency graph and its renderer
+    scales.js     the energy/size/time rulers, and the ħc/E tie between them
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

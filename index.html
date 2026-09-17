@@ -103,20 +103,20 @@
   #module-index .mi-ch{ font-size:.6rem; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
     color:var(--accent2); opacity:.75; flex:none; }
   #module-index .mi-none{ padding:8px 11px; font-family:var(--sans); font-size:.76rem; color:var(--sub); }
-  #sheet-open, #quiz-open, #map-open{
+  #sheet-open, #quiz-open, #map-open, #scale-open{
     margin-top:8px; width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
     background:#fff; font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub);
     cursor:pointer; letter-spacing:.2px;
   }
   #quiz-open{ margin-top:14px; }
-  #sheet-open:hover, #quiz-open:hover, #map-open:hover{ border-color:var(--accent2); color:var(--accent2); }
+  #sheet-open:hover, #quiz-open:hover, #map-open:hover, #scale-open:hover{ border-color:var(--accent2); color:var(--accent2); }
 
   /* ---------- quiz ---------- */
-  #quiz-overlay, #map-overlay{
+  #quiz-overlay, #map-overlay, #scale-overlay{
     position:fixed; inset:0; z-index:200; background:rgba(20,22,26,.42);
     display:flex; align-items:flex-start; justify-content:center; padding:38px 18px;
   }
-  #quiz-overlay[hidden], #map-overlay[hidden]{ display:none; }
+  #quiz-overlay[hidden], #map-overlay[hidden], #scale-overlay[hidden]{ display:none; }
   #quiz-panel{
     background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
     width:min(720px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
@@ -127,6 +127,17 @@
   }
   #map-hint{ font-family:var(--sans); font-size:.76rem; color:var(--sub); margin:12px 20px 0; line-height:1.5; }
   #map-canvas{ width:calc(100% - 28px); margin:6px 14px 14px; }
+  #scale-panel{
+    background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
+    width:min(1180px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #scale-hint{ font-family:var(--sans); font-size:.76rem; color:var(--sub); margin:12px 20px 0; line-height:1.5; }
+  #scale-canvas{ width:calc(100% - 28px); margin:6px 14px 0; }
+  #scale-caption{
+    font-family:var(--sans); font-size:.78rem; line-height:1.55; color:var(--body);
+    margin:2px 14px 16px; padding:11px 14px; border-radius:9px; background:var(--code);
+    border-left:3px solid var(--accent); min-height:2.6em;
+  }
   #quiz-score{ font-family:var(--sans); font-size:.75rem; font-weight:700; color:var(--accent2); }
   #quiz-body{ overflow:auto; padding:20px; }
   .qz-q{ font-size:1.02rem; line-height:1.5; color:var(--ink); margin:0 0 16px; }
@@ -167,8 +178,10 @@
     padding:16px 20px; border-bottom:1px solid var(--line); flex:none;
   }
   .panel-head h3{ margin:0; font-size:1.05rem; color:var(--ink); }
-  #sheet-close{ border:none; background:none; font-size:1.5rem; line-height:1; color:var(--sub); cursor:pointer; padding:0 4px; }
-  #sheet-close:hover{ color:var(--accent); }
+  #sheet-close, #quiz-close, #map-close, #scale-close{
+    border:none; background:none; font-size:1.5rem; line-height:1; color:var(--sub); cursor:pointer; padding:0 4px;
+  }
+  #sheet-close:hover, #quiz-close:hover, #map-close:hover, #scale-close:hover{ color:var(--accent); }
   #sheet-body{ overflow:auto; padding:6px 20px 22px; }
   #sheet-body h4{
     font-family:var(--sans); font-size:.64rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
@@ -355,6 +368,7 @@
     <nav id="module-index"></nav>
     <button type="button" id="quiz-open">check yourself on this chapter</button>
     <button type="button" id="map-open">how the book fits together</button>
+    <button type="button" id="scale-open">the whole book, to scale</button>
     <button type="button" id="sheet-open">every equation in the book</button>
   </aside>
 
@@ -379,6 +393,19 @@
       </div>
       <p id="map-hint">Each box is a module. An arrow means the idea it points at rests on the one it comes from. Hover to light up everything a topic depends on and everything that depends on it; click to go there.</p>
       <canvas id="map-canvas" height="620"></canvas>
+    </div>
+  </div>
+
+  <!-- three log rulers: every quantity in the book, and the ħc/E tie between them -->
+  <div id="scale-overlay" hidden>
+    <div id="scale-panel" role="dialog" aria-modal="true" aria-labelledby="scale-title">
+      <div class="panel-head">
+        <h3 id="scale-title">The whole book, to scale</h3>
+        <button type="button" id="scale-close" aria-label="close">&times;</button>
+      </div>
+      <p id="scale-hint">Every mark is a real quantity from the book, computed from the same constants and tables the modules use. Any energy fixes a length and a time on its own — ℓ = ħc/E and t = ħ/E — so hovering a mark shows where it lands on the other two rulers. Where the answer matches the physics, that is Yukawa's argument; where it misses, the gap is the physics too.</p>
+      <canvas id="scale-canvas" height="410"></canvas>
+      <div id="scale-caption"></div>
     </div>
   </div>
 
@@ -3746,5 +3773,6 @@
 <script src="ch13.js"></script>
 <script src="quiz.js"></script>
 <script src="conceptmap.js"></script>
+<script src="scales.js"></script>
 </body>
 </html>

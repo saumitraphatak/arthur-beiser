@@ -453,7 +453,7 @@ function initExtras(){
       e.preventDefault();
       if(search){ search.focus(); search.select(); }
     }
-    if(e.key==='Escape'){ closeSheet(); closeQuiz(); closeMap(); }
+    if(e.key==='Escape'){ closeSheet(); closeQuiz(); closeMap(); closeScale(); }
   });
   const open=document.getElementById('sheet-open'), close=document.getElementById('sheet-close'),
         ov=document.getElementById('sheet-overlay');
@@ -472,6 +472,12 @@ function initExtras(){
   if(mOpen) mOpen.addEventListener('click', openMap);
   if(mClose) mClose.addEventListener('click', closeMap);
   if(mOv) mOv.addEventListener('click', e=>{ if(e.target===mOv) closeMap(); });
+
+  const sOpen=document.getElementById('scale-open'), sClose=document.getElementById('scale-close'),
+        sOv=document.getElementById('scale-overlay');
+  if(sOpen) sOpen.addEventListener('click', openScale);
+  if(sClose) sClose.addEventListener('click', closeScale);
+  if(sOv) sOv.addEventListener('click', e=>{ if(e.target===sOv) closeScale(); });
 }
 
 function initProgressTracking(){
