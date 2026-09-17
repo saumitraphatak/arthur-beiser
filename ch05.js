@@ -363,7 +363,150 @@ function setupTunnel(){
   const UEl=document.getElementById('tn_U'), UVal=document.getElementById('tn_U_val');
   const LEl=document.getElementById('tn_L'), LVal=document.getElementById('tn_L_val');
   const readout=document.getElementById('tn_readout');
+  const packetCanvas=document.getElementById('tn_packet');
+  const fireBtn=document.getElementById('tn_fire');
   let tnPhase=0;
+
+  /* ---- a packet actually thrown at the barrier ----
+     The steady-state picture below shows what the formula says. This solves the
+     time-dependent Schrödinger equation on a grid and lets a real wave packet
+     hit the barrier, so the split into a reflected and a transmitted packet
+     happens rather than being asserted. Units are ħ = m = dx = 1 and the
+     barrier height is 1, with the packet's energy and the barrier's width
+     chosen to match the two dimensionless numbers the transmission depends on
+     (E/U and the decay exponent 2k₂L), so the fraction that gets through is the
+     same fraction the formula gives for the settings above.
+     Integration is Visscher's staggered leapfrog: explicit, cheap, stable. */
+  const NG=900, SIG=32, XSTART=170;
+  let gR=null, gI=null, gV=null, gBar=[0,0], gRunning=false, gT=0;
+  let gTrans=0, gRefl=0, gInside=1, gTheory=0, gLast=performance.now();
+
+  function launch(){
+    const E=parseFloat(EEl.value), U=parseFloat(UEl.value), L=parseFloat(LEl.value);
+    const e=Math.min(3, E/U);
+    // Grid units are chosen so the packet is well resolved (about 30 points per
+    // wavelength) while still being narrow enough in momentum to have a
+    // meaningful energy. The barrier's width is then set so that the two
+    // dimensionless numbers transmission depends on — E/U and the decay
+    // exponent 2k2L — match the sliders above.
+    const k0=0.2, Eg=k0*k0/2, V0=Eg/Math.max(0.02,e);
+    let Lsim;
+    if(e<1){
+      const k2g=k0*Math.sqrt(1/Math.max(0.02,e)-1);
+      Lsim=Math.min(200, (2*kIn(E,U)*L)/(2*k2g));
+    } else {
+      Lsim=Math.max(2, L*30);
+    }
+    const x0=XSTART, xb=470;
+    gBar=[xb, xb+Lsim];
+    gR=new Float64Array(NG); gI=new Float64Array(NG); gV=new Float64Array(NG);
+    for(let i=0;i<NG;i++){
+      // fractional cell overlap, so a barrier only a couple of cells wide still
+      // carries the right integral of V and transmits the right amount
+      const lo=Math.max(gBar[0], i-0.5), hi=Math.min(gBar[1], i+0.5);
+      gV[i]=Math.max(0, hi-lo)*V0;
+      const g=Math.exp(-Math.pow((i-x0)/SIG,2)/2);
+      gR[i]=g*Math.cos(k0*(i-x0));
+      gI[i]=g*Math.sin(k0*(i-x0));
+    }
+    let s=0; for(let i=0;i<NG;i++) s+=gR[i]*gR[i]+gI[i]*gI[i];
+    const f=1/Math.sqrt(s);
+    for(let i=0;i<NG;i++){ gR[i]*=f; gI[i]*=f; }
+    gT=0; gTrans=0; gRefl=0; gInside=1; gRunning=true;
+    gTheory=Texact(E,U,L);
+  }
+
+  function gStep(){
+    const dt=0.25;
+    for(let n=0;n<30;n++){
+      for(let i=1;i<NG-1;i++) gR[i] += dt*(-0.5*(gI[i+1]-2*gI[i]+gI[i-1]) + gV[i]*gI[i]);
+      for(let i=1;i<NG-1;i++) gI[i] -= dt*(-0.5*(gR[i+1]-2*gR[i]+gR[i-1]) + gV[i]*gR[i]);
+      gT+=dt;
+    }
+    // A gentle absorber at the two ends, applied once a frame rather than once
+    // a sub-step — otherwise it eats the packet and the percentages below stop
+    // meaning anything.
+    for(let k=0;k<40;k++){
+      const damp=0.985+0.015*(k/40);
+      gR[k]*=damp; gI[k]*=damp;
+      gR[NG-1-k]*=damp; gI[NG-1-k]*=damp;
+    }
+    let tr=0, rf=0, inside=0, edge=0;
+    for(let i=0;i<NG;i++){
+      const p=gR[i]*gR[i]+gI[i]*gI[i];
+      if(i>gBar[1]+6) tr+=p;
+      else if(i<gBar[0]-6) rf+=p;
+      else inside+=p;
+      if(i<50 || i>NG-50) edge+=p;
+    }
+    const tot=tr+rf+inside;
+    if(tot>0){ gTrans=tr/tot; gRefl=rf/tot; gInside=inside/tot; }
+    // stop once the two packets have separated, before either runs into the
+    // absorber and the split stops being trustworthy
+    if(edge>0.02 || gT>4000) gRunning=false;
+  }
+
+  function drawPacket(){
+    if(!packetCanvas) return;
+    const {ctx,w,h}=fitCanvas(packetCanvas);
+    ctx.clearRect(0,0,w,h);
+    const m={l:14,r:14,t:26,b:26};
+    const X=i=>m.l+(i/(NG-1))*(w-m.l-m.r);
+    const base=h-m.b;
+    if(!gR){
+      ctx.font='12px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='center';
+      ctx.fillText('press Fire to throw a wave packet at the barrier', w/2, h/2);
+      return;
+    }
+    // the barrier
+    const bw=Math.max(4, X(gBar[1])-X(gBar[0]));
+    ctx.fillStyle='#efebe2';
+    ctx.fillRect(X(gBar[0]), m.t, bw, base-m.t);
+    ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=1;
+    ctx.strokeRect(X(gBar[0]), m.t, bw, base-m.t);
+
+    let peak=1e-9;
+    for(let i=0;i<NG;i++) peak=Math.max(peak, gR[i]*gR[i]+gI[i]*gI[i]);
+    const amp=(base-m.t)*0.86/peak;
+    // |psi|^2, which is where the particle would actually be found
+    ctx.beginPath(); ctx.moveTo(X(0),base);
+    for(let i=0;i<NG;i++) ctx.lineTo(X(i), base-(gR[i]*gR[i]+gI[i]*gI[i])*amp);
+    ctx.lineTo(X(NG-1),base); ctx.closePath();
+    ctx.fillStyle='rgba(164,52,44,0.18)'; ctx.fill();
+    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2; ctx.stroke();
+    // the real part underneath, so the wiggle is visible
+    ctx.beginPath();
+    const ra=(base-m.t)*0.30/Math.sqrt(peak);
+    for(let i=0;i<NG;i++){ const y=base-(base-m.t)*0.10-gR[i]*ra; i?ctx.lineTo(X(i),y):ctx.moveTo(X(i),y); }
+    ctx.strokeStyle='rgba(31,111,120,0.55)'; ctx.lineWidth=1; ctx.stroke();
+
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#5a5d63';
+    ctx.fillText('|ψ|² — a real packet, solved on a grid, not a sketch', m.l, m.t-10);
+    ctx.textAlign='right';
+    if(gInside<0.02 && gTrans+gRefl>0.5){
+      ctx.fillStyle='#1f6f78';
+      ctx.fillText(`got through ${fmt(gTrans*100,2)}%   ·   bounced back ${fmt(gRefl*100,2)}%`
+                   + (gTheory>1e-4?`   ·   the formula, for one exact energy, says ${fmt(gTheory*100,2)}%`:''), w-m.r, m.t-10);
+    } else {
+      ctx.fillStyle='#8a8d92'; ctx.fillText('incoming…', w-m.r, m.t-10);
+    }
+    ctx.textAlign='center'; ctx.fillStyle='#8a8d92'; ctx.font='10px Helvetica,Arial,sans-serif';
+    ctx.fillText('barrier', X(gBar[0])+bw/2, base+14);
+  }
+
+  function gLoop(now){
+    const dt=(now-gLast)/1000; gLast=now;
+    const active=document.getElementById('ch5') && document.getElementById('ch5').classList.contains('active');
+    if(active && gRunning && !prefersReducedMotion()){
+      gStep();
+      drawPacket();
+      if(!gRunning && fireBtn){
+        fireBtn.textContent='↺ Fire another';
+        fireBtn.classList.remove('playing');
+      }
+    }
+    requestAnimationFrame(gLoop);
+  }
 
   function kOut(E){ return Math.sqrt(E/H2_2M); }                 // nm^-1
   function kIn(E,U){ return Math.sqrt(Math.max(0,(U-E))/H2_2M); }
@@ -532,6 +675,20 @@ function setupTunnel(){
 
   // let the wave actually travel: a still picture of a travelling wave hides
   // the fact that anything is arriving on the far side at all
+  if(fireBtn) fireBtn.addEventListener('click', ()=>{
+    if(prefersReducedMotion()){
+      launch();
+      for(let k=0;k<400 && gRunning;k++) gStep();     // run it through without animating
+      gRunning=false; drawPacket();
+      return;
+    }
+    launch();
+    gLast=performance.now();
+    fireBtn.textContent='⏸ running…'; fireBtn.classList.add('playing');
+  });
+  registerCanvas('tn_packet',drawPacket);
+  requestAnimationFrame(gLoop);
+
   let tnLast=performance.now();
   function tnLoop(now){
     const dt=Math.min(0.05,(now-tnLast)/1000); tnLast=now;

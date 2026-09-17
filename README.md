@@ -28,7 +28,7 @@ site data — there is no account and nothing is collected.
 
 ## Chapter 2 — Particle Properties of Waves
 - Blackbody radiation: Planck's law vs. the Rayleigh–Jeans "ultraviolet catastrophe" (the visible band in its real colours, cooler blackbodies nested underneath, the locus of the peaks, and a colour-vs-temperature strip — every colour integrated from the spectrum through the CIE colour-matching functions, not looked up)
-- Photoelectric effect (stopping voltage, KE_max vs. frequency)
+- Photoelectric effect (the apparatus itself: photons in their true colour land on a cathode, electrons leave with a spread of energies and climb against the retarding voltage, turning back if they are too slow — plus stopping voltage and KE_max vs. frequency)
 - X-ray production: the Duane–Hunt cutoff and characteristic lines
 - Compton scattering (wavelength shift + momentum vector diagram)
 - Bragg diffraction
@@ -58,7 +58,7 @@ site data — there is no account and nothing is collected.
 - The wave function and what it means (normalisation, probability, expectation values)
 - Particle in a box, solved properly (quantization from boundary conditions)
 - The finite potential well (leakage into the classically forbidden region)
-- The tunnel effect (the wave travels; the collapse across the barrier is at true scale and what emerges is magnified by a stated factor, because otherwise there is nothing to see)
+- The tunnel effect (fire a wave packet at the barrier and watch it split into a reflected and a transmitted one — the time-dependent Schrödinger equation solved live on a grid, agreeing with the formula to within the energy spread of the packet; below it, the steady-state picture, with what emerges magnified by a stated factor)
 - The harmonic oscillator (zero-point energy, quantum vs classical density)
 - Superposition — why stationary states are stationary, and why atoms radiate
 
@@ -73,7 +73,7 @@ site data — there is no account and nothing is collected.
 ## Chapter 7 — Many-Electron Atoms
 - Electron spin (two orientations, and why it cannot be literal rotation)
 - The exclusion principle as a symmetry (antisymmetric wave functions vanish when states coincide)
-- Building up the elements (Madelung filling, generated not looked up)
+- Building up the elements (Madelung filling, generated not looked up — press Play to walk Z upward and watch the periodic table assemble itself, its s, p and d blocks falling out of the filling order rather than being drawn in)
 - The periodic trend made visible (measured ionization energies, Z = 1–54)
 - Spin–orbit coupling and total angular momentum (j = ℓ ± ½, fine-structure doublets)
 - X-ray spectra and Moseley's law (√ν linear in Z, and why it is Z − 1)
@@ -97,7 +97,7 @@ site data — there is no account and nothing is collected.
 ## Chapter 10 — The Solid State
 - What holds an ionic crystal together (Madelung sums, the exclusion-principle repulsion, cohesive energy against measurement)
 - The van der Waals bond (Lennard-Jones, the fcc lattice sums, and all five bond types compared against their melting points)
-- Free electrons, drift and Ohm's law (animated; drift velocity, Fermi velocity, mean free path in ion spacings)
+- Free electrons, drift and Ohm's law (animated; the average position of the whole cloud is tracked separately, because one electron's creep is invisible against its own random motion)
 - How a level becomes a band (a chain of N atoms solved exactly, and what happens as N grows — press Play to watch the discrete levels smear into a band in real time)
 - Conductor, semiconductor, insulator (Fermi–Dirac tails on a log scale, intrinsic carriers, the Arrhenius plot)
 - Doping and the p–n junction (band bending under bias, np = n_i², the diode equation, 60 mV per decade)
@@ -115,7 +115,7 @@ site data — there is no account and nothing is collected.
 
 ## Chapter 12 — Nuclear Transformations
 - Five kinds of decay, and which one a nucleus picks (decay arrows on the chart of the nuclides, every Q from measured masses)
-- The decay law (half-life vs mean life, activity in Bq and Ci, and why two half-lives leave a quarter)
+- The decay law (half-life vs mean life, activity in Bq and Ci — and 400 simulated nuclei, each with its own random lifetime, decaying one by one while the surviving count traces the exponential with visible statistical wobble)
 - Radiometric dating (six clocks on one log-time axis, from radiocarbon to rubidium–strontium)
 - Alpha decay by tunnelling (the Gamow integral reproducing 17 decades of half-life, and recovering R₀ = 1.2 fm from decay rates alone)
 - Beta decay and the neutrino (the Fermi spectrum, the Kurie plot, and where neutrino mass hides)
