@@ -74,7 +74,8 @@ function buildModuleIndex(section){
     if(!card.id) card.id = section.id + '-m' + (i+1);
     const h = card.querySelector('h2');
     const title = h ? h.childNodes[0].textContent.trim() : ('Module '+(i+1));
-    return `<a href="#${card.id}"><span class="mi-num">${i+1}</span>${title}</a>`;
+    const done = !!PROGRESS[card.id];
+    return `<a href="#${card.id}"${done?' class="done"':''}><span class="mi-num">${done?'✓':i+1}</span>${title}</a>`;
   }).join('');
   nav.querySelectorAll('a').forEach(a=>{
     a.addEventListener('click', e=>{
@@ -84,6 +85,102 @@ function buildModuleIndex(section){
     });
   });
   observeCards(cards, nav);
+}
+
+/* =====================================================================
+   PROGRESS TRACKING — "mark as understood", saved to localStorage only
+   (per browser, never sent anywhere). Purely additive: every module
+   works exactly as before if this fails to load or storage is blocked.
+   ===================================================================== */
+const PROG_KEY = 'beiser-progress';
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(PROG_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function saveProgress(){
+  try{ localStorage.setItem(PROG_KEY, JSON.stringify(PROGRESS)); }
+  catch(e){ /* private browsing / storage disabled: progress just won't persist */ }
+}
+let PROGRESS = loadProgress();
+
+// Every card needs a stable id up front — not just the active chapter's,
+// the way buildModuleIndex lazily does it — so chapter pills can show
+// accurate counts before a chapter has ever been opened.
+function assignAllCardIds(){
+  document.querySelectorAll('.chapter').forEach(section=>{
+    [...section.querySelectorAll('.card')].forEach((card,i)=>{
+      if(!card.id) card.id = section.id + '-m' + (i+1);
+    });
+  });
+}
+
+function addProgressToggles(){
+  document.querySelectorAll('.card').forEach(card=>{
+    const h2 = card.querySelector('h2');
+    if(!h2 || h2.querySelector('.prog-toggle')) return;
+    card.classList.toggle('done', !!PROGRESS[card.id]);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'prog-toggle' + (PROGRESS[card.id] ? ' on' : '');
+    btn.setAttribute('aria-pressed', PROGRESS[card.id] ? 'true' : 'false');
+    btn.textContent = PROGRESS[card.id] ? '✓ understood' : 'mark understood';
+    h2.appendChild(btn);
+    btn.addEventListener('click', ()=>{
+      const on = !PROGRESS[card.id];
+      if(on) PROGRESS[card.id] = true; else delete PROGRESS[card.id];
+      saveProgress();
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.textContent = on ? '✓ understood' : 'mark understood';
+      card.classList.toggle('done', on);
+      refreshChapterProgress();
+      const active = document.querySelector('.chapter.active');
+      if(active) buildModuleIndex(active);
+    });
+  });
+}
+
+function refreshChapterProgress(){
+  document.querySelectorAll('.chap-btn[data-chapter]').forEach(btn=>{
+    const section = document.getElementById(btn.dataset.chapter);
+    if(!section) return;
+    const cards = [...section.querySelectorAll('.card')];
+    const total = cards.length;
+    const done = cards.filter(c=>PROGRESS[c.id]).length;
+    let frac = btn.querySelector('.prog-frac');
+    if(!frac){ frac = document.createElement('span'); frac.className='prog-frac'; btn.appendChild(frac); }
+    frac.textContent = done>0 ? `${done}/${total}` : '';
+    btn.classList.toggle('all-done', total>0 && done===total);
+  });
+  const summary = document.getElementById('overall-progress');
+  if(summary){
+    const total = document.querySelectorAll('.card').length;
+    const done = Object.keys(PROGRESS).filter(id=>document.getElementById(id)).length;
+    summary.textContent = done>0 ? `${done} of ${total} modules marked understood` : '';
+  }
+  const resetBtn = document.getElementById('reset-progress');
+  if(resetBtn){
+    const any = Object.keys(PROGRESS).some(id=>document.getElementById(id));
+    resetBtn.style.display = any ? 'inline' : 'none';
+  }
+}
+
+function initProgressTracking(){
+  assignAllCardIds();
+  addProgressToggles();
+  refreshChapterProgress();
+  const resetBtn = document.getElementById('reset-progress');
+  if(resetBtn) resetBtn.addEventListener('click', ()=>{
+    PROGRESS = {};
+    saveProgress();
+    document.querySelectorAll('.prog-toggle.on').forEach(b=>{
+      b.classList.remove('on'); b.setAttribute('aria-pressed','false'); b.textContent='mark understood';
+    });
+    document.querySelectorAll('.card.done').forEach(c=>c.classList.remove('done'));
+    refreshChapterProgress();
+    const active = document.querySelector('.chapter.active');
+    if(active) buildModuleIndex(active);
+  });
 }
 
 // Highlight whichever module is currently on screen.
@@ -241,6 +338,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     try{ fn(); }
     catch(err){ console.error(`[arthur-beiser] ${name}() failed to initialize:`, err); }
   });
+
+  try{ initProgressTracking(); }
+  catch(err){ console.error('[arthur-beiser] progress tracking failed to initialize:', err); }
 
   const wanted = location.hash && document.querySelector(location.hash + '.chapter')
     ? location.hash.slice(1)

@@ -8,6 +8,14 @@ Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.s
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
+Every module also has a **mark understood** toggle in its top-right corner. Checking it off is
+saved to `localStorage` — nothing leaves the browser — and shows up three ways: a running
+`n/total` on that chapter's pill in the top nav, a checkmark in the chapter's sidebar index, and
+an overall `n of 91 modules marked understood` line under the title once you've checked off at
+least one. A **reset progress** link appears in the sidebar once there's anything to reset. Since
+it's per-browser storage, progress does not sync between devices and does not survive clearing
+site data — there is no account and nothing is collected.
+
 ## Chapter 1 — Relativity
 - The Michelson–Morley experiment (arm transit times, predicted fringe shift, the null result)
 - Light-clock time dilation (animated)
@@ -155,7 +163,7 @@ Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter"
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
 never changes.
 
-Three conventions worth knowing before editing:
+Four conventions worth knowing before editing:
 
 - `canvas.width`/`.height` **reflect the HTML attributes**, so never read an intended CSS
   size back out of the `height` attribute after writing it. `fitCanvas()` handles this and
@@ -164,6 +172,12 @@ Three conventions worth knowing before editing:
   broken module can never blank the others.
 - Chapter files share one global scope, so top-level `const` names and DOM `id`s must be
   unique across the whole site. The test harness fails the build on duplicate element ids.
+- A card's id (`chNN-mM`) is assigned by its position within the chapter and is what the
+  progress-tracking feature keys a visitor's "understood" marks to in `localStorage`.
+  Reordering or inserting a card in the middle of a chapter shifts every id after it, which
+  silently reassigns existing visitors' checkmarks to the wrong module. Appending a new card
+  at the end of a chapter is safe; reordering existing ones is not, without also accepting
+  that saved progress.
 
 Verified at devicePixelRatio 1, 2 and 3 — bugs have hidden at dpr 1.
 
