@@ -8,7 +8,7 @@ Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.s
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
-Three things make ninety-one modules navigable:
+Five things make ninety-one modules navigable:
 
 - **Search** in the sidebar, across every module's title, equation and prose at once, from
   whichever chapter you happen to be in. `/` focuses it, Enter jumps to the first hit.
@@ -17,6 +17,17 @@ Three things make ninety-one modules navigable:
 - A **link** button on each module that copies a URL carrying that module's current control
   settings, so a particular configuration can be shared or bookmarked and comes back exactly.
   The hash looks like `#ch5|ch5-m4|tn_E=3.5&tn_U=10&tn_L=1.23`.
+- **Check yourself** — a quiz on the chapter you're reading, 34 questions across the thirteen
+  chapters. The numbers in each question are redrawn every time and the answer is computed from
+  the same constants and functions the modules use, so a question cannot go stale or disagree with
+  the page it came from. Every wrong option is a specific named mistake — dividing by γ instead of
+  multiplying, counting `2n` states where the closed shell holds `n²` — and picking it says which
+  mistake it was rather than just "incorrect".
+- A **concept map** of 45 ideas and the 57 dependencies between them, laid out chapter by chapter.
+  Hovering an idea lights up everything it rests on, in one colour, and everything that rests on it
+  in another — and says so in words ("rests on 10 earlier ideas, and 2 later ones rest on it").
+  Clicking one goes to its module. It answers the question the table of contents can't: what do I
+  need to have understood before this will make sense.
 
 Every module also has a **mark understood** toggle in its top-right corner. Checking it off is
 saved to `localStorage` — nothing leaves the browser — and shows up three ways: a running
@@ -168,10 +179,14 @@ from Beiser's own particle-physics tables.
     ch12.js
     ch13.js
     nuclides.js   atomic masses, abundances and half-lives, for Chapters 11-12
+    quiz.js       per-chapter question banks, each generated fresh from live constants
+    conceptmap.js the 45-idea dependency graph and its renderer
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
-never changes.
+never changes. The quiz and the concept map are registries in the same style — `registerQuiz('chNN', fn)`
+and entries in `MAP_NODES`/`MAP_EDGES` — so a chapter without them still works; it just has nothing
+to check yourself on.
 
 Shared drawing machinery lives in `app.js` and is worth knowing about before adding a plot:
 
@@ -209,7 +224,10 @@ Ch 5, a gas thermalising in Ch 9, 400 nuclei decaying in Ch 12.
 
 Verified at devicePixelRatio 1, 2 and 3 — bugs have hidden at dpr 1. The test harness also sweeps
 every module for labels that run outside their canvas or land on top of each other, and checks
-that each chapter's animation is actually moving.
+that each chapter's animation is actually moving. Quiz questions are validated by drawing each one
+two hundred times and rejecting any draw where two options come out identical or where none is
+correct — parameter choices that collapse a distractor onto the answer (Compton at λ₀ = 10, a
+particle in a box at n = 1) are easy to write and impossible to spot by reading.
 
 ## Status
 

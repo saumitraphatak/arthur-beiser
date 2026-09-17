@@ -103,12 +103,54 @@
   #module-index .mi-ch{ font-size:.6rem; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
     color:var(--accent2); opacity:.75; flex:none; }
   #module-index .mi-none{ padding:8px 11px; font-family:var(--sans); font-size:.76rem; color:var(--sub); }
-  #sheet-open{
-    margin-top:14px; width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
+  #sheet-open, #quiz-open, #map-open{
+    margin-top:8px; width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
     background:#fff; font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub);
     cursor:pointer; letter-spacing:.2px;
   }
-  #sheet-open:hover{ border-color:var(--accent2); color:var(--accent2); }
+  #quiz-open{ margin-top:14px; }
+  #sheet-open:hover, #quiz-open:hover, #map-open:hover{ border-color:var(--accent2); color:var(--accent2); }
+
+  /* ---------- quiz ---------- */
+  #quiz-overlay, #map-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(20,22,26,.42);
+    display:flex; align-items:flex-start; justify-content:center; padding:38px 18px;
+  }
+  #quiz-overlay[hidden], #map-overlay[hidden]{ display:none; }
+  #quiz-panel{
+    background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
+    width:min(720px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #map-panel{
+    background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
+    width:min(1180px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #map-hint{ font-family:var(--sans); font-size:.76rem; color:var(--sub); margin:12px 20px 0; line-height:1.5; }
+  #map-canvas{ width:calc(100% - 28px); margin:6px 14px 14px; }
+  #quiz-score{ font-family:var(--sans); font-size:.75rem; font-weight:700; color:var(--accent2); }
+  #quiz-body{ overflow:auto; padding:20px; }
+  .qz-q{ font-size:1.02rem; line-height:1.5; color:var(--ink); margin:0 0 16px; }
+  .qz-opt{
+    display:block; width:100%; text-align:left; margin-bottom:9px; padding:11px 14px;
+    border:1px solid var(--line); border-radius:10px; background:#fff; cursor:pointer;
+    font-family:var(--sans); font-size:.87rem; color:var(--ink); line-height:1.4; transition:.12s;
+  }
+  .qz-opt:hover:not(:disabled){ border-color:var(--accent2); background:var(--code); }
+  .qz-opt:disabled{ cursor:default; }
+  .qz-opt.right{ border-color:var(--accent2); background:#e9f2f2; }
+  .qz-opt.wrong{ border-color:var(--accent); background:#fbeeec; }
+  .qz-why{
+    font-family:var(--sans); font-size:.82rem; line-height:1.55; color:var(--body);
+    margin:4px 0 14px; padding:11px 14px; border-radius:9px; background:var(--code);
+    border-left:3px solid var(--accent2);
+  }
+  .qz-why.no{ border-left-color:var(--accent); }
+  .qz-next{
+    margin-top:6px; padding:9px 18px; border:1px solid var(--accent2); border-radius:999px;
+    background:var(--accent2); color:#fff; font-family:var(--sans); font-size:.8rem;
+    font-weight:700; cursor:pointer;
+  }
+  .qz-none{ font-family:var(--sans); font-size:.85rem; color:var(--sub); }
 
   /* ---------- formula sheet ---------- */
   #sheet-overlay{
@@ -120,11 +162,11 @@
     background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
     width:min(880px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
   }
-  #sheet-head{
+  .panel-head{
     display:flex; align-items:center; justify-content:space-between; gap:14px;
     padding:16px 20px; border-bottom:1px solid var(--line); flex:none;
   }
-  #sheet-head h3{ margin:0; font-size:1.05rem; color:var(--ink); }
+  .panel-head h3{ margin:0; font-size:1.05rem; color:var(--ink); }
   #sheet-close{ border:none; background:none; font-size:1.5rem; line-height:1; color:var(--sub); cursor:pointer; padding:0 4px; }
   #sheet-close:hover{ color:var(--accent); }
   #sheet-body{ overflow:auto; padding:6px 20px 22px; }
@@ -311,13 +353,39 @@
     </div>
     <input type="search" id="module-search" placeholder="Search all 91 modules…" autocomplete="off" spellcheck="false">
     <nav id="module-index"></nav>
+    <button type="button" id="quiz-open">check yourself on this chapter</button>
+    <button type="button" id="map-open">how the book fits together</button>
     <button type="button" id="sheet-open">every equation in the book</button>
   </aside>
+
+  <div id="quiz-overlay" hidden>
+    <div id="quiz-panel" role="dialog" aria-modal="true" aria-labelledby="quiz-title">
+      <div class="panel-head">
+        <h3 id="quiz-title">Check yourself</h3>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <span id="quiz-score"></span>
+          <button type="button" id="quiz-close" aria-label="close">&times;</button>
+        </div>
+      </div>
+      <div id="quiz-body"></div>
+    </div>
+  </div>
+
+  <div id="map-overlay" hidden>
+    <div id="map-panel" role="dialog" aria-modal="true" aria-labelledby="map-title">
+      <div class="panel-head">
+        <h3 id="map-title">How the book fits together</h3>
+        <button type="button" id="map-close" aria-label="close">&times;</button>
+      </div>
+      <p id="map-hint">Each box is a module. An arrow means the idea it points at rests on the one it comes from. Hover to light up everything a topic depends on and everything that depends on it; click to go there.</p>
+      <canvas id="map-canvas" height="620"></canvas>
+    </div>
+  </div>
 
   <!-- the formula sheet, gathered from the cards themselves so it cannot drift -->
   <div id="sheet-overlay" hidden>
     <div id="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-      <div id="sheet-head">
+      <div class="panel-head">
         <h3 id="sheet-title">Every equation in the book</h3>
         <button type="button" id="sheet-close" aria-label="close">&times;</button>
       </div>
@@ -3676,5 +3744,7 @@
 <script src="ch11.js"></script>
 <script src="ch12.js"></script>
 <script src="ch13.js"></script>
+<script src="quiz.js"></script>
+<script src="conceptmap.js"></script>
 </body>
 </html>

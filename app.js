@@ -184,6 +184,25 @@ function refreshChapterProgress(){
 }
 
 /* =====================================================================
+   QUIZ REGISTRY
+   Questions live in quiz.js and are functions, not strings: each one
+   picks its own numbers and works the answer out with the same formulas
+   and tables the modules use, so a question can never drift away from
+   what the page next to it says. Wrong options are specific mistakes
+   rather than noise, and each says what went wrong.
+   ===================================================================== */
+const QUIZ = {};
+function registerQuiz(chapterId, fn){
+  (QUIZ[chapterId] = QUIZ[chapterId] || []).push(fn);
+}
+function qPick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function qShuffle(a){
+  const out = a.slice();
+  for(let i=out.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [out[i],out[j]]=[out[j],out[i]]; }
+  return out;
+}
+
+/* =====================================================================
    SEARCH, FORMULA SHEET, AND LINKS THAT REMEMBER THE SLIDERS
    Ninety-one modules is more than a chapter nav can carry, so: search
    across all of them at once, one page with every equation on it, and a
@@ -346,6 +365,72 @@ function applyStateFromHash(){
   return true;
 }
 
+/* ---- quiz UI ---- */
+let quizRight = 0, quizAsked = 0, quizLastIdx = -1;
+function drawQuizQuestion(){
+  const body = document.getElementById('quiz-body');
+  const active = document.querySelector('.chapter.active');
+  if(!body || !active) return;
+  const pool = QUIZ[active.id] || [];
+  const titleEl = document.getElementById('quiz-title');
+  const btn = document.querySelector(`.chap-btn[data-chapter="${active.id}"]`);
+  if(titleEl) titleEl.textContent = 'Check yourself — ' + (btn ? btn.textContent.replace(/^\d+/,'').trim() : active.id);
+  const scoreEl = document.getElementById('quiz-score');
+  if(scoreEl) scoreEl.textContent = quizAsked ? `${quizRight} / ${quizAsked}` : '';
+  if(!pool.length){
+    body.innerHTML = '<p class="qz-none">No questions for this chapter yet.</p>';
+    return;
+  }
+  // a question may decline to be asked (its random draw came out degenerate)
+  let item = null, guard = 0;
+  while(!item && guard++ < 30){
+    let i = Math.floor(Math.random()*pool.length);
+    if(pool.length > 1 && i === quizLastIdx) i = (i+1) % pool.length;
+    try{ item = pool[i](); }catch(err){ console.error('[arthur-beiser] a quiz question threw:', err); item = null; }
+    if(item) quizLastIdx = i;
+  }
+  if(!item){ body.innerHTML = '<p class="qz-none">No questions for this chapter yet.</p>'; return; }
+
+  const opts = qShuffle(item.opts);
+  body.innerHTML = `<p class="qz-q">${item.q}</p>` +
+    opts.map((o,i)=>`<button type="button" class="qz-opt" data-i="${i}">${o.t}</button>`).join('') +
+    `<div id="qz-feedback"></div>`;
+  let answered = false;
+  body.querySelectorAll('.qz-opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(answered) return;
+      answered = true;
+      quizAsked++;
+      const chosen = opts[+b.dataset.i];
+      if(chosen.ok) quizRight++;
+      body.querySelectorAll('.qz-opt').forEach((el,i)=>{
+        el.disabled = true;
+        if(opts[i].ok) el.classList.add('right');
+        else if(el===b) el.classList.add('wrong');
+      });
+      const fb = document.getElementById('qz-feedback');
+      const right = opts.find(o=>o.ok);
+      fb.innerHTML =
+        `<div class="qz-why${chosen.ok?'':' no'}">${chosen.ok?'':'<b>Not quite.</b> '}${chosen.why}</div>` +
+        (chosen.ok ? '' : `<div class="qz-why"><b>The answer is ${right.t}.</b> ${right.why}</div>`) +
+        `<button type="button" class="qz-next">Next question</button>`;
+      const sc = document.getElementById('quiz-score');
+      if(sc) sc.textContent = `${quizRight} / ${quizAsked}`;
+      fb.querySelector('.qz-next').addEventListener('click', drawQuizQuestion);
+    });
+  });
+}
+function openQuiz(){
+  const ov = document.getElementById('quiz-overlay');
+  if(!ov) return;
+  ov.hidden = false;
+  drawQuizQuestion();
+}
+function closeQuiz(){
+  const ov = document.getElementById('quiz-overlay');
+  if(ov) ov.hidden = true;
+}
+
 function initExtras(){
   const search = document.getElementById('module-search');
   if(search){
@@ -368,13 +453,25 @@ function initExtras(){
       e.preventDefault();
       if(search){ search.focus(); search.select(); }
     }
-    if(e.key==='Escape') closeSheet();
+    if(e.key==='Escape'){ closeSheet(); closeQuiz(); closeMap(); }
   });
   const open=document.getElementById('sheet-open'), close=document.getElementById('sheet-close'),
         ov=document.getElementById('sheet-overlay');
   if(open) open.addEventListener('click', openSheet);
   if(close) close.addEventListener('click', closeSheet);
   if(ov) ov.addEventListener('click', e=>{ if(e.target===ov) closeSheet(); });
+
+  const qOpen=document.getElementById('quiz-open'), qClose=document.getElementById('quiz-close'),
+        qOv=document.getElementById('quiz-overlay');
+  if(qOpen) qOpen.addEventListener('click', openQuiz);
+  if(qClose) qClose.addEventListener('click', closeQuiz);
+  if(qOv) qOv.addEventListener('click', e=>{ if(e.target===qOv) closeQuiz(); });
+
+  const mOpen=document.getElementById('map-open'), mClose=document.getElementById('map-close'),
+        mOv=document.getElementById('map-overlay');
+  if(mOpen) mOpen.addEventListener('click', openMap);
+  if(mClose) mClose.addEventListener('click', closeMap);
+  if(mOv) mOv.addEventListener('click', e=>{ if(e.target===mOv) closeMap(); });
 }
 
 function initProgressTracking(){
