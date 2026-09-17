@@ -363,6 +363,7 @@ function setupTunnel(){
   const UEl=document.getElementById('tn_U'), UVal=document.getElementById('tn_U_val');
   const LEl=document.getElementById('tn_L'), LVal=document.getElementById('tn_L_val');
   const readout=document.getElementById('tn_readout');
+  let tnPhase=0;
 
   function kOut(E){ return Math.sqrt(E/H2_2M); }                 // nm^-1
   function kIn(E,U){ return Math.sqrt(Math.max(0,(U-E))/H2_2M); }
@@ -400,28 +401,56 @@ function setupTunnel(){
     ctx.fillStyle='#5a5d63';
     ctx.fillText(`U = ${fmt(U,1)} eV`, X(L)+6, Y(U)+14);
 
-    // the wave: oscillating in, decaying across, oscillating out with smaller amplitude
+    // the wave: travelling in, dying across the barrier, travelling out the far
+    // side with an amplitude that is usually far too small to see
     const T=Texact(E,U,L);
     const amp=(h-m.t-m.b)*0.15, base=Y(E);
     const k1=kOut(E), k2=kIn(E,U);
-    const outAmp=Math.sqrt(Math.max(T,1e-12));
-    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2.2; ctx.beginPath();
-    for(let i=0;i<=1000;i++){
-      const x=-span/2+span*i/1000;
-      let v;
-      if(x<0) v=Math.cos(k1*x*6);
-      else if(x<=L) v=Math.exp(-k2*x)*Math.cos(k1*0);
-      else v=outAmp*Math.cos(k1*(x-L)*6);
-      // keep the decaying section visible even when it is astronomically small
-      if(x>0 && x<=L) v=Math.max(v, Math.exp(-k2*L)*0.0);
-      const y=base-amp*v;
-      if(i===0) ctx.moveTo(X(x),y); else ctx.lineTo(X(x),y);
+    const outAmp=Math.sqrt(Math.max(T,1e-300));
+    const ph=tnPhase;
+    // Magnify whatever comes out, and say by how much: the size of the factor
+    // is itself the lesson.
+    const mag=Math.min(1e12, 0.42/Math.max(outAmp,1e-300));
+
+    // Inside and before the barrier everything is at true scale, so the collapse
+    // across the barrier is honest; only what emerges on the far side is
+    // magnified, and the caption says by how much.
+    function wave(x, magnified){
+      if(x<0) return Math.cos(k1*x*6 - ph);
+      if(x<=L) return Math.exp(-k2*x)*Math.cos(ph);
+      return outAmp*(magnified?mag:1)*Math.cos(k1*(x-L)*6 - ph);
+    }
+    // true scale first, faint: past the barrier it is a flat line, which is the truth
+    ctx.strokeStyle='rgba(164,52,44,0.22)'; ctx.lineWidth=1.4; ctx.beginPath();
+    for(let i=0;i<=900;i++){
+      const x=-span/2+span*i/900, y=base-amp*wave(x,false);
+      i===0?ctx.moveTo(X(x),y):ctx.lineTo(X(x),y);
     }
     ctx.stroke();
+    // then the magnified version
+    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2.2; ctx.beginPath();
+    for(let i=0;i<=900;i++){
+      const x=-span/2+span*i/900, y=base-amp*Math.max(-1.2,Math.min(1.2,wave(x,true)));
+      i===0?ctx.moveTo(X(x),y):ctx.lineTo(X(x),y);
+    }
+    ctx.stroke();
+    // mark where the vertical scale changes
+    if(mag>1.5){
+      ctx.save(); ctx.strokeStyle='rgba(138,141,146,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(X(L),base-amp*1.3); ctx.lineTo(X(L),base+amp*1.3); ctx.stroke();
+      ctx.restore();
+    }
+
     ctx.fillStyle='#a4342c'; ctx.textAlign='center';
     ctx.fillText('incident', X(-span/4), base-amp-8);
-    ctx.fillText('decaying', X(L/2), base-amp-8);
-    ctx.fillText('transmitted', X(L+span/4), base-amp-8);
+    if(X(L)-X(0) > 54) ctx.fillText('decaying', X(L/2), base-amp-8);
+    ctx.textAlign='right';
+    ctx.fillText('transmitted', w-m.r-4, base-amp-8);
+    if(mag>1.5){
+      ctx.fillStyle='#8a8d92'; ctx.font='10px Helvetica,Arial,sans-serif';
+      ctx.fillText(`amplitude past the barrier magnified ×${mag>1e4?fmtSci(mag,1):fmt(mag,0)}`, w-m.r-4, base-amp+6);
+      ctx.font='11px Helvetica,Arial,sans-serif';
+    }
     ctx.fillStyle='#8a8d92'; ctx.textAlign='center';
     ctx.fillText(`barrier width L = ${fmt(L,2)} nm`, X(L/2), h-m.b+16);
   }
@@ -451,7 +480,9 @@ function setupTunnel(){
     ctx.fillText('transmission probability',0,0); ctx.restore();
     ctx.restore();
 
-    [[1.0,'#c9776f'],[2.0,'#a4342c'],[5.0,'#1f6f78']].forEach(([e,col])=>{
+    // Each curve is labelled at a different width: all three labelled at the
+    // same place stack on top of each other and become unreadable.
+    [[1.0,'#c9776f',0.30],[2.0,'#a4342c',0.58],[5.0,'#1f6f78',1.02]].forEach(([e,col,xlab])=>{
       if(e>=U) return;
       ctx.strokeStyle=col; ctx.lineWidth = Math.abs(e-E)<0.05?3:1.8; ctx.beginPath();
       let st=false;
@@ -461,9 +492,13 @@ function setupTunnel(){
         if(!st){ ctx.moveTo(X(x),y); st=true; } else ctx.lineTo(X(x),y);
       }
       ctx.stroke();
-      ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle=col; ctx.textAlign='left';
-      const yl=Y(Texact(e,U,0.35));
-      if(yl>m.t&&yl<h-m.b) ctx.fillText(`E = ${e} eV`, X(0.36), yl-5);
+      ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+      const yl=Y(Texact(e,U,xlab));
+      if(yl>m.t&&yl<h-m.b){
+        ctx.lineWidth=3; ctx.strokeStyle='rgba(255,253,248,0.92)';
+        ctx.strokeText(`E = ${e} eV`, X(xlab)+4, yl-5);
+        ctx.fillStyle=col; ctx.fillText(`E = ${e} eV`, X(xlab)+4, yl-5);
+      }
     });
     const yc=Y(Texact(E,U,L));
     if(yc>m.t&&yc<h-m.b){
@@ -494,6 +529,20 @@ function setupTunnel(){
   [EEl,UEl,LEl].forEach(el=>el.addEventListener('input',draw));
   registerCanvas('tn_canvas',draw);
   registerCanvas('tn_canvas_t',draw);
+
+  // let the wave actually travel: a still picture of a travelling wave hides
+  // the fact that anything is arriving on the far side at all
+  let tnLast=performance.now();
+  function tnLoop(now){
+    const dt=Math.min(0.05,(now-tnLast)/1000); tnLast=now;
+    const active=document.getElementById('ch5') && document.getElementById('ch5').classList.contains('active');
+    if(active && !prefersReducedMotion()){
+      tnPhase += dt*3.4;
+      drawBar();
+    }
+    requestAnimationFrame(tnLoop);
+  }
+  requestAnimationFrame(tnLoop);
 }
 
 /* =====================================================================

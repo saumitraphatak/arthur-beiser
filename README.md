@@ -27,7 +27,7 @@ site data — there is no account and nothing is collected.
 - Minkowski spacetime diagram (boosted axes, relativity of simultaneity)
 
 ## Chapter 2 — Particle Properties of Waves
-- Blackbody radiation: Planck's law vs. the Rayleigh–Jeans "ultraviolet catastrophe"
+- Blackbody radiation: Planck's law vs. the Rayleigh–Jeans "ultraviolet catastrophe" (the visible band in its real colours, cooler blackbodies nested underneath, the locus of the peaks, and a colour-vs-temperature strip — every colour integrated from the spectrum through the CIE colour-matching functions, not looked up)
 - Photoelectric effect (stopping voltage, KE_max vs. frequency)
 - X-ray production: the Duane–Hunt cutoff and characteristic lines
 - Compton scattering (wavelength shift + momentum vector diagram)
@@ -38,7 +38,7 @@ site data — there is no account and nothing is collected.
 
 ## Chapter 3 — Wave Properties of Particles
 - De Broglie wavelength across forty decades of scale
-- Phase and group velocity (animated packet; why v_p > c carries no information)
+- Phase and group velocity (a genuinely localised travelling packet, with one crest tracked as it is born at the back and dies off the front, against a single endless de Broglie wave that localises nothing)
 - Davisson–Germer electron diffraction
 - Particle in a box (standing waves, the n² energy ladder)
 - Building a wave packet — where Δx·Δp ≥ ℏ/2 actually comes from
@@ -46,7 +46,7 @@ site data — there is no account and nothing is collected.
 - Energy–time uncertainty and the natural width of a spectral line
 
 ## Chapter 4 — Atomic Structure
-- Rutherford scattering (numerically integrated trajectories, the 1/sin⁴(θ/2) law)
+- Rutherford scattering (an animated beam with impact parameters sampled the way a foil samples them — probability ∝ b db — so the rare backscatter is as rare on screen as it was in the lab; the plum-pudding prediction is drawn alongside rather than asserted)
 - Why the classical atom collapses (the spiral, and the frequency smear it would emit)
 - The hydrogen spectral series (Lyman through Pfund, plus the Balmer lines in true colour)
 - Bohr orbits as standing de Broglie waves
@@ -58,7 +58,7 @@ site data — there is no account and nothing is collected.
 - The wave function and what it means (normalisation, probability, expectation values)
 - Particle in a box, solved properly (quantization from boundary conditions)
 - The finite potential well (leakage into the classically forbidden region)
-- The tunnel effect (exact and approximate transmission, the STM's sensitivity)
+- The tunnel effect (the wave travels; the collapse across the barrier is at true scale and what emerges is magnified by a stated factor, because otherwise there is nothing to see)
 - The harmonic oscillator (zero-point energy, quantum vs classical density)
 - Superposition — why stationary states are stationary, and why atoms radiate
 
@@ -87,7 +87,7 @@ site data — there is no account and nothing is collected.
 - Three energy scales, four decades apart
 
 ## Chapter 9 — Statistical Mechanics
-- The Maxwell–Boltzmann speed distribution (v_p, v̄, v_rms, and which gases a planet keeps)
+- The Maxwell–Boltzmann speed distribution (a simulated three-dimensional gas of 170 molecules colliding elastically, its speeds binned live against the analytic curve; start them all at one speed and watch collisions alone build the distribution)
 - The energy distribution and the activation tail (why 10 K can double a reaction rate)
 - Three statistics on one plot (Maxwell–Boltzmann, Bose–Einstein, Fermi–Dirac, and where they merge)
 - Where Planck's law comes from (⟨ε⟩ per mode, and how equipartition fails)
@@ -162,6 +162,20 @@ from Beiser's own particle-physics tables.
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
 never changes.
+
+Shared drawing machinery lives in `app.js` and is worth knowing about before adding a plot:
+
+- `drawAxes()` picks its own tick positions — round multiples of 1, 2, 2.5 or 5 times a power of
+  ten near the requested spacing — rather than dividing the range into equal parts, which is what
+  used to produce axes labelled 0, 310, 620, 930, 1241. Pass `exactTicks:true` to get the old
+  behaviour. With no `xfmt`/`yfmt` it also formats the labels itself, factoring a common power of
+  ten into the axis title instead of repeating `8.1e5` on every tick.
+- `drawAxes()` records the plotting box, and `plotLine()` clips to it, so a curve that runs off the
+  top of its own axes stops there instead of being drawn across the rest of the card. A diagram
+  that never calls `drawAxes()` is not clipped.
+- `wavelengthRGB()`, `spectrumRGB()` and `cieBar()` turn a computed spectrum into the colour an eye
+  would see, through analytic fits to the CIE 1931 colour-matching functions. Prefer them to a
+  hand-tuned rainbow ramp.
 
 Four conventions worth knowing before editing:
 

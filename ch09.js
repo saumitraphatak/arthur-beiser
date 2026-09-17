@@ -25,8 +25,10 @@ const SOLIDS = {
    ===================================================================== */
 function setupMaxwell(){
   const canvas=document.getElementById('mw_canvas');
+  const boxCanvas=document.getElementById('mw_box');
   const gasEl=document.getElementById('mw_gas');
   const tEl=document.getElementById('mw_t'), tVal=document.getElementById('mw_t_val');
+  const resetEl=document.getElementById('mw_reset');
   const readout=document.getElementById('mw_readout');
 
   function speeds(M,T){
@@ -39,6 +41,120 @@ function setupMaxwell(){
   function nv(v,m,T){
     const a=m/(2*K_B*T);
     return 4*Math.PI*Math.pow(a/Math.PI,1.5)*v*v*Math.exp(-a*v*v);
+  }
+
+  /* ---- a real gas, simulated ----
+     N molecules in a cubic box, bouncing elastically off the walls and off each
+     other. Positions are in units of the box; velocities are in m/s, so the
+     histogram of their speeds lands on the same axis as the analytic curve and
+     can be compared with it directly. Only the drawing is two-dimensional — the
+     dynamics, and therefore the distribution, are fully three-dimensional. */
+  const N=170, RAD=0.030;
+  const mol=[];                 // {x,y,z,vx,vy,vz}
+  const NBIN=34;
+  let hist=new Float64Array(NBIN), samples=0, binMax=1;
+  let lastFrame=performance.now(), simT=300, simM=28;
+
+  function gaussian(){
+    let u=0,v=0;
+    while(u===0) u=Math.random();
+    while(v===0) v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+  function clearHist(){ hist=new Float64Array(NBIN); samples=0; }
+
+  // draw each velocity component from a Gaussian of width sqrt(kT/m): that is
+  // exactly what makes the speeds Maxwell-Boltzmann
+  function thermalise(M,T){
+    const m=M*U_AMU, sig=Math.sqrt(K_B*T/m);
+    mol.length=0;
+    for(let i=0;i<N;i++){
+      mol.push({x:Math.random(), y:Math.random(), z:Math.random(),
+                vx:gaussian()*sig, vy:gaussian()*sig, vz:gaussian()*sig});
+    }
+    simT=T; simM=M; clearHist();
+  }
+  // every molecule at the rms speed, directions random: the same total energy,
+  // the wrong distribution, and collisions alone fix it
+  function sameSpeed(M,T){
+    const m=M*U_AMU, v=Math.sqrt(3*K_B*T/m);
+    mol.length=0;
+    for(let i=0;i<N;i++){
+      const ct=2*Math.random()-1, st=Math.sqrt(1-ct*ct), ph=2*Math.PI*Math.random();
+      mol.push({x:Math.random(), y:Math.random(), z:Math.random(),
+                vx:v*st*Math.cos(ph), vy:v*st*Math.sin(ph), vz:v*ct});
+    }
+    simT=T; simM=M; clearHist();
+  }
+
+  function step(dt, vScale){
+    const d = dt*vScale;
+    for(let i=0;i<N;i++){
+      const p=mol[i];
+      p.x+=p.vx*d; p.y+=p.vy*d; p.z+=p.vz*d;
+      if(p.x<RAD){ p.x=RAD; p.vx=Math.abs(p.vx); } else if(p.x>1-RAD){ p.x=1-RAD; p.vx=-Math.abs(p.vx); }
+      if(p.y<RAD){ p.y=RAD; p.vy=Math.abs(p.vy); } else if(p.y>1-RAD){ p.y=1-RAD; p.vy=-Math.abs(p.vy); }
+      if(p.z<RAD){ p.z=RAD; p.vz=Math.abs(p.vz); } else if(p.z>1-RAD){ p.z=1-RAD; p.vz=-Math.abs(p.vz); }
+    }
+    // equal masses: an elastic collision just swaps the velocity components
+    // along the line of centres
+    const D2=(2*RAD)*(2*RAD);
+    for(let i=0;i<N;i++){
+      const a=mol[i];
+      for(let j=i+1;j<N;j++){
+        const b=mol[j];
+        const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+        const r2=dx*dx+dy*dy+dz*dz;
+        if(r2>D2 || r2<1e-12) continue;
+        const r=Math.sqrt(r2), nx=dx/r, ny=dy/r, nz=dz/r;
+        const dvx=b.vx-a.vx, dvy=b.vy-a.vy, dvz=b.vz-a.vz;
+        const along=dvx*nx+dvy*ny+dvz*nz;
+        if(along>0) continue;                      // already separating
+        a.vx+=along*nx; a.vy+=along*ny; a.vz+=along*nz;
+        b.vx-=along*nx; b.vy-=along*ny; b.vz-=along*nz;
+        const push=(2*RAD-r)/2 + 1e-4;             // unstick them
+        a.x-=nx*push; a.y-=ny*push; a.z-=nz*push;
+        b.x+=nx*push; b.y+=ny*push; b.z+=nz*push;
+      }
+    }
+  }
+
+  function accumulate(){
+    for(let i=0;i<N;i++){
+      const p=mol[i];
+      const v=Math.sqrt(p.vx*p.vx+p.vy*p.vy+p.vz*p.vz);
+      const k=Math.floor(v/binMax*NBIN);
+      if(k>=0 && k<NBIN) hist[k]++;
+    }
+    samples++;
+  }
+
+  function drawBox(){
+    if(!boxCanvas) return;
+    const {ctx,w,h}=fitCanvas(boxCanvas);
+    ctx.clearRect(0,0,w,h);
+    const S=Math.min(w,h)-10, x0=(w-S)/2, y0=(h-S)/2;
+    ctx.fillStyle='#fffdf8'; ctx.fillRect(x0,y0,S,S);
+    ctx.strokeStyle='#d8d3c6'; ctx.lineWidth=1; ctx.strokeRect(x0,y0,S,S);
+    const vr=Math.sqrt(3*K_B*simT/(simM*U_AMU));
+    // paint the faster molecules warm and the slower ones cool, so the spread
+    // of speeds is visible in the box itself and not only in the histogram
+    for(let i=0;i<N;i++){
+      const p=mol[i];
+      const v=Math.sqrt(p.vx*p.vx+p.vy*p.vy+p.vz*p.vz);
+      const t=Math.max(0,Math.min(1,v/(1.8*vr)));
+      const depth=0.45+0.55*p.z;                     // further away = paler
+      // slow -> teal, middling -> gold, fast -> red
+      const stops=[[31,111,120],[201,162,39],[164,52,44]];
+      const f=t*2, k=f<1?0:1, u=f<1?f:f-1;
+      const r=Math.round(stops[k][0]+(stops[k+1][0]-stops[k][0])*u);
+      const g=Math.round(stops[k][1]+(stops[k+1][1]-stops[k][1])*u);
+      const bl=Math.round(stops[k][2]+(stops[k+1][2]-stops[k][2])*u);
+      ctx.fillStyle=`rgba(${r},${g},${bl},${depth})`;
+      ctx.beginPath();
+      ctx.arc(x0+p.x*S, y0+p.y*S, RAD*S*(0.55+0.45*p.z), 0, 7);
+      ctx.fill();
+    }
   }
 
   function draw(){
@@ -59,18 +175,40 @@ function setupMaxwell(){
       const pts=[]; for(let v=1;v<=vmax;v+=vmax/300) pts.push({x:v,y:nv(v,s2.m,T)});
       plotLine(ctx,X,Y,pts,'#e4dfd4',1.4);
     });
+    // the simulated gas, binned — an estimate of the very curve above it
+    binMax = vmax;
+    if(samples>0){
+      const bw = vmax/NBIN;
+      ctx.save();
+      ctx.fillStyle='rgba(31,111,120,0.30)';
+      ctx.strokeStyle='rgba(31,111,120,0.55)'; ctx.lineWidth=1;
+      for(let k=0;k<NBIN;k++){
+        const pdf = hist[k]/(samples*N*bw);        // counts -> probability density
+        if(!(pdf>0)) continue;
+        const xA=X(k*bw), xB=X((k+1)*bw), yT=Y(pdf);
+        if(yT < m.t) continue;
+        ctx.fillRect(xA, yT, Math.max(1,xB-xA-1), Y(0)-yT);
+        ctx.strokeRect(xA, yT, Math.max(1,xB-xA-1), Y(0)-yT);
+      }
+      ctx.restore();
+    }
+
     const pts=[]; for(let v=1;v<=vmax;v+=vmax/400) pts.push({x:v,y:nv(v,s.m,T)});
-    ctx.save(); ctx.fillStyle='rgba(164,52,44,0.14)'; ctx.beginPath(); ctx.moveTo(X(0),Y(0));
+    ctx.save(); ctx.fillStyle='rgba(164,52,44,0.10)'; ctx.beginPath(); ctx.moveTo(X(0),Y(0));
     pts.forEach(p=>ctx.lineTo(X(p.x),Y(p.y))); ctx.lineTo(X(vmax),Y(0)); ctx.closePath(); ctx.fill(); ctx.restore();
     plotLine(ctx,X,Y,pts,'#a4342c',2.6);
 
     [[s.vp,'#1f6f78','most probable'],[s.vav,'#8a6d1f','average'],[s.vrms,'#1c1d20','rms']].forEach(([v,col,lab],i)=>{
       plotLine(ctx,X,Y,[{x:v,y:0},{x:v,y:nv(v,s.m,T)}],col,1.8,[4,3]);
       ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle=col; ctx.textAlign='left';
-      ctx.fillText(`${lab} ${fmt(v,0)}`, X(v)+5, m.t+14+i*15);
+      ctx.fillText(`${lab} ${fmt(v,0)}`, X(v)+5, m.t+48+i*15);   // below the legend block
     });
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='right'; ctx.fillStyle='#5a5d63';
     ctx.fillText(`${g.name} at ${fmt(T,0)} K — the other gases are shown faintly`, w-m.r-8, m.t+14);
+    if(samples>0){
+      ctx.fillStyle='#1f6f78';
+      ctx.fillText(`teal bars: the ${N} simulated molecules, sampled as they fly`, w-m.r-8, m.t+30);
+    }
 
     // escape speeds put the distribution in context
     const vEsc=11200, vEscMoon=2380;
@@ -84,9 +222,34 @@ function setupMaxwell(){
       <div>v<sub>rms</sub> / earth escape speed <b>${fmt(s.vrms/vEsc,3)}</b></div>
       <div>v<sub>rms</sub> / moon escape speed <b>${fmt(s.vrms/vEscMoon,3)}</b></div>`;
   }
-  gasEl.addEventListener('change',draw);
-  tEl.addEventListener('input',draw);
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch9') && document.getElementById('ch9').classList.contains('active');
+    if(active && !prefersReducedMotion() && mol.length){
+      const vr=Math.sqrt(3*K_B*simT/(simM*U_AMU));
+      // cross the box in about four seconds whatever the real speed is
+      step(dt, 0.25/vr);
+      accumulate();
+      drawBox();
+      draw();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function reThermalise(){
+    thermalise(GASES[gasEl.value].M, parseFloat(tEl.value));
+    drawBox(); draw();
+  }
+  gasEl.addEventListener('change',reThermalise);
+  tEl.addEventListener('input',reThermalise);
+  if(resetEl) resetEl.addEventListener('click',()=>{
+    sameSpeed(GASES[gasEl.value].M, parseFloat(tEl.value));
+    drawBox(); draw();
+  });
   registerCanvas('mw_canvas',draw);
+  registerCanvas('mw_box',drawBox);
+  thermalise(GASES[gasEl.value].M, parseFloat(tEl.value));
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

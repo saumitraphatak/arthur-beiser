@@ -249,6 +249,7 @@ function fitCanvas(canvas){
   const cached = _canvasFitCache.get(canvas);
   if(cached && cached.cssW===cssW && cached.cssH===cssH && cached.dpr===dpr){
     cached.ctx.clearRect(0,0,cssW,cssH); // cheap: just repaint, no buffer reallocation
+    cached.ctx._plotRect = null;         // plotLine clips only to the axes drawn this pass
     return cached.dims;
   }
 
@@ -258,9 +259,66 @@ function fitCanvas(canvas){
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,cssW,cssH);
+  ctx._plotRect = null;
   const dims = {ctx, w:cssW, h:cssH};
   _canvasFitCache.set(canvas, {cssW, cssH, dpr, ctx, dims});
   return dims;
+}
+
+// ---------- axis ticks ----------
+// Dividing a range into N equal parts gives ticks like 0, 310, 620, 930, 1241 —
+// arithmetically correct and horrible to read. Real plots put ticks on round
+// numbers, so pick a step of 1, 2, 2.5 or 5 times a power of ten near the
+// requested spacing and land the ticks on multiples of it.
+function niceTicks(min, max, target){
+  if(!isFinite(min) || !isFinite(max) || max<=min) return [min, max];
+  target = Math.max(2, target||5);
+  const raw = (max-min)/target;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw/mag;
+  const step = (norm<1.5 ? 1 : norm<2.25 ? 2 : norm<3.5 ? 2.5 : norm<7.5 ? 5 : 10) * mag;
+  const out = [];
+  const eps = step*1e-9;
+  for(let v=Math.ceil(min/step - 1e-9)*step; v<=max+eps; v+=step){
+    out.push(Math.abs(v) < eps ? 0 : v);
+  }
+  return out.length ? out : [min, max];
+}
+function _equalTicks(min, max, n){
+  const out=[];
+  for(let i=0;i<=n;i++) out.push(min + i*(max-min)/n);
+  return out;
+}
+// how many decimals it takes to write this step exactly
+function _decimalsFor(step){
+  step = Math.abs(step);
+  if(!isFinite(step) || step===0) return 0;
+  for(let d=0; d<=6; d++){
+    const r = step*Math.pow(10,d);
+    if(Math.abs(r-Math.round(r)) < 1e-6*Math.max(1,Math.abs(r))) return d;
+  }
+  return 6;
+}
+const _SUPD = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+function _supDigits(n){ return String(n).split('').map(c=>_SUPD[c]||c).join(''); }
+
+// Pick a formatter for a set of ticks. When the numbers are very large or very
+// small, factor the common power of ten out into the axis label rather than
+// repeating "8.1e5" on every tick.
+function _autoLabeler(ticks){
+  const finite = ticks.filter(t=>isFinite(t));
+  const maxabs = finite.reduce((a,t)=>Math.max(a,Math.abs(t)), 0);
+  const step = finite.length>1 ? Math.abs(finite[1]-finite[0]) : (maxabs||1);
+  let e = 0;
+  if(maxabs>0 && (maxabs>=1e4 || maxabs<1e-2)) e = Math.floor(Math.log10(maxabs));
+  const scale = Math.pow(10, e);
+  const dec = _decimalsFor(step/scale);
+  const fmt = v => {
+    let s = (v/scale).toFixed(dec);
+    if(/^-0(\.0*)?$/.test(s)) s = s.slice(1);   // no "-0"
+    return s;
+  };
+  return {fmt, suffix: e ? `  ×10${_supDigits(e)}` : ''};
 }
 
 // ---------- generic xy-plot axes helper ----------
@@ -268,34 +326,45 @@ function drawAxes(ctx, w, h, m, xmin, xmax, ymin, ymax, xlabel, ylabel, opts){
   opts = opts||{};
   const X = x => m.l + (x-xmin)/(xmax-xmin)*(w-m.l-m.r);
   const Y = y => h-m.b - (y-ymin)/(ymax-ymin)*(h-m.b-m.t);
+  // Remember the plotting box so plotLine can clip to it. A curve that runs off
+  // the top of its own axes used to keep going across the rest of the card.
+  ctx._plotRect = {x:m.l, y:m.t, w:w-m.l-m.r, h:h-m.b-m.t};
+
+  const xt = opts.exactTicks ? _equalTicks(xmin,xmax,opts.nx||5) : niceTicks(xmin,xmax,opts.nx||5);
+  const yt = opts.exactTicks ? _equalTicks(ymin,ymax,opts.ny||5) : niceTicks(ymin,ymax,opts.ny||5);
+  const xl = opts.xfmt ? {fmt:opts.xfmt, suffix:''} : _autoLabeler(xt);
+  const yl = opts.yfmt ? {fmt:opts.yfmt, suffix:''} : _autoLabeler(yt);
+
   ctx.save();
   ctx.font = '11px Helvetica, Arial, sans-serif';
-  // gridlines
   ctx.strokeStyle = '#e7e4dc'; ctx.lineWidth = 1;
-  const nx = opts.nx||5, ny = opts.ny||5;
   ctx.fillStyle = '#8a8d92';
-  for(let i=0;i<=nx;i++){
-    const xv = xmin + i*(xmax-xmin)/nx;
+  xt.forEach(xv=>{
     const px = X(xv);
     ctx.beginPath(); ctx.moveTo(px, m.t); ctx.lineTo(px, h-m.b); ctx.stroke();
-    ctx.textAlign='center'; ctx.fillText(opts.xfmt?opts.xfmt(xv):xv.toFixed(2), px, h-m.b+16);
-  }
-  for(let i=0;i<=ny;i++){
-    const yv = ymin + i*(ymax-ymin)/ny;
+    ctx.textAlign='center'; ctx.fillText(xl.fmt(xv), px, h-m.b+16);
+  });
+  yt.forEach(yv=>{
     const py = Y(yv);
     ctx.beginPath(); ctx.moveTo(m.l, py); ctx.lineTo(w-m.r, py); ctx.stroke();
-    ctx.textAlign='right'; ctx.fillText(opts.yfmt?opts.yfmt(yv):yv.toFixed(2), m.l-8, py+3);
-  }
+    ctx.textAlign='right'; ctx.fillText(yl.fmt(yv), m.l-8, py+3);
+  });
   ctx.strokeStyle = '#1c1d20'; ctx.lineWidth = 1.3;
   ctx.beginPath(); ctx.moveTo(m.l,m.t); ctx.lineTo(m.l,h-m.b); ctx.lineTo(w-m.r,h-m.b); ctx.stroke();
   ctx.fillStyle = '#1c1d20'; ctx.textAlign='center';
-  ctx.fillText(xlabel, m.l+(w-m.l-m.r)/2, h-6);
-  ctx.save(); ctx.translate(12, m.t+(h-m.b-m.t)/2); ctx.rotate(-Math.PI/2); ctx.fillText(ylabel,0,0); ctx.restore();
+  ctx.fillText(xlabel + xl.suffix, m.l+(w-m.l-m.r)/2, h-6);
+  ctx.save(); ctx.translate(12, m.t+(h-m.b-m.t)/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText(ylabel + yl.suffix, 0, 0); ctx.restore();
   ctx.restore();
   return {X,Y};
 }
 function plotLine(ctx, X, Y, pts, color, width, dash){
-  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=width||2; if(dash) ctx.setLineDash(dash);
+  ctx.save();
+  // clip to the axes box when there is one (drawAxes sets it; free-form
+  // diagrams that never call drawAxes are left alone)
+  const R = ctx._plotRect;
+  if(R){ ctx.beginPath(); ctx.rect(R.x-2, R.y-2, R.w+4, R.h+4); ctx.clip(); }
+  ctx.strokeStyle=color; ctx.lineWidth=width||2; if(dash) ctx.setLineDash(dash);
   ctx.beginPath();
   let started=false;
   pts.forEach(p=>{
@@ -311,6 +380,55 @@ function dotAt(ctx,X,Y,x,y,color,r){
 }
 function fmt(x,d){ if(!isFinite(x)) return '—'; d=d==null?3:d; return Number(x).toFixed(d); }
 function fmtSci(x,d){ if(!isFinite(x)) return '—'; d=d==null?3:d; return Number(x).toExponential(d).replace('e+','e'); }
+
+/* ---------- colorimetry ----------
+   Analytic fits to the CIE 1931 colour-matching functions (Wyman, Sloan &
+   Shirley, JCGT 2013), so a computed spectrum can be turned into the colour an
+   eye would actually see, instead of a hand-tuned rainbow ramp. Used for the
+   blackbody colour strip and the visible band. */
+function _pieceGauss(x, mu, s1, s2){
+  const t = (x-mu)/(x<mu ? s1 : s2);
+  return Math.exp(-0.5*t*t);
+}
+function cieBar(nm){
+  return [
+    1.056*_pieceGauss(nm,599.8,37.9,31.0) + 0.362*_pieceGauss(nm,442.0,16.0,26.7)
+      - 0.065*_pieceGauss(nm,501.1,20.4,26.2),
+    0.821*_pieceGauss(nm,568.8,46.9,40.5) + 0.286*_pieceGauss(nm,530.9,16.3,31.1),
+    1.217*_pieceGauss(nm,437.0,11.8,36.0) + 0.681*_pieceGauss(nm,459.0,26.0,13.8)
+  ];
+}
+// XYZ -> sRGB, desaturating rather than clipping when a colour falls outside
+// the monitor's gamut (which pure spectral colours always do).
+function xyzToRgb(X,Y,Z,opts){
+  opts = opts||{};
+  let r =  3.2406*X - 1.5372*Y - 0.4986*Z;
+  let g = -0.9689*X + 1.8758*Y + 0.0415*Z;
+  let b =  0.0557*X - 0.2040*Y + 1.0570*Z;
+  const mn = Math.min(r,g,b);
+  if(mn < 0){ r-=mn; g-=mn; b-=mn; }
+  const mx = Math.max(r,g,b,1e-12);
+  if(opts.normalize !== false){ r/=mx; g/=mx; b/=mx; }
+  const gam = c => { c=Math.max(0,Math.min(1,c)); return c<=0.0031308 ? 12.92*c : 1.055*Math.pow(c,1/2.4)-0.055; };
+  return [Math.round(255*gam(r)), Math.round(255*gam(g)), Math.round(255*gam(b))];
+}
+function wavelengthRGB(nm, opts){
+  const [x,y,z] = cieBar(nm);
+  return xyzToRgb(x,y,z,opts);
+}
+// colour of an arbitrary spectrum f(nm) -> spectral power
+function spectrumRGB(f, lo, hi, step){
+  lo=lo||360; hi=hi||780; step=step||4;
+  let X=0,Y=0,Z=0;
+  for(let nm=lo; nm<=hi; nm+=step){
+    const p=f(nm);
+    if(!isFinite(p) || p<=0) continue;
+    const [x,y,z]=cieBar(nm);
+    X+=p*x; Y+=p*y; Z+=p*z;
+  }
+  return xyzToRgb(X,Y,Z);
+}
+function rgbCss(c){ return `rgb(${c[0]},${c[1]},${c[2]})`; }
 
 function wavelengthToColor(nm){
   let r,g,b;

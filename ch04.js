@@ -57,46 +57,124 @@ function setupRutherford(){
     return pts;
   }
 
+  /* ---- the beam ----
+     One trajectory tells you what a hyperbola looks like. What Rutherford
+     actually saw is a statistical fact — nearly everything goes straight
+     through, and once in a great while something comes back — so the picture
+     is a beam, with impact parameters sampled the way a real foil samples
+     them (uniformly over area, i.e. probability ∝ b db). */
+  const NB = 34;                 // cached impact parameters
+  let cache = null, cacheKey = '';
+  const shots = [];              // the alphas currently in flight
+  let fired = 0, backscattered = 0, spawnAcc = 0;
+  let lastFrame = performance.now();
+
+  function ensureCache(D, bmaxD, ext, extX){
+    const key = `${D.toFixed(4)}|${bmaxD.toFixed(3)}|${ext.toFixed(3)}|${extX.toFixed(3)}`;
+    if(cache && cacheKey===key) return cache;
+    const bs=[], paths=[], win=[];
+    for(let i=0;i<NB;i++){
+      const bb = bmaxD*(i+0.5)/NB;
+      const pts = trajectory(D, bb);
+      // the part of the path that is actually on screen
+      let i0=0, i1=pts.length-1;
+      for(let k=0;k<pts.length;k++){
+        if(Math.abs(pts[k][0])<=extX && Math.abs(pts[k][1])<=ext*1.04){ i0=k; break; }
+      }
+      for(let k=pts.length-1;k>=0;k--){
+        if(Math.abs(pts[k][0])<=extX && Math.abs(pts[k][1])<=ext*1.04){ i1=k; break; }
+      }
+      bs.push(bb); paths.push(pts); win.push([i0, Math.max(i0+2,i1)]);
+    }
+    cache = {bs, paths, win, D, bmaxD, ext, extX};
+    cacheKey = key;
+    shots.length = 0; fired = 0; backscattered = 0;
+    // pre-fill with alphas already part-way across, so the beam is populated
+    // from the first frame instead of arriving as one clump
+    for(let k=0;k<24;k++){
+      const s = spawn(cache);
+      const [i0,i1] = cache.win[s.i];
+      s.t = i0 + Math.random()*(i1-i0);
+      shots.push(s);
+    }
+    return cache;
+  }
+  // probability ∝ b, because equal areas of foil hold equal numbers of nuclei
+  function sampleB(bs){
+    let tot=0; for(let i=0;i<bs.length;i++) tot+=bs[i];
+    let r=Math.random()*tot;
+    for(let i=0;i<bs.length;i++){ r-=bs[i]; if(r<=0) return i; }
+    return bs.length-1;
+  }
+  function spawn(c){
+    const i = sampleB(c.bs);
+    const theta = 2*Math.atan(c.D/(2*c.bs[i]));
+    fired++;
+    if(theta > Math.PI/2) backscattered++;
+    return {i, sign: Math.random()<0.5?1:-1, t: c.win[i][0], theta};
+  }
+
   function drawTraj(){
     const {ctx,w,h}=fitCanvas(cTraj);
     const p = physics();
     ctx.clearRect(0,0,w,h);
-    const pts = trajectory(p.D, p.b);
     // Frame the interaction region, not the long straight run-in — otherwise the
     // hyperbola collapses into a corner of the plot.
-    const ext = Math.max(2.6*p.b, 2.4*p.D, 6);
-    const cx=w*0.44, cy=h*0.56, S=Math.min(w*0.40, h*0.40)/ext;
+    const bmaxD = Math.max(p.b*1.15, 4*p.D, 8);
+    const ext = bmaxD*1.08;
+    // The vertical extent has to cover the whole beam width, so it sets the
+    // scale; the horizontal window is then whatever that scale gives, which is
+    // wider and shows the run-in and the run-out rather than wasting the canvas.
+    const cx=w*0.5, cy=h*0.5, S=(h-26)/(2*ext);
+    const extX = (w*0.5 - 8)/S;
     const X=x=>cx+x*S, Y=y=>cy-y*S;
+    const c = ensureCache(p.D, bmaxD, ext, extX);
 
-    // the atom's own scale, to make the point about how empty it is
-    ctx.strokeStyle='#eee9de'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
-    [0.25,0.5,0.75,1].forEach(f=>{ ctx.beginPath(); ctx.arc(cx,cy,ext*S*f,0,7); ctx.stroke(); });
-    ctx.setLineDash([]);
+    // the family of paths this beam can take, faintly
+    ctx.strokeStyle='rgba(164,52,44,0.13)'; ctx.lineWidth=1;
+    for(let i=0;i<NB;i+=3){
+      [1,-1].forEach(sg=>{
+        const pts=c.paths[i], [i0,i1]=c.win[i];
+        ctx.beginPath();
+        for(let k=i0;k<=i1;k+=4){
+          const px=X(pts[k][0]), py=Y(sg*pts[k][1]);
+          k===i0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+        }
+        ctx.stroke();
+      });
+    }
 
-    // incoming asymptote
-    ctx.strokeStyle='#d8d3c6'; ctx.lineWidth=1.2; ctx.setLineDash([5,3]);
-    ctx.beginPath(); ctx.moveTo(X(-ext),Y(p.b)); ctx.lineTo(X(ext),Y(p.b)); ctx.stroke();
-    ctx.setLineDash([]);
+    // the alphas in flight
+    shots.forEach(s=>{
+      const pts=c.paths[s.i], k=Math.min(Math.floor(s.t), pts.length-1);
+      const big = s.theta > Math.PI/2;
+      // a short trail, which also shows the speed-up as it falls away again
+      ctx.strokeStyle = big ? 'rgba(164,52,44,0.85)' : 'rgba(31,111,120,0.5)';
+      ctx.lineWidth = big ? 2.2 : 1.4;
+      ctx.beginPath();
+      const k0=Math.max(c.win[s.i][0], k-260);
+      for(let q=k0;q<=k;q+=3){
+        const px=X(pts[q][0]), py=Y(s.sign*pts[q][1]);
+        q===k0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+      ctx.fillStyle = big ? '#a4342c' : '#1f6f78';
+      ctx.beginPath(); ctx.arc(X(pts[k][0]), Y(s.sign*pts[k][1]), big?4:3, 0, 7); ctx.fill();
+    });
 
-    // impact parameter
-    ctx.strokeStyle='#1f6f78'; ctx.lineWidth=1.6;
-    ctx.beginPath(); ctx.moveTo(X(-ext*0.72),Y(0)); ctx.lineTo(X(-ext*0.72),Y(p.b)); ctx.stroke();
-    ctx.fillStyle='#1f6f78'; ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='right';
-    ctx.fillText(`b = ${fmt(p.b,1)} fm`, X(-ext*0.72)-8, (Y(0)+Y(p.b))/2 + (p.b>0?0:-8));
-
-    // the trajectory
-    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2.4;
+    // the highlighted trajectory: the one the sliders describe
+    const pts = trajectory(p.D, p.b);
+    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2.6;
     ctx.beginPath();
     let drawn=false, lastIn=pts.length-1;
     pts.forEach(([x,y],i)=>{
-      const px=X(x), py=Y(y);
-      if(Math.abs(x)<=ext*1.02 && Math.abs(y)<=ext*1.02){
+      if(Math.abs(x)<=extX && Math.abs(y)<=ext*1.02){
+        const px=X(x), py=Y(y);
         if(!drawn){ ctx.moveTo(px,py); drawn=true; } else ctx.lineTo(px,py);
         lastIn=i;
       }
     });
     ctx.stroke();
-    // arrowhead where the path leaves the frame
     const n=lastIn+1;
     if(n>6){
       const [x1,y1]=pts[n-1], [x0,y0]=pts[n-6];
@@ -108,6 +186,20 @@ function setupRutherford(){
       ctx.closePath(); ctx.fill();
     }
 
+    // impact parameter of the highlighted path
+    const bx = -Math.min(extX*0.82, ext*2.2);
+    ctx.strokeStyle='#1f6f78'; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(X(bx),Y(0)); ctx.lineTo(X(bx),Y(p.b)); ctx.stroke();
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+    ctx.lineWidth=3; ctx.strokeStyle='rgba(255,253,248,0.92)';
+    ctx.strokeText(`b = ${fmt(p.b,1)} fm`, X(bx)+6, Y(0)+15);
+    ctx.fillStyle='#1f6f78';
+    ctx.fillText(`b = ${fmt(p.b,1)} fm`, X(bx)+6, Y(0)+15);
+    // the beam axis, so it is obvious which way the alphas are coming from
+    ctx.strokeStyle='rgba(28,29,32,0.18)'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(X(-extX),Y(0)); ctx.lineTo(X(extX),Y(0)); ctx.stroke();
+    ctx.setLineDash([]);
+
     // the nucleus, drawn to scale against the trajectory
     const rNuc = 1.2*Math.pow(197,1/3);          // gold, fm
     ctx.fillStyle='#1c1d20';
@@ -115,10 +207,42 @@ function setupRutherford(){
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63'; ctx.textAlign='center';
     ctx.fillText('nucleus', cx, cy+Math.max(3.2,rNuc*S)+15);
 
+    // legends sit on top of moving trajectories, so give them a paper backing
+    ctx.fillStyle='rgba(255,253,248,0.82)';
+    ctx.fillRect(4, 6, 270, 38);
+    if(fired>20) ctx.fillRect(w-250, 6, 246, 38);
     ctx.font='12px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#1c1d20';
-    ctx.fillText(`α particle, ${fmt(p.KE,1)} MeV`, 12, 20);
+    ctx.fillText(`α particles, ${fmt(p.KE,1)} MeV`, 12, 20);
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#a4342c';
-    ctx.fillText(`scattered through ${fmt(p.theta*180/Math.PI,1)}°`, 12, 37);
+    ctx.fillText(`highlighted path scatters through ${fmt(p.theta*180/Math.PI,1)}°`, 12, 37);
+    if(fired>20){
+      ctx.fillStyle='#5a5d63'; ctx.textAlign='right';
+      ctx.fillText(`${backscattered} of ${fired} came back past 90°`, w-12, 20);
+      ctx.fillStyle='#8a8d92';
+      ctx.fillText(`within b < ${fmt(bmaxD,0)} fm of dead centre`, w-12, 36);
+    }
+  }
+
+  function loop(now){
+    const dt=Math.min(0.05,(now-lastFrame)/1000); lastFrame=now;
+    const active=document.getElementById('ch4') && document.getElementById('ch4').classList.contains('active');
+    if(active && !prefersReducedMotion() && cache){
+      const c=cache;
+      // release alphas at a steady rate rather than refilling in one go, so the
+      // beam is a stream instead of a pulse
+      spawnAcc += dt;
+      while(spawnAcc > 0.1 && shots.length < 30){ shots.push(spawn(c)); spawnAcc -= 0.1; }
+      if(spawnAcc > 1) spawnAcc = 1;
+      for(let s=shots.length-1;s>=0;s--){
+        const sh=shots[s], [i0,i1]=c.win[sh.i];
+        // the cached points are equally spaced in time, so advancing the index
+        // at a constant rate is the real motion: slow near the nucleus, fast away
+        sh.t += dt*(i1-i0)/2.6;
+        if(sh.t >= i1) shots.splice(s,1);
+      }
+      drawTraj();
+    }
+    requestAnimationFrame(loop);
   }
 
   function drawDist(){
@@ -168,10 +292,26 @@ function setupRutherford(){
         ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
       }
     }
+    // What the plum pudding predicted, drawn rather than asserted. With the
+    // positive charge smeared over the whole atom there is no concentrated
+    // field to turn an alpha sharply; you get many tiny deflections that random
+    // walk to a roughly Gaussian spread about a degree wide.
+    const thBar = 1.0;                       // degrees, the multiple-scattering width
+    const norm = 1/Math.pow(Math.sin(1*Math.PI/360),4);   // tie the two curves together at 1°
+    ctx.strokeStyle='#5b3f8a'; ctx.lineWidth=2; ctx.setLineDash([5,3]); ctx.beginPath();
+    let st2=false;
+    for(let a=1;a<=180;a+=0.5){
+      const v = norm*Math.exp(-(a*a - 1)/(thBar*thBar));
+      const py=Y(v);
+      if(py<m.t||py>h-m.b){ st2=false; continue; }
+      if(!st2){ ctx.moveTo(X(a),py); st2=true; } else ctx.lineTo(X(a),py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='right'; ctx.fillStyle='#a4342c';
-    ctx.fillText('N(θ) ∝ 1/sin⁴(θ/2)', w-m.r-8, m.t+14);
-    ctx.fillStyle='#5a5d63';
-    ctx.fillText('a Thomson "plum pudding" atom predicts nothing beyond ~1°', w-m.r-8, m.t+30);
+    ctx.fillText('N(θ) ∝ 1/sin⁴(θ/2) — a point nucleus', w-m.r-8, m.t+14);
+    ctx.fillStyle='#5b3f8a';
+    ctx.fillText('a Thomson "plum pudding" atom — off the bottom of the chart by 4°', w-m.r-8, m.t+30);
   }
 
   function draw(){
@@ -195,6 +335,7 @@ function setupRutherford(){
   zEl.addEventListener('change',draw);
   registerCanvas('rs_canvas',draw);
   registerCanvas('rs_canvas_dist',draw);
+  requestAnimationFrame(loop);
 }
 
 /* =====================================================================

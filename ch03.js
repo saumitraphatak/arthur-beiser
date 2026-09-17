@@ -152,7 +152,7 @@ function setupPhaseGroup(){
   const runEl=document.getElementById('pg_run');
   const readout=document.getElementById('pg_readout');
   let dims = fitCanvas(cWave);
-  let t = 0, lastFrame = performance.now();
+  let t = 0, lastFrame = performance.now(), crestN = null;
 
   function refit(){ dims = fitCanvas(cWave); drawWave(); }
   registerCanvas('pg_canvas', refit);
@@ -163,44 +163,73 @@ function setupPhaseGroup(){
     ctx.clearRect(0,0,w,h);
     // de Broglie: group velocity is the particle speed, phase velocity is c^2/v.
     // Drawn in arbitrary display units with the SAME ratio vp/vg = 1/beta^2.
-    const vg = 42*beta;            // px per second on screen
-    const vp = vg/(beta*beta);
-    const k0 = 0.085, dk = 0.0125; // carrier and modulation wave numbers (px^-1)
-    const midY = h*0.46, amp = h*0.26;
+    const vg = 120*beta;                       // px per second on screen
+    const vp = Math.min(900, vg/(beta*beta));
+    const k0 = 0.085, lam = 2*Math.PI/k0;      // carrier wavenumber, wavelength
+    const sigma = Math.max(46, w*0.10);        // half-width of the packet
+    const midY = h*0.54, amp = h*0.23;
+
+    // A genuinely localised packet, not an endless beat: one Gaussian envelope
+    // that crosses the screen and wraps.
+    const period = w + 4*sigma;
+    const xc = -2*sigma + (((vg*t) % period) + period) % period;
+    const env = x => Math.exp(-Math.pow((x-xc)/sigma, 2));
+
+    // the single infinite de Broglie wave, for contrast: it localises nothing
+    ctx.strokeStyle='rgba(138,141,146,0.35)'; ctx.lineWidth=1.2;
+    ctx.beginPath();
+    for(let x=0;x<=w;x++){
+      const y = midY - amp*0.30*Math.cos(k0*(x - vp*t));
+      x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
 
     // envelope
-    ctx.strokeStyle='rgba(31,111,120,0.55)'; ctx.lineWidth=1.6; ctx.setLineDash([5,3]);
+    ctx.strokeStyle='rgba(31,111,120,0.7)'; ctx.lineWidth=1.6; ctx.setLineDash([5,3]);
     for(const sgn of [1,-1]){
       ctx.beginPath();
       for(let x=0;x<=w;x++){
-        const y = midY - sgn*amp*Math.abs(Math.cos(dk*(x - vg*t)));
-        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        const y = midY - sgn*amp*env(x);
+        x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
       }
       ctx.stroke();
     }
     ctx.setLineDash([]);
-    // the wave itself
-    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2;
+    // the packet itself
+    ctx.strokeStyle='#a4342c'; ctx.lineWidth=2.2;
     ctx.beginPath();
     for(let x=0;x<=w;x++){
-      const y = midY - amp*Math.cos(dk*(x - vg*t))*Math.cos(k0*(x - vp*t));
-      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      const y = midY - amp*env(x)*Math.cos(k0*(x - vp*t));
+      x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
     }
     ctx.stroke();
 
-    // marker riding the envelope (group) and one riding a crest (phase)
-    const envX = ((vg*t) % (Math.PI/dk) + Math.PI/dk) % (Math.PI/dk);
+    // a marker riding the envelope: this is what moves at the particle's speed
     ctx.fillStyle='#1f6f78';
-    ctx.beginPath(); ctx.arc(envX, midY-amp, 6, 0, 7); ctx.fill();
-    const crestX = ((vp*t) % (2*Math.PI/k0) + 2*Math.PI/k0) % (2*Math.PI/k0);
-    ctx.fillStyle='#1c1d20';
-    ctx.beginPath(); ctx.arc(crestX, midY, 4.5, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(xc, midY-amp, 6, 0, 7); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+
+    // and one riding a single crest. Crests sit at x = vp*t + n*lam; follow one
+    // n until it has run out of the front of the packet, then pick up another
+    // at the back — which is exactly what the crests are seen to do.
+    if(crestN===null) crestN = Math.round((xc - vp*t)/lam - 1.3);
+    let xcrest = vp*t + crestN*lam;
+    if(xcrest - xc > 1.5*sigma){
+      crestN = Math.round((xc - vp*t)/lam - 1.3);
+      xcrest = vp*t + crestN*lam;
+    }
+    if(Math.abs(xcrest-xc) < 2.2*sigma && xcrest>=0 && xcrest<=w){
+      ctx.fillStyle='#1c1d20';
+      ctx.beginPath(); ctx.arc(xcrest, midY - amp*env(xcrest), 4.5, 0, 7); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=1.4; ctx.stroke();
+    }
 
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
-    ctx.fillStyle='#1f6f78'; ctx.fillText('envelope — travels at the group velocity = the particle speed', 12, 16);
+    ctx.fillStyle='#1f6f78'; ctx.fillText('the packet — travels at the group velocity = the particle speed', 12, 16);
     ctx.fillStyle='#1c1d20'; ctx.fillText('a single crest — travels at the phase velocity, faster than light', 12, 32);
-    ctx.fillStyle='#8a8d92'; ctx.textAlign='right';
-    ctx.fillText('crests slide forward through the packet', w-12, h-10);
+    ctx.fillStyle='#8a8d92'; ctx.fillText('one endless de Broglie wave — everywhere at once, so it is nowhere', 12, 48);
+    ctx.textAlign='right';
+    ctx.fillText('crests are born at the back and die off the front', w-12, h-10);
   }
 
   function drawPlot(){
@@ -246,7 +275,7 @@ function setupPhaseGroup(){
     if(visible && runEl.checked && !prefersReducedMotion()){ t += dt; drawWave(); }
     requestAnimationFrame(loop);
   }
-  betaEl.addEventListener('input',draw);
+  betaEl.addEventListener('input',()=>{ crestN=null; draw(); });
   runEl.addEventListener('change',()=>{ lastFrame = performance.now(); });
   registerCanvas('pg_canvas_plot',drawPlot);
   requestAnimationFrame(loop);

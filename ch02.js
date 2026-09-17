@@ -16,40 +16,137 @@ function setupBlackbody(){
     return (8*Math.PI*H_J*C/Math.pow(lam_m,5))/(Math.exp(x)-1);
   }
   function rjLambda(lam_m,T){ return 8*Math.PI*K_B*T/Math.pow(lam_m,4); }
+  // the colour an eye sees, integrated from this very spectrum through the CIE
+  // colour-matching functions — not a look-up
+  function bbColor(T){ return spectrumRGB(nm=>planckLambda(nm*1e-9,T)); }
+
+  // a few familiar radiators to anchor the temperature scale
+  const LANDMARKS=[[1900,'candle'],[2800,'bulb'],[5800,'Sun'],[9940,'Rigel']];
+
   function draw(){
     const {ctx,w,h}=fitCanvas(canvas);
     const T=parseFloat(TEl.value); TVal.textContent=T.toFixed(0);
     const lamPeak_nm = (WIEN_B/T)*1e9;
     const xmax = Math.max(2500, lamPeak_nm*3.4);
     ctx.clearRect(0,0,w,h);
-    const m={l:56,r:16,t:20,b:34};
+
+    /* ---- colour-vs-temperature strip across the top ---- */
+    // Its axis is temperature, not wavelength, so it deliberately does not line
+    // up with the plot below.
+    const Tlo=parseFloat(TEl.min), Thi=parseFloat(TEl.max);
+    const sx0=104, sx1=w-16, stripY=8, stripH=17;
+    for(let px=sx0; px<=sx1; px++){
+      const Tp = Tlo + (Thi-Tlo)*(px-sx0)/(sx1-sx0);
+      ctx.fillStyle = rgbCss(bbColor(Tp));
+      ctx.fillRect(px, stripY, 1, stripH);
+    }
+    ctx.strokeStyle='#d8d3c6'; ctx.lineWidth=1; ctx.strokeRect(sx0,stripY,sx1-sx0,stripH);
+    ctx.font='10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='right';
+    ctx.fillText('colour to the eye', sx0-8, stripY+12);
+    const Tx = Tp => sx0 + (sx1-sx0)*(Tp-Tlo)/(Thi-Tlo);
+    ctx.textAlign='center';
+    LANDMARKS.forEach(([Tl,lab])=>{
+      if(Tl<Tlo||Tl>Thi) return;
+      ctx.strokeStyle='rgba(28,29,32,0.45)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(Tx(Tl),stripY+stripH); ctx.lineTo(Tx(Tl),stripY+stripH+3); ctx.stroke();
+      ctx.fillStyle='#8a8d92'; ctx.fillText(lab, Tx(Tl), stripY+stripH+13);
+    });
+    // current temperature: a notched marker drawn through the strip itself
+    ctx.strokeStyle='#fffdf8'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(Tx(T),stripY); ctx.lineTo(Tx(T),stripY+stripH); ctx.stroke();
+    ctx.strokeStyle='#1c1d20'; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(Tx(T),stripY-2); ctx.lineTo(Tx(T),stripY+stripH+2); ctx.stroke();
+
+    const m={l:56,r:16,t:52,b:34};
     const peakVal = planckLambda(lamPeak_nm*1e-9, T);
     const ymax = peakVal*1.25;
-    const {X,Y}=drawAxes(ctx,w,h,m,0,xmax,0,ymax,'λ (nm)','u(λ) (rel. units)',{nx:5,ny:4,yfmt:v=>fmtSci(v,1)});
+    const {X,Y}=drawAxes(ctx,w,h,m,0,xmax,0,ymax,'λ (nm)','u(λ) (rel. units)',{nx:5,ny:4});
 
-    // visible band shading
+    /* ---- the visible band, in its actual colours ---- */
+    // Hue at full saturation, but faded by the eye's own luminous efficiency
+    // ȳ(λ), so the band dies away at the violet and red ends instead of turning
+    // muddy grey the way an unnormalised spectral colour does.
     if(380<xmax){
-      ctx.fillStyle='rgba(120,180,255,0.10)';
-      ctx.fillRect(X(Math.min(380,xmax)), m.t, X(Math.min(750,xmax))-X(Math.min(380,xmax)), (h-m.b)-m.t);
+      const vx0=X(380), vx1=X(Math.min(750,xmax));
+      for(let px=vx0; px<=vx1; px++){
+        const nm = 380 + (750-380)*(px-vx0)/(vx1-vx0);
+        const c = wavelengthRGB(nm);
+        const lum = Math.pow(Math.min(1,cieBar(nm)[1]), 0.55);   // lift the dim ends a little
+        ctx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${0.44*lum})`;
+        ctx.fillRect(px, m.t, 1, (h-m.b)-m.t);
+      }
+      ctx.save();
+      ctx.strokeStyle='rgba(28,29,32,0.16)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      [vx0,vx1].forEach(px=>{ ctx.beginPath(); ctx.moveTo(px,m.t); ctx.lineTo(px,h-m.b); ctx.stroke(); });
+      ctx.restore();
+      ctx.font='10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='center';
+      ctx.fillText('visible', (vx0+vx1)/2, h-m.b-6);
     }
-    const pts=[]; for(let l=5;l<=xmax;l+=xmax/300){ pts.push({x:l,y:planckLambda(l*1e-9,T)}); }
-    plotLine(ctx,X,Y,pts,'#a4342c',2.4);
+
+    /* ---- cooler blackbodies, for the shape of Wien's law ---- */
+    // Only temperatures below the current one: they always nest underneath, so
+    // nothing has to be clipped, and dragging T upward leaves a visible trail.
+    const ghosts=[];
+    for(let Tg=1000; Tg<T-200; Tg+=(T>6000?1500:1000)) ghosts.push(Tg);
+    ghosts.slice(-5).forEach(Tg=>{
+      const gp=[]; for(let l=5;l<=xmax;l+=xmax/220) gp.push({x:l,y:planckLambda(l*1e-9,Tg)});
+      const c=bbColor(Tg);
+      plotLine(ctx,X,Y,gp,`rgba(${Math.round(c[0]*0.75)},${Math.round(c[1]*0.6)},${Math.round(c[2]*0.55)},0.85)`,1.5);
+      const lp=(WIEN_B/Tg)*1e9, ly=planckLambda(lp*1e-9,Tg);
+      if(Y(ly) > m.t+10 && X(lp) < w-m.r-30){
+        ctx.font='9px Helvetica,Arial,sans-serif'; ctx.textAlign='center';
+        // haloed, so it stays readable where it crosses the colour band
+        ctx.lineWidth=3; ctx.strokeStyle='rgba(255,253,248,0.92)';
+        ctx.strokeText(`${fmt(Tg,0)} K`, X(lp), Y(ly)-4);
+        ctx.fillStyle='#6b6152';
+        ctx.fillText(`${fmt(Tg,0)} K`, X(lp), Y(ly)-4);
+      }
+    });
+
+    /* ---- the locus of the peaks: λ_peak ∝ 1/T, u_peak ∝ T⁵ ---- */
+    const locus=[];
+    for(let Tg=Tlo; Tg<=Thi; Tg+=50){
+      const lp=(WIEN_B/Tg)*1e9;
+      if(lp<=xmax) locus.push({x:lp, y:planckLambda(lp*1e-9,Tg)});
+    }
+    plotLine(ctx,X,Y,locus,'rgba(138,109,31,0.85)',1.5,[4,3]);
+
     if(rjEl.checked){
-      const rjpts=[]; for(let l=5;l<=xmax;l+=xmax/300){ rjpts.push({x:l,y:Math.min(ymax*1.4,rjLambda(l*1e-9,T))}); }
+      const rjpts=[]; for(let l=5;l<=xmax;l+=xmax/300){ rjpts.push({x:l,y:rjLambda(l*1e-9,T)}); }
       plotLine(ctx,X,Y,rjpts,'#8a8d92',2,[5,3]);
     }
-    plotLine(ctx,X,Y,[{x:lamPeak_nm,y:0},{x:lamPeak_nm,y:ymax}],'#1f6f78',1.6,[3,3]);
-    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1f6f78'; ctx.textAlign='left';
-    ctx.fillText(`λ_peak = ${fmt(lamPeak_nm,0)} nm`, X(lamPeak_nm)+6, m.t+14);
-    ctx.fillStyle='#a4342c'; ctx.fillText('Planck', m.l+8, m.t+14);
-    if(rjEl.checked){ ctx.fillStyle='#8a8d92'; ctx.fillText('Rayleigh–Jeans (classical)', m.l+8, m.t+30); }
+
+    const pts=[]; for(let l=5;l<=xmax;l+=xmax/300){ pts.push({x:l,y:planckLambda(l*1e-9,T)}); }
+    plotLine(ctx,X,Y,pts,'#a4342c',2.6);
+
+    plotLine(ctx,X,Y,[{x:lamPeak_nm,y:0},{x:lamPeak_nm,y:peakVal}],'#1f6f78',1.6,[3,3]);
+    dotAt(ctx,X,Y,lamPeak_nm,peakVal,'#1f6f78',4.5);
+
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+    ctx.fillStyle='#1f6f78';
+    ctx.fillText(`λ_peak = ${fmt(lamPeak_nm,0)} nm`, Math.min(X(lamPeak_nm)+8, w-m.r-120), m.t+14);
+    ctx.fillStyle='#a4342c'; ctx.fillText(`Planck, ${fmt(T,0)} K`, m.l+8, m.t+14);
+    ctx.fillStyle='#8a6d1f'; ctx.fillText('locus of the peaks', m.l+8, m.t+30);
+    if(rjEl.checked){ ctx.fillStyle='#8a8d92'; ctx.fillText('Rayleigh–Jeans (classical)', m.l+8, m.t+46); }
 
     let band='infrared';
     if(lamPeak_nm<380) band='ultraviolet'; else if(lamPeak_nm<=750) band='visible';
+    // fraction of the radiated energy that actually falls in the visible
+    let vis=0, tot=0;
+    for(let l=10;l<=20000;l+=10){
+      const u=planckLambda(l*1e-9,T)*10;
+      tot+=u; if(l>=380&&l<=750) vis+=u;
+    }
+    const c=bbColor(T);
     readout.innerHTML = `
       <div>T <b>${fmt(T,0)} K</b></div>
-      <div>&lambda;<sub>peak</sub> (Wien) <b>${fmt(lamPeak_nm,0)} nm</b></div>
-      <div>peak lies in the <b>${band}</b></div>`;
+      <div>&lambda;<sub>peak</sub> (Wien) <b>${fmt(lamPeak_nm,0)} nm</b> — in the <b>${band}</b></div>
+      <div>colour to the eye
+        <b style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;
+           border:1px solid rgba(0,0,0,.2);background:rgb(${c[0]},${c[1]},${c[2]})"></b>
+        rgb(${c[0]}, ${c[1]}, ${c[2]})</div>
+      <div>energy landing in the visible <b>${fmt(vis/tot*100,1)}%</b></div>
+      <div>total radiated power &prop; T&#8308; — <b>${fmt(Math.pow(T/5800,4),2)}&times;</b> the Sun's per unit area</div>`;
   }
   TEl.addEventListener('input',draw); rjEl.addEventListener('change',draw);
   registerCanvas('bb_canvas',draw);

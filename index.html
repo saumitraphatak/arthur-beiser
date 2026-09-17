@@ -161,6 +161,7 @@
     border-radius:10px; padding:13px 16px; margin-top:14px; display:grid;
     grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:9px 20px; color:var(--sub);
   }
+  .readout:empty{ display:none; }
   .readout div b{ color:var(--accent2); font-variant-numeric:tabular-nums; }
   .note{ font-family:var(--sans); font-size:.8rem; color:var(--sub); margin-top:11px;
     border-top:1px dashed var(--line); padding-top:9px;}
@@ -562,7 +563,7 @@
           <input type="range" id="bb_T" min="500" max="10000" step="50" value="5500"></div>
         <div class="ctrl"><label><input type="checkbox" id="bb_rj" checked style="width:auto; margin-right:6px;">show Rayleigh&ndash;Jeans overlay</label></div>
       </div>
-      <canvas id="bb_canvas" height="300"></canvas>
+      <canvas id="bb_canvas" height="360"></canvas>
       <div class="readout" id="bb_readout"></div>
 
       <div class="explain">
@@ -1093,7 +1094,7 @@
             <option value="13">aluminium (Z = 13)</option>
           </select></div>
       </div>
-      <canvas id="rs_canvas" height="300"></canvas>
+      <canvas id="rs_canvas" height="380"></canvas>
       <canvas id="rs_canvas_dist" height="250" style="margin-top:12px;"></canvas>
       <div class="readout" id="rs_readout"></div>
 
@@ -2165,8 +2166,15 @@
           </select></div>
         <div class="ctrl"><label>Temperature (K) <span class="val" id="mw_t_val">300</span></label>
           <input type="range" id="mw_t" min="50" max="2000" step="10" value="300"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="mw_reset">&#8635; Start them all at the same speed</button></div>
       </div>
-      <canvas id="mw_canvas" height="300"></canvas>
+      <div class="rowflex">
+        <div class="colgrow" style="max-width:290px; min-width:230px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <canvas id="mw_box" height="300"></canvas>
+          <p style="font-size:.68rem; color:var(--sub); text-align:center; margin:0; font-family:var(--sans);">a three-dimensional gas, seen flat &mdash; paler dots are further away</p>
+        </div>
+        <div class="colgrow" style="min-width:380px;"><canvas id="mw_canvas" height="300"></canvas></div>
+      </div>
       <div class="readout" id="mw_readout"></div>
 
       <div class="explain">
