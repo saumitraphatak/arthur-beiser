@@ -94,6 +94,54 @@
     text-decoration-color:var(--line2); display:none;
   }
   #reset-progress:hover{ color:var(--accent); }
+  #module-search{
+    width:100%; margin:0 0 10px; padding:7px 10px; border:1px solid var(--line);
+    border-radius:8px; background:#fff; font-family:var(--sans); font-size:.78rem;
+    color:var(--ink); -webkit-appearance:none;
+  }
+  #module-search:focus{ outline:none; border-color:var(--accent2); box-shadow:0 0 0 3px rgba(31,111,120,.10); }
+  #module-index .mi-ch{ font-size:.6rem; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+    color:var(--accent2); opacity:.75; flex:none; }
+  #module-index .mi-none{ padding:8px 11px; font-family:var(--sans); font-size:.76rem; color:var(--sub); }
+  #sheet-open{
+    margin-top:14px; width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
+    background:#fff; font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub);
+    cursor:pointer; letter-spacing:.2px;
+  }
+  #sheet-open:hover{ border-color:var(--accent2); color:var(--accent2); }
+
+  /* ---------- formula sheet ---------- */
+  #sheet-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(20,22,26,.42);
+    display:flex; align-items:flex-start; justify-content:center; padding:38px 18px;
+  }
+  #sheet-overlay[hidden]{ display:none; }
+  #sheet-panel{
+    background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
+    width:min(880px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #sheet-head{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:16px 20px; border-bottom:1px solid var(--line); flex:none;
+  }
+  #sheet-head h3{ margin:0; font-size:1.05rem; color:var(--ink); }
+  #sheet-close{ border:none; background:none; font-size:1.5rem; line-height:1; color:var(--sub); cursor:pointer; padding:0 4px; }
+  #sheet-close:hover{ color:var(--accent); }
+  #sheet-body{ overflow:auto; padding:6px 20px 22px; }
+  #sheet-body h4{
+    font-family:var(--sans); font-size:.64rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:var(--accent); margin:20px 0 8px;
+  }
+  .sheet-row{
+    display:block; width:100%; text-align:left; border:none; background:none; cursor:pointer;
+    padding:8px 10px; border-radius:9px; border-left:2px solid transparent;
+  }
+  .sheet-row:hover{ background:var(--code); border-left-color:var(--accent2); }
+  .sheet-row .sr-name{ font-family:var(--sans); font-size:.72rem; color:var(--sub); display:block; margin-bottom:3px; }
+  .sheet-row .sr-eq{
+    font-family:'Cambria Math','Georgia',serif; font-style:italic; font-size:.92rem; color:var(--ink);
+    display:block; overflow-x:auto;
+  }
   main{ min-width:0; padding:30px 0 90px; max-width:900px; }
 
   /* ---------- chapter head ---------- */
@@ -121,8 +169,14 @@
     font-family:var(--sans); font-size:.66rem; font-weight:700; color:var(--accent2);
     background:#e9f2f2; padding:3px 9px; border-radius:6px; letter-spacing:.3px; white-space:nowrap;
   }
+  .card h2 .card-link{
+    margin-left:auto; font-family:var(--sans); font-size:.66rem; font-weight:600;
+    letter-spacing:.2px; padding:4px 9px; border-radius:999px; border:1px solid transparent;
+    background:none; color:var(--sub); cursor:pointer; transition:.14s; white-space:nowrap;
+  }
+  .card h2 .card-link:hover{ border-color:var(--line); color:var(--accent2); background:#fff; }
   .card h2 .prog-toggle{
-    margin-left:auto; font-family:var(--sans); font-size:.66rem; font-weight:700;
+    margin-left:8px; font-family:var(--sans); font-size:.66rem; font-weight:700;
     letter-spacing:.2px; padding:4px 11px; border-radius:999px; border:1px solid var(--line);
     background:#fff; color:var(--sub); cursor:pointer; transition:.14s; white-space:nowrap;
   }
@@ -252,11 +306,24 @@
 <div class="shell">
   <aside class="sidebar">
     <div class="sidebar-head">
-      <h4>In this chapter</h4>
+      <h4 id="sidebar-title">In this chapter</h4>
       <button type="button" id="reset-progress" title="clear all your understood-marks, on this device only">reset progress</button>
     </div>
+    <input type="search" id="module-search" placeholder="Search all 91 modules…" autocomplete="off" spellcheck="false">
     <nav id="module-index"></nav>
+    <button type="button" id="sheet-open">every equation in the book</button>
   </aside>
+
+  <!-- the formula sheet, gathered from the cards themselves so it cannot drift -->
+  <div id="sheet-overlay" hidden>
+    <div id="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div id="sheet-head">
+        <h3 id="sheet-title">Every equation in the book</h3>
+        <button type="button" id="sheet-close" aria-label="close">&times;</button>
+      </div>
+      <div id="sheet-body"></div>
+    </div>
+  </div>
 
 <main>
 

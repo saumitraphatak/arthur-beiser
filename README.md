@@ -8,6 +8,16 @@ Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.s
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
+Three things make ninety-one modules navigable:
+
+- **Search** in the sidebar, across every module's title, equation and prose at once, from
+  whichever chapter you happen to be in. `/` focuses it, Enter jumps to the first hit.
+- **Every equation in the book** on one page, gathered from the cards themselves at load, so it
+  cannot drift out of date. Click any equation to land on the module it came from.
+- A **link** button on each module that copies a URL carrying that module's current control
+  settings, so a particular configuration can be shared or bookmarked and comes back exactly.
+  The hash looks like `#ch5|ch5-m4|tn_E=3.5&tn_U=10&tn_L=1.23`.
+
 Every module also has a **mark understood** toggle in its top-right corner. Checking it off is
 saved to `localStorage` — nothing leaves the browser — and shows up three ways: a running
 `n/total` on that chapter's pill in the top nav, a checkmark in the chapter's sidebar index, and

@@ -119,6 +119,24 @@ function addProgressToggles(){
     const h2 = card.querySelector('h2');
     if(!h2 || h2.querySelector('.prog-toggle')) return;
     card.classList.toggle('done', !!PROGRESS[card.id]);
+    // a link that reopens this module with the controls exactly as they are now
+    const link = document.createElement('button');
+    link.type = 'button';
+    link.className = 'card-link';
+    link.title = 'copy a link to this module with its current settings';
+    link.textContent = 'link';
+    link.addEventListener('click', ()=>{
+      const url = linkForCard(card);
+      const done = ()=>{ link.textContent='copied'; setTimeout(()=>{ link.textContent='link'; }, 1400); };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(done, ()=>{ location.hash=url.split('#')[1]; done(); });
+      } else {
+        location.hash = url.split('#')[1];
+        done();
+      }
+    });
+    h2.appendChild(link);
+
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'prog-toggle' + (PROGRESS[card.id] ? ' on' : '');
@@ -163,6 +181,200 @@ function refreshChapterProgress(){
     const any = Object.keys(PROGRESS).some(id=>document.getElementById(id));
     resetBtn.style.display = any ? 'inline' : 'none';
   }
+}
+
+/* =====================================================================
+   SEARCH, FORMULA SHEET, AND LINKS THAT REMEMBER THE SLIDERS
+   Ninety-one modules is more than a chapter nav can carry, so: search
+   across all of them at once, one page with every equation on it, and a
+   link per module that reopens it with the controls exactly as they are.
+   ===================================================================== */
+let SEARCH_INDEX = null;
+function buildSearchIndex(){
+  SEARCH_INDEX = [];
+  document.querySelectorAll('.chapter').forEach(section=>{
+    const chBtn = document.querySelector(`.chap-btn[data-chapter="${section.id}"]`);
+    const chName = chBtn ? chBtn.textContent.replace(/^\d+/,'').trim() : section.id;
+    const chNum = chBtn && chBtn.querySelector('.n') ? chBtn.querySelector('.n').textContent : '';
+    section.querySelectorAll('.card').forEach(card=>{
+      const h = card.querySelector('h2');
+      const title = h ? h.childNodes[0].textContent.trim() : '';
+      const tag = card.querySelector('.eqtag');
+      const desc = card.querySelector('p.desc');
+      const eq = card.querySelector('.eq');
+      const explain = card.querySelector('.explain');
+      SEARCH_INDEX.push({
+        id: card.id, chapter: section.id, chName, chNum, title,
+        // title and tag are what people actually search for, so they are
+        // matched separately and rank above a hit buried in the prose
+        strong: `${title} ${tag?tag.textContent:''}`.toLowerCase(),
+        weak: `${desc?desc.textContent:''} ${eq?eq.textContent:''} ${explain?explain.textContent:''}`.toLowerCase()
+      });
+    });
+  });
+}
+function runSearch(q){
+  const nav = document.getElementById('module-index');
+  const titleEl = document.getElementById('sidebar-title');
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length){
+    if(titleEl) titleEl.textContent = 'In this chapter';
+    const active = document.querySelector('.chapter.active');
+    if(active) buildModuleIndex(active);
+    return;
+  }
+  if(!SEARCH_INDEX) buildSearchIndex();
+  const hits = [];
+  SEARCH_INDEX.forEach(m=>{
+    let score = 0;
+    for(const t of terms){
+      if(m.strong.includes(t)) score += 10;
+      else if(m.weak.includes(t)) score += 1;
+      else { score = -1; break; }            // every term has to appear somewhere
+    }
+    if(score > 0) hits.push({m, score});
+  });
+  // ties break by chapter order, numerically — "ch12" sorts before "ch5" as text
+  const chNo = m => parseInt(m.chapter.replace(/\D/g,''),10) || 0;
+  hits.sort((a,b)=> b.score-a.score || chNo(a.m)-chNo(b.m));
+  if(titleEl) titleEl.textContent = `${hits.length} match${hits.length===1?'':'es'}`;
+  if(!hits.length){
+    nav.innerHTML = '<div class="mi-none">nothing matches that</div>';
+    return;
+  }
+  nav.innerHTML = hits.slice(0,40).map(({m})=>
+    `<a href="#${m.id}" data-ch="${m.chapter}" data-card="${m.id}">` +
+    `<span class="mi-ch">${m.chNum}</span>${m.title}</a>`).join('');
+  nav.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      goToModule(a.dataset.ch, a.dataset.card);
+    });
+  });
+}
+function goToModule(chapterId, cardId){
+  const active = document.querySelector('.chapter.active');
+  if(!active || active.id !== chapterId) showChapter(chapterId, {keepScroll:true});
+  requestAnimationFrame(()=>{
+    const el = document.getElementById(cardId);
+    if(el) el.scrollIntoView({behavior: prefersReducedMotion() ? 'instant' : 'smooth', block:'start'});
+  });
+}
+
+function buildFormulaSheet(){
+  const body = document.getElementById('sheet-body');
+  if(!body) return;
+  let html = '';
+  document.querySelectorAll('.chapter').forEach(section=>{
+    const btn = document.querySelector(`.chap-btn[data-chapter="${section.id}"]`);
+    // the pill's number lives in its own span, so textContent runs them
+    // together into "1Relativity" unless they are pulled apart
+    let name = section.id;
+    if(btn){
+      const n = btn.querySelector('.n');
+      const num = n ? n.textContent.trim() : '';
+      const rest = n ? btn.textContent.replace(num,'').trim() : btn.textContent.trim();
+      name = num ? `${num} · ${rest}` : rest;
+    }
+    const rows = [];
+    section.querySelectorAll('.card').forEach(card=>{
+      const eq = card.querySelector('.eq');
+      if(!eq) return;
+      const h = card.querySelector('h2');
+      const title = h ? h.childNodes[0].textContent.trim() : '';
+      rows.push(`<button type="button" class="sheet-row" data-ch="${section.id}" data-card="${card.id}">
+        <span class="sr-name">${title}</span><span class="sr-eq">${eq.innerHTML}</span></button>`);
+    });
+    if(rows.length) html += `<h4>${name}</h4>` + rows.join('');
+  });
+  body.innerHTML = html;
+  body.querySelectorAll('.sheet-row').forEach(r=>{
+    r.addEventListener('click', ()=>{
+      closeSheet();
+      goToModule(r.dataset.ch, r.dataset.card);
+    });
+  });
+}
+function openSheet(){
+  const ov=document.getElementById('sheet-overlay');
+  if(!ov) return;
+  if(!document.getElementById('sheet-body').innerHTML) buildFormulaSheet();
+  ov.hidden=false;
+}
+function closeSheet(){
+  const ov=document.getElementById('sheet-overlay');
+  if(ov) ov.hidden=true;
+}
+
+/* ---- links that carry the controls with them ---- */
+function cardControls(card){
+  return [...card.querySelectorAll('input[type=range], input[type=checkbox], select')].filter(el=>el.id);
+}
+function linkForCard(card){
+  const parts = cardControls(card).map(el=>{
+    const v = el.type==='checkbox' ? (el.checked?'1':'0') : el.value;
+    return `${encodeURIComponent(el.id)}=${encodeURIComponent(v)}`;
+  });
+  const section = card.closest('.chapter');
+  const base = location.href.split('#')[0];
+  return `${base}#${section.id}|${card.id}` + (parts.length?`|${parts.join('&')}`:'');
+}
+// #chapter|card|id=value&id=value
+function applyStateFromHash(){
+  const raw = decodeURIComponent(location.hash.slice(1));
+  if(!raw.includes('|')) return false;
+  const [chapterId, cardId, query] = raw.split('|');
+  if(!document.getElementById(chapterId)) return false;
+  showChapter(chapterId, {keepScroll:true});
+  if(query){
+    query.split('&').forEach(pair=>{
+      const [k,v] = pair.split('=');
+      const el = document.getElementById(decodeURIComponent(k||''));
+      if(!el) return;
+      const val = decodeURIComponent(v||'');
+      if(el.type==='checkbox') el.checked = (val==='1');
+      else el.value = val;
+      el.dispatchEvent(new Event(el.tagName==='SELECT'?'change':'input', {bubbles:true}));
+    });
+  }
+  if(cardId){
+    requestAnimationFrame(()=>{
+      const el=document.getElementById(cardId);
+      if(el) el.scrollIntoView({block:'start', behavior:'instant'});
+    });
+  }
+  return true;
+}
+
+function initExtras(){
+  const search = document.getElementById('module-search');
+  if(search){
+    // count the modules rather than hard-coding a number that can drift
+    buildSearchIndex();
+    search.placeholder = `Search all ${SEARCH_INDEX.length} modules…`;
+    let t;
+    search.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>runSearch(search.value), 90); });
+    search.addEventListener('keydown', e=>{
+      if(e.key==='Escape'){ search.value=''; runSearch(''); search.blur(); }
+      if(e.key==='Enter'){
+        const first=document.querySelector('#module-index a[data-card]');
+        if(first){ e.preventDefault(); first.click(); }
+      }
+    });
+  }
+  // "/" focuses the search box, the way it does everywhere else
+  document.addEventListener('keydown', e=>{
+    if(e.key==='/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){
+      e.preventDefault();
+      if(search){ search.focus(); search.select(); }
+    }
+    if(e.key==='Escape') closeSheet();
+  });
+  const open=document.getElementById('sheet-open'), close=document.getElementById('sheet-close'),
+        ov=document.getElementById('sheet-overlay');
+  if(open) open.addEventListener('click', openSheet);
+  if(close) close.addEventListener('click', closeSheet);
+  if(ov) ov.addEventListener('click', e=>{ if(e.target===ov) closeSheet(); });
 }
 
 function initProgressTracking(){
@@ -490,11 +702,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   try{ initProgressTracking(); }
   catch(err){ console.error('[arthur-beiser] progress tracking failed to initialize:', err); }
+  try{ initExtras(); }
+  catch(err){ console.error('[arthur-beiser] search / formula sheet failed to initialize:', err); }
 
-  const wanted = location.hash && document.querySelector(location.hash + '.chapter')
-    ? location.hash.slice(1)
-    : (document.querySelector('.chapter.active') || document.querySelector('.chapter')).id;
-  showChapter(wanted, {keepScroll:true});
+  // a link that carries slider settings takes priority over a plain #chapter
+  let restored = false;
+  try{ restored = applyStateFromHash(); }
+  catch(err){ console.error('[arthur-beiser] could not restore the link state:', err); }
+  if(!restored){
+    const wanted = location.hash && document.querySelector(location.hash + '.chapter')
+      ? location.hash.slice(1)
+      : (document.querySelector('.chapter.active') || document.querySelector('.chapter')).id;
+    showChapter(wanted, {keepScroll:true});
+  }
 });
 
 
