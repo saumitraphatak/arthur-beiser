@@ -194,7 +194,9 @@ function setupVanDerWaals(){
     plotLine(ctx,X,Y,[{x:g.Rexp,y:ymin},{x:g.Rexp,y:ymax*0.2}],'#1c1d20',1.4,[3,3]);
 
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
-    ctx.fillStyle='#a4342c'; ctx.fillText('fcc crystal, summed over all neighbours', m.l+10, m.t+14);
+    ctx.textAlign='right';
+    ctx.fillStyle='#a4342c'; ctx.fillText('fcc crystal, summed over all neighbours', w-m.r-10, m.t+14);
+    ctx.textAlign='left';
     ctx.fillStyle='#9a9384'; ctx.fillText('a single isolated pair', m.l+10, m.t+29);
     ctx.fillStyle='#1f6f78'; ctx.fillText('the −1/r⁶ attraction alone', m.l+10, m.t+44);
     ctx.fillStyle='#1c1d20'; ctx.textAlign='center';
@@ -277,11 +279,13 @@ function setupDrift(){
 
   // the walkers: random direction after each collision, plus a drift
   const N=26; let walkers=null, lastFrame=0;
+  let meanDisp=0, meanPath=0;
   function reset(w,h){
     walkers=[];
     for(let i=0;i<N;i++)
       walkers.push({x:Math.random()*w, y:24+Math.random()*(h-48),
                     a:Math.random()*2*Math.PI, tNext:Math.random()*0.18, trail:[]});
+    meanDisp=0; meanPath=0;
   }
 
   function drawPaths(){
@@ -303,6 +307,26 @@ function setupDrift(){
       ctx.beginPath(); ctx.arc(p.x,p.y,2.6,0,7); ctx.fill();
     });
     ctx.restore();
+    /* ---- where the cloud's centre has got to ----
+       Any single electron's creep is swamped by its own random motion, so show
+       the average of all of them: with the field off it jitters about its
+       starting point, with the field on it walks steadily to the right, and the
+       ratio of the two numbers is the ratio the readout quotes. */
+    const trackY=h-26, trackX0=14, trackX1=w-14;
+    ctx.save();
+    ctx.strokeStyle='#e0dbd0'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(trackX0,trackY); ctx.lineTo(trackX1,trackY); ctx.stroke();
+    const mx=Math.max(trackX0, Math.min(trackX1, trackX0 + (meanDisp % (trackX1-trackX0))));
+    ctx.strokeStyle='#c7c2b5'; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(trackX0,trackY-7); ctx.lineTo(trackX0,trackY+7); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=drift?'#a4342c':'#1f6f78';
+    ctx.beginPath(); ctx.arc(mx,trackY,5,0,7); ctx.fill();
+    ctx.font='10px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#8a8d92';
+    ctx.fillText(`average position of all ${N} — moved ${fmt(meanDisp,0)} px while each travelled ${fmt(meanPath,0)}`,
+                 trackX0, trackY-10);
+    ctx.restore();
+
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63';
     ctx.textAlign='left';
     ctx.fillText(drift ? 'field on — the same fast random motion, with a slow rightward creep'
@@ -319,9 +343,16 @@ function setupDrift(){
   function step(dt,w,h){
     const drift=fieldEl.checked;
     const speed=90, vdrift=drift?26:0;
+    // Track the cloud's average displacement as well as its position. The creep
+    // is invisible against the random motion of any one electron; averaged over
+    // all of them it is the only thing left.
+    let sumdx=0;
     walkers.forEach(p=>{
       p.tNext-=dt;
       if(p.tNext<=0){ p.a=Math.random()*2*Math.PI; p.tNext=0.10+Math.random()*0.16; }
+      const dx=Math.cos(p.a)*speed*dt + vdrift*dt;
+      sumdx += dx;
+      meanPath += Math.hypot(dx, Math.sin(p.a)*speed*dt)/N;
       p.x+=Math.cos(p.a)*speed*dt + vdrift*dt;
       p.y+=Math.sin(p.a)*speed*dt;
       if(p.y<16||p.y>h-16){ p.a=-p.a; p.y=Math.max(16,Math.min(h-16,p.y)); }
@@ -330,6 +361,7 @@ function setupDrift(){
       p.trail.push({x:p.x,y:p.y});
       if(p.trail.length>34) p.trail.shift();
     });
+    meanDisp += sumdx/N;
   }
 
   function loop(now){
@@ -355,7 +387,13 @@ function setupDrift(){
     const mfp=M_E*vF/(met.n*EV_J*EV_J*met.rho);
     const tau=mfp/vF;
     const ions=mfp/(met.d*1e-9);
-    const yearPerM = 1/vd/(365.25*24*3600);
+    // 1/vd is anything from minutes to years across the slider range, so pick a
+    // unit that actually says something instead of printing "0.0 years"
+    const secPerM = 1/vd;
+    const timePerM = secPerM<7200 ? `${fmt(secPerM/60,0)} minutes`
+                   : secPerM<2*86400 ? `${fmt(secPerM/3600,1)} hours`
+                   : secPerM<2*365.25*86400 ? `${fmt(secPerM/86400,1)} days`
+                   : `${fmt(secPerM/(365.25*24*3600),1)} years`;
 
     readout.innerHTML = `
       <div>metal <b>${met.name}</b>, n = ${fmtSci(met.n,3)} m⁻³, ρ = ${fmtSci(met.rho,3)} Ω m</div>
@@ -365,13 +403,14 @@ function setupDrift(){
       <div>mean free path λ = mv<sub>F</sub>/ne²ρ <b>${fmt(mfp*1e9,1)} nm</b></div>
       <div>&nbsp;&nbsp;→ past about <b>${fmt(ions,0)} ions</b> (spaced ${fmt(met.d,3)} nm) between collisions</div>
       <div>collision time τ = λ/v<sub>F</sub> <b>${fmtSci(tau,2)} s</b></div>
-      <div>at this drift speed one electron takes <b>${fmt(yearPerM,1)} years</b> to travel one metre</div>`;
+      <div>at this drift speed one electron takes <b>${timePerM}</b> to travel one metre</div>`;
   }
 
   metEl.addEventListener('change',draw);
   iEl.addEventListener('input',draw);
   aEl.addEventListener('input',draw);
-  fieldEl.addEventListener('change',draw);
+  // turning the field on or off starts the displacement tally again
+  fieldEl.addEventListener('change',()=>{ meanDisp=0; meanPath=0; draw(); });
   registerCanvas('dr_canvas',draw);
   requestAnimationFrame(loop);
 }

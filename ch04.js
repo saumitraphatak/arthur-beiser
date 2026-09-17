@@ -715,6 +715,7 @@ function setupEnergyLevels(){
     ctx.textAlign='left'; ctx.fillStyle='#5a5d63';
     ctx.fillText('ionised — electron free', w-m.r+8, Y(0)+4);
 
+    let lastLabelY = -1e9;
     for(let n=1;n<=NMAX;n++){
       const y=Y(En(n));
       const involved = (n===ni||n===nf);
@@ -722,7 +723,12 @@ function setupEnergyLevels(){
       ctx.lineWidth = involved ? 2.6 : 1.4;
       ctx.beginPath(); ctx.moveTo(m.l,y); ctx.lineTo(w-m.r,y); ctx.stroke();
       ctx.fillStyle = involved ? '#a4342c' : '#8a8d92'; ctx.textAlign='right';
-      ctx.fillText(`n = ${n}`, m.l-8, y+4);
+      // the levels crowd together as they approach the ionisation limit, so
+      // only label one where there is actually room for the text
+      if(involved || (Math.abs(y-Y(0))>=13 && Math.abs(y-lastLabelY)>=12)){
+        ctx.fillText(`n = ${n}`, m.l-8, y+4);
+        lastLabelY = y;
+      }
       if(n<=5 || involved){
         ctx.textAlign='left';
         ctx.fillText(`${fmt(En(n),2)} eV`, w-m.r+8, y+4);
@@ -960,7 +966,7 @@ function setupFranckHertz(){
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#5a5d63';
     ctx.fillText(`${g.name}: first excited state at ${g.E} eV`, m.l+8, h-m.b-10);
     ctx.textAlign='right'; ctx.fillStyle='#a4342c';
-    ctx.fillText('every dip is one more inelastic collision per electron', w-m.r-8, m.t+14);
+    ctx.fillText('every dip is one more inelastic collision per electron', w-m.r-8, m.t+28);
 
     const nColl = Math.floor(V/g.E);
     const leftover = V - nColl*g.E;

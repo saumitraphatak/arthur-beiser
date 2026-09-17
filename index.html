@@ -601,8 +601,13 @@
           </select></div>
         <div class="ctrl"><label>Incident wavelength &lambda; (nm) <span class="val" id="pe_lam_val">300</span></label>
           <input type="range" id="pe_lam" min="100" max="700" step="1" value="300"></div>
+        <div class="ctrl"><label>Retarding voltage V (volts) <span class="val" id="pe_V_val">0.0</span></label>
+          <input type="range" id="pe_V" min="0" max="6" step="0.05" value="0"></div>
+        <div class="ctrl"><label>Light intensity <span class="val" id="pe_I_val">1.0</span></label>
+          <input type="range" id="pe_I" min="0.2" max="3" step="0.1" value="1"></div>
       </div>
       <div class="rowflex">
+        <div class="colgrow" style="min-width:100%;"><canvas id="pe_stage" height="260"></canvas></div>
         <div class="colgrow"><canvas id="pe_canvas_iv" height="230"></canvas></div>
         <div class="colgrow"><canvas id="pe_canvas_slope" height="230"></canvas></div>
       </div>
@@ -1794,6 +1799,7 @@
       <div class="controls">
         <div class="ctrl"><label>Element <span class="val" id="pt_z_val">11  (Na)</span></label>
           <input type="range" id="pt_z" min="1" max="54" step="1" value="11"></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="pt_play">&#9654; Build the table, one electron at a time</button></div>
       </div>
       <canvas id="pt_canvas" height="330"></canvas>
       <div class="readout" id="pt_readout"></div>
@@ -3003,8 +3009,15 @@
         <div class="ctrl"><label>Elapsed time (half-lives) <span class="val" id="dl_t_val">1.00</span></label>
           <input type="range" id="dl_t" min="0" max="6" step="0.01" value="1"></div>
         <div class="ctrl"><label><input type="checkbox" id="dl_log" style="width:auto; margin-right:6px;">logarithmic vertical axis</label></div>
+        <div class="ctrl"><button type="button" class="btn-anim" id="dl_play">&#9654; Watch 400 nuclei decay</button></div>
       </div>
-      <canvas id="dl_canvas" height="300"></canvas>
+      <div class="rowflex">
+        <div class="colgrow" style="max-width:270px; min-width:220px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <canvas id="dl_box" height="300"></canvas>
+          <p style="font-size:.68rem; color:var(--sub); text-align:center; margin:0; font-family:var(--sans);" id="dl_box_cap">400 nuclei, each waiting its own random turn</p>
+        </div>
+        <div class="colgrow" style="min-width:380px;"><canvas id="dl_canvas" height="300"></canvas></div>
+      </div>
       <div class="readout" id="dl_readout"></div>
 
       <div class="explain">

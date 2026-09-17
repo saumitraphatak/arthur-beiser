@@ -474,7 +474,7 @@ function setupVibRot(){
     ctx.clearRect(0,0,w,h);
     const kT=8.617e-5*T;                                  // eV
     const B=md.B_eV, hv=md.hv;
-    const m={l:52,r:18,t:28,b:44};
+    const m={l:52,r:18,t:28,b:58};       // two caption lines under the axis
     const JMAX=14;
     const span=2*B*(JMAX+1)*1.25;
     const X=dE=>m.l+(dE+span)/(2*span)*(w-m.l-m.r);

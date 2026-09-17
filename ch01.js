@@ -482,9 +482,11 @@ function setupTwinParadox(){
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#1c1d20';
     ctx.fillText(`turnaround: earth t=${fmt(D/beta,1)} yr`, X(D)+8, Y(D/beta)-6);
     ctx.fillText(`Dick's proper time so far: ${fmt((D/beta)*Math.sqrt(1-beta*beta),1)} yr`, X(D)+8, Y(D/beta)+12);
+    // the reunion is at x = 0, hard against the left margin, so these have to be
+    // written out to the right of it rather than off the edge of the canvas
     ctx.textAlign='right';
-    ctx.fillText(`reunion: Jane ${fmt(age0+Tearth,1)} yr old`, X(0)-8, Y(Tearth)-8);
-    ctx.fillText(`Dick ${fmt(age0+Ttrav,1)} yr old`, X(0)-8, Y(Tearth)+8);
+    ctx.fillText(`reunion: Jane ${fmt(age0+Tearth,1)} yr old`, w-m.r-8, Y(Tearth)-8);
+    ctx.fillText(`Dick ${fmt(age0+Ttrav,1)} yr old`, w-m.r-8, Y(Tearth)+8);
 
     // moving markers: Dick's position bends at the star, Jane's just climbs the ct axis.
     if(simT>0){

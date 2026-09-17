@@ -374,6 +374,37 @@ function plotLine(ctx, X, Y, pts, color, width, dash){
   });
   ctx.stroke(); ctx.restore();
 }
+/* Labels that land on top of each other are the commonest way one of these
+   plots goes unreadable — particles of equal mass, degenerate energy levels,
+   two curves that meet. Given the labels a plot wants to draw, this pushes
+   overlapping ones apart vertically and keeps them inside the canvas. Set
+   ctx.font first; returns the resolved y for each item, in input order. */
+function layoutLabels(ctx, items, opts){
+  opts = opts || {};
+  const lh   = opts.lineHeight || 12;
+  const pad  = opts.pad == null ? 2 : opts.pad;
+  const minY = opts.minY == null ? 10 : opts.minY;
+  const maxY = opts.maxY == null ? 1e9 : opts.maxY;
+  const dir  = opts.down ? 1 : -1;            // stack upward by default
+  const placed = [];
+  return items.map(it=>{
+    const w = ctx.measureText(it.text).width;
+    const align = it.align || 'center';
+    const x0 = align==='center' ? it.x-w/2 : (align==='right' ? it.x-w : it.x);
+    const hits = y => placed.some(p =>
+      Math.abs(p.y-y) < lh && x0 < p.x0+p.w+pad && p.x0 < x0+w+pad);
+    let y = it.y, guard = 0;
+    while(guard++ < 60 && hits(y) && y+dir*lh >= minY && y+dir*lh <= maxY) y += dir*lh;
+    if(hits(y)){                                // ran out of room: try the other way
+      y = it.y; guard = 0;
+      while(guard++ < 60 && hits(y) && y-dir*lh >= minY && y-dir*lh <= maxY) y -= dir*lh;
+    }
+    y = Math.max(minY, Math.min(maxY, y));
+    placed.push({x0, w, y});
+    return y;
+  });
+}
+
 function dotAt(ctx,X,Y,x,y,color,r){
   ctx.save(); ctx.fillStyle=color; ctx.beginPath(); ctx.arc(X(x),Y(y),r||5,0,7); ctx.fill();
   ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke(); ctx.restore();

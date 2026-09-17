@@ -210,16 +210,32 @@ function setupParticleZoo(){
     });
     const sel=selEl.value;
     ctx.save(); ctx.font='10px Helvetica,Arial,sans-serif'; ctx.textAlign='center';
-    rows.forEach(r=>{
-      const y=LANE[r.cls==='quark'?'quark':r.cls]+0.12;
-      const on=(r.key===sel);
-      ctx.fillStyle= r.cls==='quark' ? '#c2701f' : COL[r.cls];
+    // Antiparticles have exactly the mass of their partners, and whole isospin
+    // multiplets are within a percent of each other, so their labels land on the
+    // same spot. Stack them instead, lightest first.
+    const marks = rows.map(r=>({
+      r, x: X(Math.log10(r.m)), lane: LANE[r.cls==='quark'?'quark':r.cls]+0.12
+    })).sort((a,b)=>a.x-b.x);
+    marks.forEach(mk=>{
+      const on=(mk.r.key===sel);
+      ctx.fillStyle= mk.r.cls==='quark' ? '#c2701f' : COL[mk.r.cls];
       ctx.globalAlpha=on?1:0.8;
-      ctx.beginPath(); ctx.arc(X(Math.log10(r.m)),Y(y),on?6:3.4,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(mk.x,Y(mk.lane),on?6:3.4,0,7); ctx.fill();
       ctx.globalAlpha=1;
+    });
+    const ys = layoutLabels(ctx,
+      marks.map(mk=>({x:mk.x, y:Y(mk.lane)-9, text:mk.r.lab})),
+      {lineHeight:11, pad:1.5, minY:m.t+9});
+    marks.forEach((mk,i)=>{
+      const on=(mk.r.key===sel);
+      // a leader line when a label has been pushed well clear of its dot
+      if(Y(mk.lane)-9-ys[i] > 12){
+        ctx.strokeStyle='rgba(138,141,146,0.35)'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(mk.x, ys[i]+3); ctx.lineTo(mk.x, Y(mk.lane)-5); ctx.stroke();
+      }
       ctx.fillStyle=on?'#1c1d20':'#8a8d92';
       ctx.font=on?'bold 11px Helvetica,Arial,sans-serif':'10px Helvetica,Arial,sans-serif';
-      ctx.fillText(r.lab, X(Math.log10(r.m)), Y(y)-9);
+      ctx.fillText(mk.r.lab, mk.x, ys[i]);
     });
     ctx.restore();
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63'; ctx.textAlign='right';
@@ -245,14 +261,26 @@ function setupParticleZoo(){
     });
     const sel=selEl.value;
     ctx.save(); ctx.font='10px Helvetica,Arial,sans-serif'; ctx.textAlign='center';
-    rows.forEach(r=>{
-      const x=Math.log10(r.m), y=Math.log10(r.tau);
-      if(y<-22||y>4) return;
-      const on=(r.key===sel);
-      ctx.fillStyle=COL[r.cls]; ctx.beginPath(); ctx.arc(X(x),Y(y),on?6:3.6,0,7); ctx.fill();
+    const pts = rows
+      .filter(r=>{ const y=Math.log10(r.tau); return y>=-22 && y<=4; })
+      .map(r=>({r, px:X(Math.log10(r.m)), py:Y(Math.log10(r.tau))}))
+      .sort((a,b)=>a.px-b.px);
+    pts.forEach(pt=>{
+      const on=(pt.r.key===sel);
+      ctx.fillStyle=COL[pt.r.cls];
+      ctx.beginPath(); ctx.arc(pt.px,pt.py,on?6:3.6,0,7); ctx.fill();
+    });
+    const lys = layoutLabels(ctx, pts.map(pt=>({x:pt.px, y:pt.py-9, text:pt.r.sym})),
+                             {lineHeight:11, pad:1.5, minY:m.t+9});
+    pts.forEach((pt,i)=>{
+      const on=(pt.r.key===sel);
+      if(pt.py-9-lys[i] > 12){
+        ctx.strokeStyle='rgba(138,141,146,0.35)'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(pt.px, lys[i]+3); ctx.lineTo(pt.px, pt.py-5); ctx.stroke();
+      }
       ctx.fillStyle=on?'#1c1d20':'#8a8d92';
       ctx.font=on?'bold 11px Helvetica,Arial,sans-serif':'10px Helvetica,Arial,sans-serif';
-      ctx.fillText(r.sym, X(x), Y(y)-9);
+      ctx.fillText(pt.r.sym, pt.px, lys[i]);
     });
     ctx.restore();
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63'; ctx.textAlign='right';
@@ -920,7 +948,13 @@ function setupBosons(){
       const x=Math.log10(b.m), y=Math.log10(HBARC_MF/b.m);
       dotAt(ctx,X,Y,x,y,b.col,6);
       ctx.fillStyle=b.col; ctx.textAlign='left';
-      ctx.fillText(`${b.sym}  ${HBARC_MF/b.m>0.01?fmt(HBARC_MF/b.m,2):fmtSci(HBARC_MF/b.m,2)} fm`, X(x)+10, Y(y)+4);
+      // W and Z are close enough in mass that their labels would sit on top of
+      // each other; nudge the lighter of the pair up
+      const lab=`${b.sym}  ${HBARC_MF/b.m>0.01?fmt(HBARC_MF/b.m,2):fmtSci(HBARC_MF/b.m,2)} fm`;
+      // W, Z and H are all within a factor of two in mass, so their labels
+      // would sit on top of one another; fan them out
+      const nudge = b.sym==='W±' ? -13 : (b.sym==='Z⁰' ? 2 : 17);
+      ctx.fillText(lab, X(x)+10, Y(y)+4 + nudge);
     });
     ctx.textAlign='right'; ctx.fillStyle='#5a5d63';
     ctx.fillText('range × mass = ℏc = 197 MeV·fm, always', w-m.r-8, m.t-8);

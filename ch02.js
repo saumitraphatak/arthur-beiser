@@ -155,11 +155,169 @@ function setupBlackbody(){
 /* ---------- 2. Photoelectric effect ---------- */
 function setupPhotoelectric(){
   const cIV=document.getElementById('pe_canvas_iv'), cSlope=document.getElementById('pe_canvas_slope');
+  const cStage=document.getElementById('pe_stage');
   const metalEl=document.getElementById('pe_metal'), lamEl=document.getElementById('pe_lam'), lamVal=document.getElementById('pe_lam_val');
+  const VEl=document.getElementById('pe_V'), VVal=document.getElementById('pe_V_val');
+  const IEl=document.getElementById('pe_I'), IVal=document.getElementById('pe_I_val');
   const readout=document.getElementById('pe_readout');
+
+  /* ---- the actual experiment ----
+     Photons arrive at the cathode; if one carries more than the work function
+     an electron leaves with anything up to hν − φ, and has to cross the gap
+     against the retarding voltage to be counted. Everything the I–V curve says
+     is visible here: the threshold is about colour, the rate is about
+     brightness, and the knee is the spread of electron energies. */
+  const photons=[], electrons=[];
+  let peLast=performance.now(), photonAcc=0, collected=0, ejected=0, absorbed=0;
+  let flash=[];
+
+  function stageGeom(w,h){
+    return {cathX:Math.round(w*0.17), collX:Math.round(w*0.86),
+            y0:Math.round(h*0.16), y1:Math.round(h*0.86)};
+  }
+
+  function drawStage(){
+    if(!cStage) return;
+    const {ctx,w,h}=fitCanvas(cStage);
+    ctx.clearRect(0,0,w,h);
+    const g=stageGeom(w,h);
+    const phi=parseFloat(metalEl.value);
+    const lam=parseFloat(lamEl.value);
+    const V=parseFloat(VEl.value);
+    const Eph=HC_EV_NM/lam, KEmax=Eph-phi;
+    const pc = lam<380 ? [150,120,210] : wavelengthRGB(lam);
+
+    // the tube
+    ctx.strokeStyle='#e0dbd0'; ctx.lineWidth=1;
+    ctx.strokeRect(g.cathX-6, g.y0-14, g.collX-g.cathX+12, g.y1-g.y0+28);
+    // retarding field between the plates
+    if(V>0.02){
+      ctx.strokeStyle='rgba(31,111,120,0.22)'; ctx.lineWidth=1;
+      for(let k=1;k<=5;k++){
+        const yy=g.y0+(g.y1-g.y0)*k/6;
+        ctx.beginPath(); ctx.moveTo(g.collX-14,yy); ctx.lineTo(g.cathX+14,yy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(g.cathX+14,yy);
+        ctx.lineTo(g.cathX+22,yy-3.5); ctx.lineTo(g.cathX+22,yy+3.5); ctx.closePath();
+        ctx.fillStyle='rgba(31,111,120,0.22)'; ctx.fill();
+      }
+    }
+    // cathode and collector
+    ctx.fillStyle='#8a8d92'; ctx.fillRect(g.cathX-7, g.y0, 7, g.y1-g.y0);
+    ctx.fillStyle='#b9b3a4'; ctx.fillRect(g.collX, g.y0, 7, g.y1-g.y0);
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63';
+    ctx.textAlign='center';
+    ctx.fillText('cathode', g.cathX-3, g.y1+18);
+    ctx.fillText('collector', g.collX+3, g.y1+18);
+
+    // photons, in their own colour
+    photons.forEach(p=>{
+      ctx.strokeStyle=`rgba(${pc[0]},${pc[1]},${pc[2]},0.95)`;
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      for(let k=0;k<=12;k++){
+        const t=k/12, px=p.x-14*t*Math.cos(p.a), py=p.y-14*t*Math.sin(p.a);
+        const off=3*Math.sin(k*1.1);
+        const qx=px+off*Math.sin(p.a), qy=py-off*Math.cos(p.a);
+        k===0?ctx.moveTo(qx,qy):ctx.lineTo(qx,qy);
+      }
+      ctx.stroke();
+    });
+    // little flashes where a photon was swallowed without freeing anything
+    flash.forEach(f=>{
+      ctx.fillStyle=`rgba(138,141,146,${0.5*f.life})`;
+      ctx.beginPath(); ctx.arc(f.x,f.y,7*(1-f.life)+2,0,7); ctx.fill();
+    });
+    // electrons
+    electrons.forEach(e=>{
+      const x=g.cathX+(g.collX-g.cathX)*e.s;
+      ctx.fillStyle = e.back ? '#b06a62' : '#1f6f78';
+      ctx.beginPath(); ctx.arc(x,e.y,3.6,0,7); ctx.fill();
+    });
+
+    ctx.textAlign='left'; ctx.font='11px Helvetica,Arial,sans-serif';
+    if(KEmax<=0){
+      ctx.fillStyle='#a4342c';
+      ctx.fillText(`hν = ${fmt(Eph,2)} eV is below the ${fmt(phi,2)} eV work function —`, g.cathX+16, g.y0-24);
+      ctx.fillText('no electrons at any brightness', g.cathX+16, g.y0-10);
+    } else {
+      ctx.fillStyle='#5a5d63';
+      ctx.fillText(`hν = ${fmt(Eph,2)} eV − φ = ${fmt(phi,2)} eV → up to ${fmt(KEmax,2)} eV each`, g.cathX+16, g.y0-10);
+    }
+    ctx.textAlign='right'; ctx.fillStyle='#8a8d92';
+    ctx.fillText(`${collected} collected / ${ejected} freed`, g.collX-4, g.y0-10);
+    if(V>0.02 && KEmax>0){
+      ctx.fillStyle=V>=KEmax?'#a4342c':'#1f6f78';
+      ctx.fillText(V>=KEmax?`V = ${fmt(V,2)} V stops every one of them`
+                           :`V = ${fmt(V,2)} V turns back the slowest`, g.collX-4, g.y1+18);
+    }
+  }
+
+  function stepStage(dt){
+    const {w,h}=fitCanvas(cStage);
+    const g=stageGeom(w,h);
+    const phi=parseFloat(metalEl.value);
+    const lam=parseFloat(lamEl.value);
+    const V=parseFloat(VEl.value);
+    const inten=parseFloat(IEl.value);
+    const KEmax=HC_EV_NM/lam-phi;
+
+    // photons arrive at a rate set by the brightness alone
+    photonAcc += dt*inten*11;
+    while(photonAcc>1){
+      photonAcc-=1;
+      const y=g.y0+Math.random()*(g.y1-g.y0);
+      const a=Math.atan2(y-(g.y0-70), g.cathX-(g.cathX-150));
+      photons.push({x:g.cathX-150, y:g.y0-70, tx:g.cathX, ty:y, a, s:0});
+    }
+    for(let i=photons.length-1;i>=0;i--){
+      const p=photons[i];
+      p.s += dt*1.5;
+      p.x = (g.cathX-150) + (p.tx-(g.cathX-150))*p.s;
+      p.y = (g.y0-70) + (p.ty-(g.y0-70))*p.s;
+      p.a = Math.atan2(p.ty-(g.y0-70), p.tx-(g.cathX-150));
+      if(p.s>=1){
+        photons.splice(i,1);
+        if(KEmax>0){
+          // a real photoelectron leaves with anything from nothing up to hν − φ
+          ejected++;
+          electrons.push({s:0, y:p.ty+(Math.random()-0.5)*8, KE:Math.random()*KEmax, back:false});
+        } else {
+          absorbed++;
+          flash.push({x:p.tx, y:p.ty, life:1});
+        }
+      }
+    }
+    for(let i=flash.length-1;i>=0;i--){
+      flash[i].life -= dt*3;
+      if(flash[i].life<=0) flash.splice(i,1);
+    }
+    for(let i=electrons.length-1;i>=0;i--){
+      const e=electrons[i];
+      const KEhere = e.KE - V*e.s;               // energy left after climbing V·s
+      if(KEhere<=0) e.back=true;
+      const sp = 0.85*Math.sqrt(Math.max(0.02, Math.abs(KEhere))/Math.max(0.2,e.KE||0.2));
+      e.s += (e.back?-1:1)*dt*sp;
+      if(e.s>=1){ collected++; electrons.splice(i,1); }
+      else if(e.s<0) electrons.splice(i,1);      // fell back into the cathode
+    }
+  }
+
+  function peLoop(now){
+    const dt=Math.min(0.05,(now-peLast)/1000); peLast=now;
+    const active=document.getElementById('ch2') && document.getElementById('ch2').classList.contains('active');
+    if(active && !prefersReducedMotion()){
+      stepStage(dt);
+      drawStage();
+    }
+    requestAnimationFrame(peLoop);
+  }
+
   function draw(){
     const phi=parseFloat(metalEl.value);
     const lam=parseFloat(lamEl.value); lamVal.textContent=lam.toFixed(0);
+    if(VVal) VVal.textContent=parseFloat(VEl.value).toFixed(2);
+    if(IVal) IVal.textContent=parseFloat(IEl.value).toFixed(1);
+    drawStage();
     const Ephoton = HC_EV_NM/lam;
     const KEmax = Ephoton-phi;
     const nu0 = phi/H_EV; // threshold frequency, Hz
@@ -185,6 +343,13 @@ function setupPhotoelectric(){
         plotLine(ctx,X,Y,[{x:V0,y:0},{x:V0,y:3.3}],'#1f6f78',1.6,[4,3]);
         ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1f6f78'; ctx.textAlign='left';
         ctx.fillText(`V₀=${fmt(V0,2)} V`, X(V0)+6, m.t+14);
+        // where the animation above is currently sitting on this curve
+        const Vnow=parseFloat(VEl.value);
+        if(Vnow<=V0*1.4){
+          const Inow = Vnow>=V0 ? 0 : 3*Math.pow(1-Vnow/V0,0.6);
+          plotLine(ctx,X,Y,[{x:Vnow,y:0},{x:Vnow,y:Inow}],'#8a6d1f',1.4,[3,3]);
+          dotAt(ctx,X,Y,Vnow,Inow,'#8a6d1f',4.5);
+        }
       } else {
         ctx.font='12px Helvetica,Arial,sans-serif'; ctx.fillStyle='#a4342c'; ctx.textAlign='center';
         ctx.fillText('below threshold — no photoemission', (w+m.l)/2, (h)/2);
@@ -214,8 +379,15 @@ function setupPhotoelectric(){
       <div>KE<sub>max</sub> <b>${fmt(KEmax,3)} eV</b> ${KEmax<0?'<span class="badge no">no emission</span>':'<span class="badge ok">emits</span>'}</div>
       <div>stopping voltage V&#8320; <b>${fmt(Math.max(0,KEmax),3)} V</b></div>`;
   }
-  metalEl.addEventListener('change',draw); lamEl.addEventListener('input',draw);
+  // changing the light or the metal restarts the experiment, so the tallies and
+  // whatever is mid-flight belong to the new settings
+  function peReset(){ collected=0; ejected=0; absorbed=0; electrons.length=0; photons.length=0; flash.length=0; draw(); }
+  metalEl.addEventListener('change',peReset);
+  lamEl.addEventListener('input',peReset);
+  [VEl,IEl].forEach(el=>{ if(el) el.addEventListener('input',peReset); });
   registerCanvas('pe_canvas_iv',draw); registerCanvas('pe_canvas_slope',draw);
+  registerCanvas('pe_stage',drawStage);
+  requestAnimationFrame(peLoop);
 }
 
 /* =====================================================================
@@ -402,7 +574,7 @@ function setupBragg(){
     ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.moveTo(px0,planeY0); ctx.lineTo(px1,planeY0); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(px0,planeY1); ctx.lineTo(px1,planeY1); ctx.stroke();
-    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='left';
+    ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='right';
     ctx.fillText('crystal plane 1', px1-2, planeY0-6);
     ctx.fillText('crystal plane 2', px1-2, planeY1+14);
 

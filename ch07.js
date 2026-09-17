@@ -239,7 +239,8 @@ function setupPeriodicTable(){
     const barH=Math.min(22,(h-m.t-m.b)/Math.max(rows,1)-4);
     const gap=Math.max(2,(h-m.t-m.b-rows*barH)/Math.max(rows,1));
     const maxCap=14;
-    const unit=Math.min(24,(w-m.l-m.r-170)/maxCap);
+    const leftW=w*0.46;                      // the bars keep the left half
+    const unit=Math.min(18,(leftW-m.l-96)/maxCap);
 
     ctx.font='11px Helvetica,Arial,sans-serif';
     cfg.forEach((s,i)=>{
@@ -259,6 +260,55 @@ function setupPeriodicTable(){
       ctx.fillText(`${s.count}/${s.cap}${s.count===s.cap?'  closed':''}`, m.l+44+s.cap*unit, y+barH*0.72);
     });
 
+    /* ---- the table this rule builds ----
+       The card claims the filling rule generates the periodic table, so show it
+       doing that: each element takes its real place, coloured by the subshell
+       that was being filled when its turn came. The blocks are not imposed —
+       they fall out of the order the subshells fill in. */
+    const BLOCKCOL={0:'#a4342c',1:'#1f6f78',2:'#8a6d1f',3:'#5b3f8a'};
+    function ptPos(z){
+      if(z===1) return [1,1];
+      if(z===2) return [1,18];
+      if(z<=4)  return [2,z-2];
+      if(z<=10) return [2,z+8];
+      if(z<=12) return [3,z-10];
+      if(z<=18) return [3,z];
+      if(z<=36) return [4,z-18];
+      if(z<=54) return [5,z-36];
+      return null;
+    }
+    const tx0=w*0.52, tw=w-m.r-tx0, ty0=m.t+6;
+    const cell=Math.min(tw/18, (h-m.b-ty0)/5.6);
+    const tW=cell*18;
+    for(let z=1;z<=54;z++){
+      const pos=ptPos(z); if(!pos) continue;
+      const [row,col]=pos;
+      const cx=tx0+(col-1)*cell, cy=ty0+(row-1)*cell;
+      const on=z<=Z, cur=(z===Z);
+      const lastSub=configure(z).slice(-1)[0];
+      const col0=BLOCKCOL[Math.min(lastSub.l,3)]||'#5a5d63';
+      ctx.fillStyle = on ? col0 : '#f2efe7';
+      ctx.globalAlpha = on ? (cur?1:0.62) : 1;
+      ctx.fillRect(cx+0.6, cy+0.6, cell-1.2, cell-1.2);
+      ctx.globalAlpha = 1;
+      if(cur){
+        ctx.strokeStyle='#1c1d20'; ctx.lineWidth=2;
+        ctx.strokeRect(cx+0.6, cy+0.6, cell-1.2, cell-1.2);
+      }
+    }
+    // which colour is which block, with the caption on the same line so it
+    // stays clear of the Madelung note above the table
+    ctx.font='10px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+    const legend=[[0,'s'],[1,'p'],[2,'d']];
+    const ly=ty0+5*cell+16;
+    legend.forEach(([l,lab],i)=>{
+      const lx=tx0+i*54;
+      ctx.fillStyle=BLOCKCOL[l]; ctx.fillRect(lx, ly-8, 9, 9);
+      ctx.fillStyle='#8a8d92'; ctx.fillText(`${lab} block`, lx+13, ly);
+    });
+    ctx.textAlign='right'; ctx.fillStyle='#b0aa9c';
+    ctx.fillText('the table this rule builds, H to Xe', tx0+tW, ly);
+
     ctx.font='13px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1c1d20'; ctx.textAlign='left';
     ctx.fillText(`${ELEM[Z]}  (Z = ${Z})`, m.l, m.t-12);
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8a8d92'; ctx.textAlign='right';
@@ -276,8 +326,54 @@ function setupPeriodicTable(){
       <div>type <b>${isNoble?'noble gas — every subshell closed':(outer.count===1&&outer.l===0?'alkali — one loose electron':'')}</b></div>
       ${EXCEPTIONS[Z]?'<div>* <b>an exception</b> — a half or fully filled d subshell wins</div>':''}`;
   }
-  zEl.addEventListener('input',draw);
+  // walk Z upward so the shells and the table fill themselves in: the periods
+  // end exactly where a shell closes, which is the whole argument of the chapter
+  const playBtn=document.getElementById('pt_play');
+  let ptPlaying=false, ptAcc=0, ptLast=performance.now();
+  function ptLoop(now){
+    const dt=Math.min(0.05,(now-ptLast)/1000); ptLast=now;
+    const active=document.getElementById('ch7') && document.getElementById('ch7').classList.contains('active');
+    if(ptPlaying && active){
+      ptAcc += dt;
+      const step=0.22;                       // about four and a half elements a second
+      while(ptAcc>step){
+        ptAcc-=step;
+        const z=parseInt(zEl.value,10);
+        if(z>=parseInt(zEl.max,10)){
+          ptPlaying=false;
+          playBtn.textContent='↺ Build it again';
+          playBtn.classList.remove('playing');
+          break;
+        }
+        zEl.value=z+1;
+      }
+      draw();
+    }
+    requestAnimationFrame(ptLoop);
+  }
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    if(prefersReducedMotion()){
+      zEl.value = parseInt(zEl.value,10)>=parseInt(zEl.max,10) ? 1 : zEl.max;
+      draw(); return;
+    }
+    if(!ptPlaying){
+      if(parseInt(zEl.value,10)>=parseInt(zEl.max,10)) zEl.value=1;
+      ptPlaying=true; ptAcc=0; ptLast=performance.now();
+      playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      ptPlaying=false;
+      playBtn.textContent='▶ Build the table, one electron at a time';
+      playBtn.classList.remove('playing');
+    }
+  });
+
+  zEl.addEventListener('input',()=>{
+    ptPlaying=false;
+    if(playBtn){ playBtn.textContent='▶ Build the table, one electron at a time'; playBtn.classList.remove('playing'); }
+    draw();
+  });
   registerCanvas('pt_canvas',draw);
+  requestAnimationFrame(ptLoop);
 }
 
 /* =====================================================================
@@ -423,7 +519,7 @@ function setupSpinOrbit(){
       const Jx=cx+J*scale*Math.cos(angJ), Jy=cy+J*scale*Math.sin(angJ);
       const angL=angJ + (i===0?1:-1)*Math.acos(Math.max(-1,Math.min(1,cosLJ)));
       const Lx=cx+L*scale*Math.cos(angL), Ly=cy+L*scale*Math.sin(angL);
-      function arrow(x0,y0,x1,y1,col,lab,w0){
+      function arrow(x0,y0,x1,y1,col,lab,w0,labMid){
         ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=w0||2.4;
         ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
         const a=Math.atan2(y1-y0,x1-x0);
@@ -432,10 +528,18 @@ function setupSpinOrbit(){
         ctx.lineTo(x1-9*Math.cos(a+0.4),y1-9*Math.sin(a+0.4));
         ctx.closePath(); ctx.fill();
         ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
-        ctx.fillText(lab, x1+6, y1);
+        if(labMid){
+          // S ends where J ends, so labelling both at the tip stacks them:
+          // put this one beside the middle of its own shaft instead
+          const mx=(x0+x1)/2, my=(y0+y1)/2, len=Math.hypot(x1-x0,y1-y0)||1;
+          ctx.fillText(lab, mx + 14*(y1-y0)/len, my - 14*(x1-x0)/len + 4);
+        } else {
+          ctx.fillText(lab, x1+6, y1);
+        }
       }
-      if(l>0) arrow(cx,cy,Lx,Ly,'#1f6f78',`L = ${fmt(L,2)}ħ`);
-      arrow(Lx,Ly,Jx,Jy,'#8a6d1f',`S`,2);
+      // L and S both end near J's tip, so label each along its own shaft
+      if(l>0) arrow(cx,cy,Lx,Ly,'#1f6f78',`L = ${fmt(L,2)}ħ`,2.4,true);
+      arrow(Lx,Ly,Jx,Jy,'#8a6d1f',`S`,2,true);
       arrow(cx,cy,Jx,Jy,'#a4342c',`J = ${fmt(J,2)}ħ`,2.8);
       ctx.fillStyle='#1c1d20'; ctx.font='12px Helvetica,Arial,sans-serif'; ctx.textAlign='center';
       ctx.fillText(`j = ${j*2}/2`, cx, h-14);

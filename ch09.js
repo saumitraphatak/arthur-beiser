@@ -484,7 +484,11 @@ function setupSpecificHeat(){
     plotLine(ctx,X,Y,[{x:sol.tD,y:0},{x:sol.tD,y:3*R_GAS}],'#e0dbd0',1.4,[3,3]);
 
     ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
-    ctx.fillStyle='#8a8d92'; ctx.fillText('Dulong–Petit: 3R, independent of T', m.l+8, Y(3*R_GAS)-8);
+    // labels the 3R asymptote, which runs along the top — keep it clear of the
+    // legend in the top-left corner
+    ctx.textAlign='right';
+    ctx.fillStyle='#8a8d92'; ctx.fillText('Dulong–Petit: 3R, independent of T', w-m.r-8, Y(3*R_GAS)-8);
+    ctx.textAlign='left';
     ctx.fillStyle='#a4342c'; ctx.fillText('Debye', m.l+8, m.t+16);
     ctx.fillStyle='#1f6f78'; ctx.fillText('Einstein', m.l+8, m.t+32);
     ctx.fillStyle='#8a8d92'; ctx.textAlign='center';

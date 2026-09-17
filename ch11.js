@@ -246,7 +246,7 @@ function setupNMR(){
       ctx.beginPath(); ctx.moveTo(X(B),m.t); ctx.lineTo(X(B),h-m.b); ctx.stroke();
       ctx.restore();
       ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1c1d20'; ctx.textAlign='right';
-      ctx.fillText(`ΔE = ${fmtSci(step,2)} eV per step`, X(B)-8, m.t+16);
+      ctx.fillText(`ΔE = ${fmtSci(step,2)} eV per step`, X(B)-8, m.t+34);
       ctx.restore();
     }
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#5a5d63'; ctx.textAlign='left';

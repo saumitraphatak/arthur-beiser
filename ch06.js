@@ -70,7 +70,7 @@ function setupQuantumNumbers(){
     const N=parseInt(nEl.value,10);
     nVal.textContent=N;
     ctx.clearRect(0,0,w,h);
-    const m={l:54,r:20,t:34,b:30};
+    const m={l:54,r:20,t:42,b:30};                 // room for the m_l header above
     const rows=N;                                  // one row per n
     const rowH=(h-m.t-m.b)/rows;
     const mMax=N-1;                                // widest ml range shown
@@ -480,7 +480,7 @@ function setupSelectionRules(){
     nVal.textContent=n; lVal.textContent=`${l} (${ORB[l]})`;
     ctx.clearRect(0,0,w,h);
 
-    const m={l:64,r:26,t:38,b:34};
+    const m={l:96,r:26,t:38,b:34};        // room for "n=1   -13.60 eV" at the left
     const colW=(w-m.l-m.r)/(LMAX+1);
     const X=ll=>m.l+(ll+0.5)*colW;
     const E=k=>-E1_H/(k*k);
@@ -499,9 +499,10 @@ function setupSelectionRules(){
         ctx.lineWidth = on?3:(allowed?2:1.3);
         ctx.beginPath(); ctx.moveTo(X(ll)-lw/2,y); ctx.lineTo(X(ll)+lw/2,y); ctx.stroke();
         if(ll===0){
+          // one line, not two: the upper levels crowd together and a second
+          // line runs straight into the next level's label
           ctx.textAlign='right'; ctx.fillStyle='#8a8d92'; ctx.font='11px Helvetica,Arial,sans-serif';
-          ctx.fillText(`n=${k}`, m.l-8, y+4);
-          ctx.fillText(`${fmt(E(k),2)} eV`, m.l-8, y+16);
+          ctx.fillText(`n=${k}   ${fmt(E(k),2)} eV`, m.l-8, y+4);
         }
       }
     }
@@ -592,8 +593,8 @@ function setupZeeman(){
     }
     ctx.strokeStyle='#1f6f78'; ctx.lineWidth=2.4;
     ctx.beginPath(); ctx.moveTo(m.l+60,yLo); ctx.lineTo(w-m.r-90,yLo); ctx.stroke();
-    ctx.fillStyle='#1f6f78'; ctx.textAlign='left';
-    ctx.fillText('mₗ = 0  (an s state does not split)', w-m.r-84, yLo+4);
+    ctx.fillStyle='#1f6f78'; ctx.textAlign='right';
+    ctx.fillText('mₗ = 0 — an s state does not split', w-m.r-4, yLo+4);
 
     // the field-free levels for reference
     ctx.strokeStyle='#d8d3c6'; ctx.lineWidth=1.4; ctx.setLineDash([4,3]);

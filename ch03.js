@@ -379,7 +379,7 @@ function setupDavissonGermer(){
     if(Vmatch>=30 && Vmatch<=80){
       plotLine(ctx,X,Y,[{x:Vmatch,y:0},{x:Vmatch,y:p.lamMatch}],'#8a8d92',1.3,[3,3]);
       ctx.fillStyle='#1c1d20'; ctx.textAlign='center';
-      ctx.fillText(`match at ${fmt(Vmatch,0)} V`, X(Vmatch), h-m.b+30);
+      ctx.fillText(`match at ${fmt(Vmatch,0)} V`, X(Vmatch), h-m.b-7);   // clear of the axis title
     }
   }
 
@@ -732,14 +732,21 @@ function setupUncertaintyApplied(){
     const axisY=h*0.60;
     const X = logAxis(ctx, w, m, lgMin, lgMax, axisY, 'minimum kinetic energy (eV)');
 
-    REFS.forEach(([E,label],i)=>{
-      const px=X(E);
-      if(px<m.l||px>w-m.r) return;
+    // Alternating two rows is not enough: several of these reference energies
+    // are close together on a log axis. Let the labels find their own rows.
+    ctx.font='10px Helvetica,Arial,sans-serif';
+    const vis = REFS.map(([E,label])=>({E,label,px:X(E)}))
+                    .filter(r=>r.px>=m.l && r.px<=w-m.r);
+    const rys = layoutLabels(ctx,
+      vis.map(r=>({x:r.px+(r.px>w*0.72?-4:4), y:axisY+42,
+                   text:r.label, align:r.px>w*0.72?'right':'left'})),
+      {lineHeight:14, down:true, minY:axisY+20, maxY:h-4});
+    vis.forEach((r,i)=>{
       ctx.strokeStyle='#e7e4dc'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(px,axisY+6); ctx.lineTo(px,axisY+30+ (i%2)*16); ctx.stroke();
-      ctx.fillStyle='#b9b3a4'; ctx.font='10px Helvetica,Arial,sans-serif';
-      ctx.textAlign = px>w*0.72?'right':'left';
-      ctx.fillText(label, px+(px>w*0.72?-4:4), axisY+42+(i%2)*16);
+      ctx.beginPath(); ctx.moveTo(r.px,axisY+6); ctx.lineTo(r.px,rys[i]-9); ctx.stroke();
+      ctx.fillStyle='#b9b3a4';
+      ctx.textAlign = r.px>w*0.72?'right':'left';
+      ctx.fillText(r.label, r.px+(r.px>w*0.72?-4:4), rys[i]);
     });
 
     const keEv = p.KE/EV_J;

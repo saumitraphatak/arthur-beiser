@@ -149,6 +149,61 @@ function setupDecayLaw(){
   const tEl=document.getElementById('dl_t'), tVal=document.getElementById('dl_t_val');
   const logEl=document.getElementById('dl_log');
   const readout=document.getElementById('dl_readout');
+  const boxCanvas=document.getElementById('dl_box');
+  const boxCap=document.getElementById('dl_box_cap');
+  const playBtn=document.getElementById('dl_play');
+
+  /* ---- a real sample, decaying ----
+     The exponential law is a statement about a crowd, not about any one
+     nucleus: each of these waits its own random time and then goes, with no
+     memory and no schedule. Give each one a lifetime drawn from the right
+     distribution — P(t > T) = 2^-T in half-lives — and the smooth curve appears
+     by itself, ragged at the edges, which is exactly how a real count behaves. */
+  const NSIM=400;
+  let lifetimes=new Float64Array(NSIM);
+  let simT=0, playing=false, dlLast=performance.now();
+  const trace=[];                 // the measured survival fraction, as it happens
+
+  function reseed(){
+    for(let i=0;i<NSIM;i++) lifetimes[i] = -Math.log2(Math.max(1e-12, Math.random()));
+    simT=0; trace.length=0;
+  }
+  reseed();
+  function survivors(t){
+    let n=0;
+    for(let i=0;i<NSIM;i++) if(lifetimes[i]>t) n++;
+    return n;
+  }
+
+  function drawBox(){
+    if(!boxCanvas) return;
+    const {ctx,w,h}=fitCanvas(boxCanvas);
+    ctx.clearRect(0,0,w,h);
+    const cols=20, rows=Math.ceil(NSIM/cols);
+    const S=Math.min((w-14)/cols, (h-14)/rows);
+    const x0=(w-S*cols)/2, y0=(h-S*rows)/2;
+    let alive=0;
+    for(let i=0;i<NSIM;i++){
+      const cx=x0+(i%cols)*S+S/2, cy=y0+Math.floor(i/cols)*S+S/2;
+      const gone = lifetimes[i]<=simT;
+      if(!gone) alive++;
+      // a nucleus that has just gone flashes before settling to a pale husk
+      const justWent = gone && (simT-lifetimes[i]) < 0.10;
+      ctx.beginPath(); ctx.arc(cx,cy,S*0.30,0,7);
+      ctx.fillStyle = gone ? (justWent ? '#a4342c' : '#e6e1d6') : '#1f6f78';
+      ctx.fill();
+      if(justWent){
+        ctx.beginPath(); ctx.arc(cx,cy,S*0.30 + 6*(simT-lifetimes[i])/0.10, 0, 7);
+        ctx.strokeStyle=`rgba(164,52,44,${1-(simT-lifetimes[i])/0.10})`;
+        ctx.lineWidth=1.5; ctx.stroke();
+      }
+    }
+    if(boxCap){
+      boxCap.textContent = simT<=0
+        ? `${NSIM} nuclei, each waiting its own random turn`
+        : `${alive} left of ${NSIM} after ${fmt(simT,2)} half-lives — predicted ${fmt(NSIM*Math.pow(0.5,simT),0)}`;
+    }
+  }
 
   // populate from every tabulated nuclide that has a half-life
   const LIST=NUCLIDES.filter(r=>r[5]>0).sort((a,b)=>a[5]-b[5]);
@@ -196,6 +251,15 @@ function setupDecayLaw(){
     }
     ctx.restore();
 
+    // what the 400 simulated nuclei actually did, as it happened
+    if(trace.length>1){
+      const tp=trace.filter(p=>p.f>0).map(p=>({x:p.t, y:logScale?Math.log10(p.f):p.f}));
+      plotLine(ctx,X,Y,tp,'#1f6f78',2);
+      ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.fillStyle='#1f6f78'; ctx.textAlign='right';
+      ctx.fillText('the 400 nuclei on the left, counted as they go', w-m.r-8, m.t+30);
+      ctx.restore();
+    }
+
     const fNow=Math.pow(0.5,nHalf);
     dotAt(ctx,X,Y,nHalf, logScale?Math.log10(fNow):fNow, '#1c1d20', 6);
     // the mean life, which is NOT the half-life
@@ -228,7 +292,48 @@ function setupDecayLaw(){
   mEl.addEventListener('input',draw);
   tEl.addEventListener('input',draw);
   logEl.addEventListener('change',draw);
+  function dlLoop(now){
+    const dt=Math.min(0.05,(now-dlLast)/1000); dlLast=now;
+    const active=document.getElementById('ch12') && document.getElementById('ch12').classList.contains('active');
+    if(playing && active){
+      simT += dt*0.42;                        // six half-lives in about fourteen seconds
+      const f=survivors(simT)/NSIM;
+      trace.push({t:simT, f});
+      tEl.value=Math.min(parseFloat(tEl.max), simT);
+      if(simT>=parseFloat(tEl.max)){
+        playing=false;
+        playBtn.textContent='↺ Run it again — a fresh sample';
+        playBtn.classList.remove('playing');
+      }
+      drawBox(); draw();
+    }
+    requestAnimationFrame(dlLoop);
+  }
+  if(playBtn) playBtn.addEventListener('click', ()=>{
+    if(prefersReducedMotion()){
+      simT=parseFloat(tEl.max); tEl.value=simT;
+      trace.length=0;
+      for(let t=0;t<=simT;t+=0.05) trace.push({t, f:survivors(t)/NSIM});
+      drawBox(); draw();
+      return;
+    }
+    if(!playing){
+      // a new run means a new random sample, which is the point: the curve is
+      // the same but the wobbles are never the same twice
+      if(simT>=parseFloat(tEl.max)-1e-9 || simT<=0) reseed();
+      playing=true; dlLast=performance.now();
+      playBtn.textContent='⏸ Pause'; playBtn.classList.add('playing');
+    } else {
+      playing=false;
+      playBtn.textContent='▶ Watch 400 nuclei decay';
+      playBtn.classList.remove('playing');
+    }
+  });
+  tEl.addEventListener('input',()=>{ if(!playing){ simT=parseFloat(tEl.value); drawBox(); } });
+
   registerCanvas('dl_canvas',draw);
+  registerCanvas('dl_box',drawBox);
+  requestAnimationFrame(dlLoop);
 }
 
 /* =====================================================================
@@ -272,10 +377,13 @@ function setupDating(){
 
     ctx.save(); ctx.font='10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#b0aa9c'; ctx.textAlign='left';
     LANDMARKS.forEach(L=>{
-      const y=Math.log10(L.t);
-      plotLine(ctx,X,Y,[{x:0,y},{x:1,y}],'#eee9df',1.4);
-      ctx.fillText(L.lab, m.l+8, Y(y)-3);
+      plotLine(ctx,X,Y,[{x:0,y:Math.log10(L.t)},{x:1,y:Math.log10(L.t)}],'#eee9df',1.4);
     });
+    // the oldest rocks and the solar system are a hair apart on a log axis
+    const lys = layoutLabels(ctx,
+      LANDMARKS.map(L=>({x:m.l+8, y:Y(Math.log10(L.t))-3, text:L.lab, align:'left'})),
+      {lineHeight:11, minY:m.t+10, maxY:h-m.b-2});
+    LANDMARKS.forEach((L,i)=> ctx.fillText(L.lab, m.l+8, lys[i]));
     ctx.restore();
 
     Object.keys(METHODS).forEach(k=>{
@@ -550,8 +658,12 @@ function setupBetaDecay(){
     const mean=tot>0?eSum/tot:0;
     plotLine(ctx,X,Y,[{x:mean,y:0},{x:mean,y:peak*0.9}],'#1f6f78',1.6,[4,3]);
     ctx.save(); ctx.font='11px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
-    ctx.fillStyle='#1c1d20'; ctx.fillText('where the line would be', X(Q)-4, m.t+14);
-    ctx.fillText('with no neutrino', X(Q)-4, m.t+29);
+    // Q sits at the right-hand end of the spectrum, so this caption has to be
+    // pulled back inside the frame rather than written off the edge
+    ctx.textAlign='right';
+    ctx.fillStyle='#1c1d20'; ctx.fillText('where the line would be', Math.min(X(Q)+52, w-m.r-4), m.t+34);
+    ctx.fillText('with no neutrino', Math.min(X(Q)+52, w-m.r-4), m.t+49);
+    ctx.textAlign='left';
     ctx.fillStyle='#1f6f78'; ctx.fillText(`mean ${fmt(mean,3)} MeV`, X(mean)+6, Y(peak*0.9)-4);
     ctx.fillStyle='#5a5d63'; ctx.textAlign='right';
     ctx.fillText(mode==='minus'?'β⁻: the daughter attracts the electron, filling in the low end'
