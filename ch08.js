@@ -181,8 +181,10 @@ function setupElectronSharing(){
     const bond=[], anti=[];
     for(let r=0.03;r<=Rmax;r+=Rmax/500){
       const e=1-Math.exp(-a*(r-R_EQ)/1);
-      bond.push({x:r, y:Math.min(5.5, D_EQ*e*e - D_EQ)});
-      anti.push({x:r, y:Math.min(5.5, 6.2*Math.exp(-(r-0.03)/0.062))});
+      // no clamping: plotLine clips to the axes, and clamping drew a false flat
+      // plateau along the top of the frame where the curve really shoots up
+      bond.push({x:r, y:D_EQ*e*e - D_EQ});
+      anti.push({x:r, y:6.2*Math.exp(-(r-0.03)/0.062)});
     }
     plotLine(ctx,X,Y,bond,'#1f6f78',2.6);
     plotLine(ctx,X,Y,anti,'#a4342c',2.2,[5,3]);
@@ -213,10 +215,54 @@ function setupElectronSharing(){
       <div>result <b>${bonding?'a stable molecule':'no bond forms'}</b>
         ${bonding?'<span class="badge ok">bound</span>':'<span class="badge no">unbound</span>'}</div>`;
   }
-  rEl.addEventListener('input',draw);
+  /* ---- watch a bond form ----
+     Walk the two protons in from far apart. In the symmetric state the charge
+     between them builds up and the energy marker slides down into the well and
+     settles at R_e; in the antisymmetric state the charge is expelled from the
+     middle and the energy climbs the whole way in, which is what "antibonding"
+     means. Then it eases back out, so the cycle can be watched more than once. */
+  const shPlay=document.getElementById('sh_play');
+  let shRunning=false, shPhase=0, shLast=performance.now();
+  const R_FAR=0.36;
+  function shLoop(now){
+    const dt=Math.min(0.05,(now-shLast)/1000); shLast=now;
+    const active=document.getElementById('ch8') && document.getElementById('ch8').classList.contains('active');
+    if(shRunning && active){
+      shPhase += dt*0.26;
+      if(shPhase>=2){ shPhase=0; }
+      // in over the first half, back out over the second, pausing at the bottom
+      const u=shPhase<1 ? shPhase : 2-shPhase;
+      const eased=u<0.82 ? u/0.82 : 1;
+      rEl.value = (R_FAR + (R_EQ-R_FAR)*eased).toFixed(3);
+      draw();
+    }
+    requestAnimationFrame(shLoop);
+  }
+  if(shPlay) shPlay.addEventListener('click', ()=>{
+    if(prefersReducedMotion()){
+      rEl.value = Math.abs(parseFloat(rEl.value)-R_EQ)<0.005 ? R_FAR : R_EQ;
+      draw(); return;
+    }
+    shRunning=!shRunning;
+    if(shRunning){
+      shPhase=0; shLast=performance.now();
+      shPlay.textContent='⏸ Pause'; shPlay.classList.add('playing');
+    } else {
+      shPlay.textContent='▶ Bring the atoms together'; shPlay.classList.remove('playing');
+    }
+  });
+
+  rEl.addEventListener('input',()=>{
+    if(shRunning){
+      shRunning=false;
+      shPlay.textContent='▶ Bring the atoms together'; shPlay.classList.remove('playing');
+    }
+    draw();
+  });
   modeEl.addEventListener('change',draw);
   registerCanvas('sh_canvas',draw);
   registerCanvas('sh_canvas_e',draw);
+  requestAnimationFrame(shLoop);
 }
 
 /* =====================================================================

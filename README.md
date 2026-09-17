@@ -80,7 +80,7 @@ site data — there is no account and nothing is collected.
 
 ## Chapter 8 — Molecules
 - The molecular bond (potential well, bond length, dissociation energy, zero-point tax)
-- Electron sharing in H₂⁺ (bonding vs antibonding, and why one binds)
+- Electron sharing in H₂⁺ (bonding vs antibonding, and why one binds — press Play to walk the protons in from far apart and watch the charge gather between them while the energy slides into the well)
 - Rotational energy levels and spectra (measuring bond length from line spacing)
 - Vibrational energy levels (force constants, anharmonicity, Example 8.3)
 - The vibration–rotation band (P and R branches, the missing centre line, plus an animated inset of the molecule actually stretching and tumbling at once)
@@ -193,7 +193,13 @@ Four conventions worth knowing before editing:
   at the end of a chapter is safe; reordering existing ones is not, without also accepting
   that saved progress.
 
-Verified at devicePixelRatio 1, 2 and 3 — bugs have hidden at dpr 1.
+Every chapter has at least one animation that is the point of the chapter rather than decoration:
+the alpha beam in Ch 4, the photoelectric tube in Ch 2, a wave packet splitting on a barrier in
+Ch 5, a gas thermalising in Ch 9, 400 nuclei decaying in Ch 12.
+
+Verified at devicePixelRatio 1, 2 and 3 — bugs have hidden at dpr 1. The test harness also sweeps
+every module for labels that run outside their canvas or land on top of each other, and checks
+that each chapter's animation is actually moving.
 
 ## Status
 
