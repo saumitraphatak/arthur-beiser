@@ -1,7 +1,7 @@
 /* =====================================================================
    Concepts of Modern Physics — how the book fits together
 
-   Forty-five of the ninety-one modules, the ones that carry the
+   Forty-seven of the ninety-two modules, the ones that carry the
    argument, with an arrow wherever one idea genuinely rests on another.
    Chapters run down the page, so most arrows point downward and the
    ones that do not are the interesting ones: tunnelling reaching into
@@ -22,6 +22,7 @@ const MAP_NODES = [
   {id:'ch4-m2',  label:'why atoms collapse'},
   {id:'ch4-m4',  label:'Bohr orbits'},
   {id:'ch4-m5',  label:'energy levels'},
+  {id:'ch4-m8',  label:'the atom in α'},
   {id:'ch5-m1',  label:'the wave function'},
   {id:'ch5-m2',  label:'particle in a box'},
   {id:'ch5-m4',  label:'tunnelling'},
@@ -66,6 +67,7 @@ const MAP_EDGES = [
   ['ch3-m1','ch3-m5'], ['ch3-m5','ch3-m6'],
   ['ch3-m1','ch4-m4'],
   ['ch4-m1','ch4-m2'], ['ch4-m2','ch4-m4'], ['ch4-m4','ch4-m5'], ['ch2-m1','ch4-m5'],
+  ['ch4-m4','ch4-m8'], ['ch4-m5','ch4-m8'], ['ch1-m7','ch4-m8'],
   ['ch3-m6','ch5-m1'], ['ch3-m5','ch5-m1'],
   ['ch5-m1','ch5-m2'], ['ch5-m2','ch5-m4'], ['ch5-m2','ch5-m5'],
   ['ch5-m2','ch6-m1'], ['ch4-m5','ch6-m1'],

@@ -364,7 +364,7 @@
       <h4 id="sidebar-title">In this chapter</h4>
       <button type="button" id="reset-progress" title="clear all your understood-marks, on this device only">reset progress</button>
     </div>
-    <input type="search" id="module-search" placeholder="Search all 91 modules…" autocomplete="off" spellcheck="false">
+    <input type="search" id="module-search" placeholder="Search all 92 modules…" autocomplete="off" spellcheck="false">
     <nav id="module-index"></nav>
     <button type="button" id="quiz-open">check yourself on this chapter</button>
     <button type="button" id="map-open">how the book fits together</button>
@@ -1474,6 +1474,38 @@
 
         <h3>The catch</h3>
         <p class="catch">The curve drawn here is schematic in its detailed shape — real Franck&ndash;Hertz traces have dips that vary in depth and get broader at higher voltages, since electrons arrive with a spread of energies and can excite higher states once the voltage allows. What is exact and what the experiment rests on is the <em>spacing</em> of the dips and their identification with the first excitation energy. A subtlety worth knowing: the absolute position of the first dip is shifted by the contact potential between the electrodes, so no one reads the excitation energy off a single dip — you read it off the interval between successive ones, which is immune to that offset.</p>
+      </div>
+    </div>
+
+    <!-- 8. the whole Bohr atom as powers of Z-alpha -->
+    <div class="card">
+      <h2>One Number Runs the Atom <span class="eqtag">Sec. 4.4&ndash;4.7</span></h2>
+      <p class="desc">Every number the Bohr model produces is the electron's rest energy multiplied by a power of the same dimensionless quantity, Z&alpha;. Write them as a ladder and the whole atom turns out to be one number raised to 0, 1, 2 and 4.</p>
+      <div class="eq">v<sub>1</sub>/c = Z&alpha; &nbsp;&middot;&nbsp; E<sub>1</sub> = &frac12;mc&sup2;(Z&alpha;)&sup2; &nbsp;&middot;&nbsp; a<sub>1</sub> = (&#295;/mc)/Z&alpha; &nbsp;&middot;&nbsp; &Delta;E<sub>fine</sub> &sim; E<sub>1</sub>(Z&alpha;)&sup2;</div>
+      <div class="controls">
+        <div class="ctrl"><label>Nuclear charge Z <span class="val" id="al_z_val">1</span></label>
+          <input type="range" id="al_z" min="1" max="137" step="1" value="1"></div>
+        <div class="ctrl"><label>1/&alpha; &mdash; ours is 137 <span class="val" id="al_inv_val">137</span></label>
+          <input type="range" id="al_inv" min="8" max="600" step="1" value="137"></div>
+      </div>
+      <canvas id="al_ladder" height="300"></canvas>
+      <div class="readout" id="al_readout"></div>
+      <canvas id="al_lines" height="150"></canvas>
+
+      <div class="explain">
+        <h3>What you're looking at</h3>
+        <p>The upper panel is a logarithmic energy axis with four rungs on it. The top one is the electron's rest energy mc&sup2;, which knows nothing about atoms. Every rung below it is the one above multiplied by Z&alpha;: the momentum of the ground-state electron times c, then the binding energy, then &mdash; two factors further down &mdash; the fine-structure splitting. Each bracket carries the factor that step costs, and every one of them is Z&alpha; to some power &mdash; which is the whole claim of this card.</p>
+        <p>The lower panel is the Balmer series, the n &rarr; 2 lines, drawn at their computed wavelengths against the visible band in its own colours. Nothing about those lines is put in by hand; they follow from the binding energy on the rung above.</p>
+
+        <h3>Try this</h3>
+        <p class="tryit">Leave Z at 1 and drag 1/&alpha; away from 137. Every rung slides, but not by the same amount &mdash; the ladder stretches, because each rung carries another power. Watch the Balmer lines in the lower panel at the same time: around 1/&alpha; = 100 they have gone straight past the violet into the ultraviolet, and around 1/&alpha; = 200 they have marched out through the red into the infrared. Visible light is not a fact about atoms; it is a fact about &alpha; being near 137. Now put 1/&alpha; back and raise <b>Z</b> instead. At Z = 137 the first rung reaches mc&sup2; itself: v&#8321;/c = 1, and the innermost electron of a hypothetical element 137 would have to travel at the speed of light. That is not a rounding problem, it is the Bohr model announcing where it stops being allowed.</p>
+
+        <h3>Why writing it this way is worth the trouble</h3>
+        <p>The separate formulas of this chapter look like four unrelated results with four different constants in them. Written against mc&sup2; they are one result. The atom is big and its binding energy is small for a single reason: &alpha; is small, and every step down the ladder costs another factor of it. That is why an atom is about 10&#8309; times bigger than a nucleus, why chemistry happens at a few eV rather than a few MeV, and why fine structure is a splitting you have to look hard to see rather than a gross feature of the spectrum.</p>
+        <p>It also explains a fact that is otherwise a coincidence. The electron in hydrogen moves at 1/137 of the speed of light, so relativity is a correction of order (1/137)&sup2;, one part in twenty thousand &mdash; which is exactly why Bohr's non-relativistic model got the spectrum right to four figures in 1913 and why the fifth figure had to wait for Dirac.</p>
+
+        <h3>The catch</h3>
+        <p class="catch">Sliding &alpha; here changes one number and holds everything else fixed, which is a bookkeeping exercise and not a theory of other universes. Nothing in physics says &alpha; could have taken another value, and in any real treatment it is not free: change it and you change the nuclear binding of Chapter 11 and the stability of matter along with the size of the atom, so a universe with 1/&alpha; = 100 would differ in far more than the colour of its spectral lines. Two smaller cautions. The fine-structure rung is an order of magnitude, not a formula &mdash; the actual splitting depends on n, &#8467; and j, and Chapter 7 does it properly. And the Z axis runs to 137 because that is where this model breaks, not because element 137 has been made: well before it, the heaviest atoms need a relativistic treatment that this chapter does not have, which is also why gold is yellow and mercury is liquid.</p>
       </div>
     </div>
 
@@ -3754,7 +3786,7 @@
 </main>
 </div>
 
-<footer>All thirteen chapters of Beiser, <em>Concepts of Modern Physics</em>, 6th ed. &mdash; 91 interactive modules. Every plot and every number is computed live from the equations shown; the only stored data are measured quantities the equations are checked against (ionization energies, atomic masses and half-lives, particle properties), and those are the book’s own tables. Verified at devicePixelRatio 1, 2 and 3.</footer>
+<footer>All thirteen chapters of Beiser, <em>Concepts of Modern Physics</em>, 6th ed. &mdash; 92 interactive modules. Every plot and every number is computed live from the equations shown; the only stored data are measured quantities the equations are checked against (ionization energies, atomic masses and half-lives, particle properties), and those are the book’s own tables. Verified at devicePixelRatio 1, 2 and 3.</footer>
 
 <script src="app.js"></script>
 <script src="nuclides.js"></script>

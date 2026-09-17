@@ -985,6 +985,189 @@ function setupFranckHertz(){
   registerCanvas('fh_canvas',draw);
 }
 
+/* =====================================================================
+   8. ONE NUMBER RUNS THE ATOM
+   Every quantity the Bohr model produces is mc² times a power of Zα.
+   Laid out on a log axis the chapter turns into a ladder, and the two
+   sliders show what each rung is standing on.
+   ===================================================================== */
+function setupOneNumber(){
+  const ladder=document.getElementById('al_ladder');
+  const lines =document.getElementById('al_lines');
+  const zEl=document.getElementById('al_z'), zVal=document.getElementById('al_z_val');
+  const iEl=document.getElementById('al_inv'), iVal=document.getElementById('al_inv_val');
+  const readout=document.getElementById('al_readout');
+  const MC2 = ME_C2_MEV*1e6;            // electron rest energy, eV
+  const ALPHA_REAL = 1/137.036;
+
+  function state(){
+    const Z = parseInt(zEl.value,10), inv = parseInt(iEl.value,10);
+    const al = 1/inv, za = Z*al;
+    return {
+      Z, inv, al, za,
+      rest: MC2,                        // mc²
+      pc:   MC2*za,                     // p₁c = mc²·Zα
+      bind: 0.5*MC2*za*za,              // E₁  = ½mc²(Zα)²
+      fine: 0.5*MC2*Math.pow(za,4),     // ΔE  ~ E₁(Zα)²
+      a1:   A0*(ALPHA_REAL/al)/Z        // a₁ = ħ/(Zα m c)
+    };
+  }
+  // the n -> 2 lines, straight off the binding energy above them
+  function balmer(s){
+    const out=[];
+    for(let n=3;n<=8;n++){
+      const dE = s.bind*(1/4 - 1/(n*n));
+      if(dE>0) out.push({n, nm: HC_EV_NM/dE});
+    }
+    return out;
+  }
+
+  function drawLadder(){
+    const {ctx,w,h}=fitCanvas(ladder);
+    const s=state();
+    ctx.clearRect(0,0,w,h);
+    const m={l:74,r:16,t:16,b:24};
+    const rungs=[
+      {v:s.rest, name:'mc²  the electron\'s rest energy',      col:'#5a5d63'},
+      {v:s.pc,   name:'p₁c  the ground-state momentum',        col:'#1f6f78'},
+      {v:s.bind, name:'E₁  the binding energy',                col:'#a4342c'},
+      {v:s.fine, name:'ΔE  fine structure, in order of magnitude', col:'#8a6d1f'}
+    ];
+    const vs=rungs.map(r=>r.v).filter(v=>isFinite(v)&&v>0);
+    const lo=Math.log10(Math.min(...vs))-0.6, hi=Math.log10(Math.max(...vs))+0.6;
+    const Y=v=>h-m.b-(Math.log10(v)-lo)/(hi-lo)*(h-m.b-m.t);
+
+    // decade gridlines
+    ctx.font='9px Helvetica,Arial,sans-serif'; ctx.textAlign='right';
+    for(let e=Math.ceil(lo);e<=Math.floor(hi);e++){
+      const y=Y(Math.pow(10,e));
+      ctx.strokeStyle='#eeeae0'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(m.l,y+0.5); ctx.lineTo(w-m.r,y+0.5); ctx.stroke();
+      ctx.fillStyle='#b0aa9c'; ctx.fillText('10'+_supDigits(e), m.l-6, y+3);
+    }
+    ctx.fillStyle='#8b8578'; ctx.textAlign='left';
+    ctx.fillText('eV', 6, m.t+8);
+
+    // the rungs
+    rungs.forEach(r=>{
+      if(!isFinite(r.v)||r.v<=0) return;
+      const y=Y(r.v);
+      ctx.strokeStyle=r.col; ctx.lineWidth=2.4;
+      ctx.beginPath(); ctx.moveTo(m.l,y+0.5); ctx.lineTo(m.l+72,y+0.5); ctx.stroke();
+      ctx.fillStyle=r.col; ctx.font='10px Helvetica,Arial,sans-serif'; ctx.textAlign='left';
+      ctx.fillText(r.name, m.l+80, y-3);
+      ctx.fillStyle='#5a5d63'; ctx.font='9px Helvetica,Arial,sans-serif';
+      ctx.fillText(alEnergy(r.v), m.l+80, y+9);
+    });
+
+    // and what each step down actually costs
+    const steps=[
+      {a:0,b:1,txt:'× Zα'},
+      {a:1,b:2,txt:'× Zα/2'},
+      {a:2,b:3,txt:'× (Zα)²'}
+    ];
+    ctx.textAlign='center';
+    steps.forEach(st=>{
+      const y0=Y(rungs[st.a].v), y1=Y(rungs[st.b].v);
+      if(!isFinite(y0)||!isFinite(y1)) return;
+      const x=m.l+50;
+      ctx.strokeStyle='#c7c2b5'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x,y0+3); ctx.lineTo(x,y1-3); ctx.stroke();
+      ctx.font='9px Helvetica,Arial,sans-serif'; ctx.fillStyle='#fffdf8';
+      const tw=ctx.measureText(st.txt).width;
+      ctx.fillRect(x-tw/2-2,(y0+y1)/2-6,tw+4,11);
+      ctx.fillStyle='#8b8578';
+      ctx.fillText(st.txt, x, (y0+y1)/2+3);
+    });
+
+    if(s.za>=1){
+      ctx.textAlign='left'; ctx.font='700 10px Helvetica,Arial,sans-serif'; ctx.fillStyle='#a4342c';
+      ctx.fillText('Zα ≥ 1 — the ladder has turned over: this model is no longer saying anything.', m.l+4, m.t+10);
+    }
+  }
+
+  function drawLines(){
+    const {ctx,w,h}=fitCanvas(lines);
+    const s=state();
+    ctx.clearRect(0,0,w,h);
+    const m={l:34,r:16,t:14,b:26};
+    const lo=Math.log10(10), hi=Math.log10(1e4);     // 10 nm to 10 µm, fixed
+    const X=nm=>m.l+(Math.log10(nm)-lo)/(hi-lo)*(w-m.l-m.r);
+    const y0=m.t+8, y1=h-m.b;
+
+    // the visible band, in its own colours
+    for(let px=m.l;px<=w-m.r;px++){
+      const nm=Math.pow(10, lo+(px-m.l)/(w-m.l-m.r)*(hi-lo));
+      if(nm<380||nm>750) continue;
+      ctx.fillStyle=rgbCss(wavelengthRGB(nm));
+      ctx.fillRect(px,y0,1.2,y1-y0);
+    }
+    ctx.strokeStyle='#ddd8cc'; ctx.lineWidth=1;
+    ctx.strokeRect(m.l+0.5,y0+0.5,w-m.l-m.r-1,y1-y0-1);
+
+    // decade ticks
+    ctx.font='9px Helvetica,Arial,sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#b0aa9c';
+    [10,100,1000,10000].forEach(nm=>{
+      const x=X(nm);
+      ctx.strokeStyle='#ddd8cc';
+      ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x,y1+4); ctx.stroke();
+      ctx.fillText(nm>=1000?(nm/1000)+' µm':nm+' nm', x, y1+15);
+    });
+
+    // the Balmer lines themselves
+    balmer(s).forEach(L=>{
+      if(L.nm<10||L.nm>1e4) return;
+      const x=X(L.nm), vis=(L.nm>=380&&L.nm<=750);
+      ctx.strokeStyle = vis ? '#14161a' : '#9a958a';
+      ctx.lineWidth = L.n===3 ? 2 : 1;
+      ctx.beginPath(); ctx.moveTo(x,y0-6); ctx.lineTo(x,y1+2); ctx.stroke();
+      if(L.n===3){
+        ctx.fillStyle='#14161a'; ctx.font='700 10px Helvetica,Arial,sans-serif'; ctx.textAlign='center';
+        let tx=x; const tw=ctx.measureText('Hα').width/2;
+        tx=Math.max(m.l+tw, Math.min(w-m.r-tw, tx));
+        ctx.fillText('Hα', tx, y0-9);
+      }
+    });
+    // name the coloured strip where it is, rather than labelling the whole box
+    ctx.textAlign='center'; ctx.font='9px Helvetica,Arial,sans-serif'; ctx.fillStyle='#8b8578';
+    ctx.fillText('visible', X(550), y1+15);
+  }
+
+  function alWave(nm){
+    if(nm>=1000) return fmt(nm/1000,2)+' \u00b5m';
+    if(nm>=1)    return fmt(nm,1)+' nm';
+    return fmt(nm*1000,1)+' pm';
+  }
+  function alEnergy(eV){
+    const a=Math.abs(eV);
+    if(a>=1e6) return fmt(eV/1e6,3)+' MeV';
+    if(a>=1e3) return fmt(eV/1e3,3)+' keV';
+    if(a>=1e-2)return fmt(eV,a<10?3:1)+' eV';
+    return fmtSci(eV,2)+' eV';
+  }
+
+  function draw(){
+    const s=state();
+    zVal.textContent=s.Z; iVal.textContent=s.inv;
+    drawLadder(); drawLines();
+    const ha=balmer(s)[0];
+    const visible = ha && ha.nm>=380 && ha.nm<=750;
+    readout.innerHTML=`
+      <div>Zα <b>${fmt(s.za,4)}</b> ${s.za>=1?'<span class="badge no">≥ 1</span>':''}</div>
+      <div>v₁/c <b>${fmt(s.za,4)}</b></div>
+      <div>binding energy E₁ <b>${alEnergy(s.bind)}</b></div>
+      <div>first orbit a₁ <b>${fmtSci(s.a1,2)} m</b> (${fmt(s.a1/A0,2)}× ours)</div>
+      <div>fine structure / E₁ <b>${fmtSci(s.za*s.za,2)}</b></div>
+      <div>Hα <b>${ha?alWave(ha.nm):'—'}</b>
+        ${ha?(visible?'<span class="badge ok">visible</span>':'<span class="badge">outside the visible band</span>'):''}</div>
+      <div>lines off the wavelength axis <b>${balmer(s).filter(L=>L.nm<10||L.nm>1e4).length} of 6</b></div>`;
+  }
+  zEl.addEventListener('input',draw);
+  iEl.addEventListener('input',draw);
+  registerCanvas('al_ladder',draw);
+  registerCanvas('al_lines',draw);
+}
+
 // register with the loader in app.js
 registerModule('setupRutherford', setupRutherford);
 registerModule('setupClassicalCollapse', setupClassicalCollapse);
@@ -993,3 +1176,4 @@ registerModule('setupBohrWaves', setupBohrWaves);
 registerModule('setupEnergyLevels', setupEnergyLevels);
 registerModule('setupReducedMass', setupReducedMass);
 registerModule('setupFranckHertz', setupFranckHertz);
+registerModule('setupOneNumber', setupOneNumber);

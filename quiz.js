@@ -234,6 +234,29 @@ registerQuiz('ch4', function(){
   };
 });
 
+registerQuiz('ch4', function(){
+  // Z = 1 is excluded on purpose: at Z = 1 both the ×Z and the ÷Z² distractors
+  // collapse onto the right answer and the question has three correct options
+  const Z = qPick([2,6,26,47,79]);
+  const alpha = 1/137.036;
+  const mc2 = ME_C2_MEV*1e6;
+  const E1 = 0.5*mc2*Z*Z*alpha*alpha;
+  const names = {1:'hydrogen', 2:'He⁺', 6:'C⁵⁺', 26:'Fe²⁵⁺', 47:'Ag⁴⁶⁺', 79:'Au⁷⁸⁺'};
+  return {
+    q: `A one-electron ion with <b>Z = ${Z}</b> (${names[Z]}). Its ground-state binding energy is ½mc²(Zα)². How much is that?`,
+    opts: [
+      {t:`${fmt(E1,1)} eV`, ok:true,
+       why:`½ × 511 000 eV × (${Z}/137.04)² = ${fmt(E1,1)} eV — which is 13.6 eV scaled by Z², since the only Z in the formula is inside the square.`},
+      {t:`${fmt(13.606*Z,1)} eV`, ok:false,
+       why:'This scales by Z rather than Z². The charge enters the Coulomb energy once and the orbit radius once, and the two multiply.'},
+      {t:`${fmt(13.606/(Z*Z),3)} eV`, ok:false,
+       why:'This divides by Z² instead of multiplying. A larger nuclear charge binds the electron more tightly, not less.'},
+      {t:`${fmt(mc2*Z*alpha,1)} eV`, ok:false,
+       why:'That is mc²(Zα), one power of Zα short — it is the electron\'s momentum times c, the rung above the binding energy on the ladder, not the binding energy itself.'}
+    ]
+  };
+});
+
 /* =====================================================================
    CHAPTER 5 — QUANTUM MECHANICS
    ===================================================================== */

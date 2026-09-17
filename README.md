@@ -1,14 +1,14 @@
 # arthur-beiser
 
 Interactive companion to the whole of Arthur Beiser's *Concepts of Modern Physics* (6th ed.) — all
-thirteen chapters, 91 modules — built to develop intuition for the equations by playing with them
+thirteen chapters, 92 modules — built to develop intuition for the equations by playing with them
 rather than only reading them.
 
 Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.server`, or via GitHub Pages). No build step, no dependencies, no CDNs — plain HTML, CSS, vanilla JS and canvas 2D.
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
-Six things make ninety-one modules navigable:
+Six things make ninety-two modules navigable:
 
 - **Search** in the sidebar, across every module's title, equation and prose at once, from
   whichever chapter you happen to be in. `/` focuses it, Enter jumps to the first hit.
@@ -17,7 +17,7 @@ Six things make ninety-one modules navigable:
 - A **link** button on each module that copies a URL carrying that module's current control
   settings, so a particular configuration can be shared or bookmarked and comes back exactly.
   The hash looks like `#ch5|ch5-m4|tn_E=3.5&tn_U=10&tn_L=1.23`.
-- **Check yourself** — a quiz on the chapter you're reading, 34 questions across the thirteen
+- **Check yourself** — a quiz on the chapter you're reading, 35 questions across the thirteen
   chapters. The numbers in each question are redrawn every time and the answer is computed from
   the same constants and functions the modules use, so a question cannot go stale or disagree with
   the page it came from. Every wrong option is a specific named mistake — dividing by γ instead of
@@ -32,7 +32,7 @@ Six things make ninety-one modules navigable:
   and that is exactly the argument by which Yukawa predicted a particle nobody had seen. Sometimes
   the miss is the physics: hydrogen's 13.6 eV gives 14.5 nm, 270 times the size of the atom, and
   that factor is 2/α — a bound state sits at ħc/E only when it is relativistic.
-- A **concept map** of 45 ideas and the 57 dependencies between them, laid out chapter by chapter.
+- A **concept map** of 47 ideas and the 60 dependencies between them, laid out chapter by chapter.
   Hovering an idea lights up everything it rests on, in one colour, and everything that rests on it
   in another — and says so in words ("rests on 10 earlier ideas, and 2 later ones rest on it").
   Clicking one goes to its module. It answers the question the table of contents can't: what do I
@@ -41,7 +41,7 @@ Six things make ninety-one modules navigable:
 Every module also has a **mark understood** toggle in its top-right corner. Checking it off is
 saved to `localStorage` — nothing leaves the browser — and shows up three ways: a running
 `n/total` on that chapter's pill in the top nav, a checkmark in the chapter's sidebar index, and
-an overall `n of 91 modules marked understood` line under the title once you've checked off at
+an overall `n of 92 modules marked understood` line under the title once you've checked off at
 least one. A **reset progress** link appears in the sidebar once there's anything to reset. Since
 it's per-browser storage, progress does not sync between devices and does not survive clearing
 site data — there is no account and nothing is collected.
@@ -83,6 +83,7 @@ site data — there is no account and nothing is collected.
 - Energy levels, transitions, and the correspondence principle
 - Reduced mass and the isotope shift (H, D, T, He⁺, positronium, muonic hydrogen)
 - The Franck–Hertz experiment
+- One number runs the atom (the whole Bohr model as mc² times a power of Zα, on one log ladder — with α and Z as sliders, and the Balmer lines sliding out of the visible band as you turn them)
 
 ## Chapter 5 — Quantum Mechanics
 - The wave function and what it means (normalisation, probability, expectation values)
@@ -241,4 +242,4 @@ particle in a box at n = 1) are easy to write and impossible to spot by reading.
 
 ## Status
 
-All thirteen chapters are built — **91 modules** in total. The book is complete.
+All thirteen chapters are built — **92 modules** in total. The book is complete.
