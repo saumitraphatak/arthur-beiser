@@ -103,20 +103,20 @@
   #module-index .mi-ch{ font-size:.6rem; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
     color:var(--accent2); opacity:.75; flex:none; }
   #module-index .mi-none{ padding:8px 11px; font-family:var(--sans); font-size:.76rem; color:var(--sub); }
-  #sheet-open, #quiz-open, #map-open, #scale-open, #path-open{
+  #sheet-open, #quiz-open, #map-open, #scale-open, #path-open, #dv-open{
     margin-top:8px; width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
     background:#fff; font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub);
     cursor:pointer; letter-spacing:.2px;
   }
   #quiz-open{ margin-top:14px; }
-  #sheet-open:hover, #quiz-open:hover, #map-open:hover, #scale-open:hover, #path-open:hover{ border-color:var(--accent2); color:var(--accent2); }
+  #sheet-open:hover, #quiz-open:hover, #map-open:hover, #scale-open:hover, #path-open:hover, #dv-open:hover{ border-color:var(--accent2); color:var(--accent2); }
 
   /* ---------- quiz ---------- */
-  #quiz-overlay, #map-overlay, #scale-overlay, #path-overlay{
+  #quiz-overlay, #map-overlay, #scale-overlay, #path-overlay, #dv-overlay{
     position:fixed; inset:0; z-index:200; background:rgba(20,22,26,.42);
     display:flex; align-items:flex-start; justify-content:center; padding:38px 18px;
   }
-  #quiz-overlay[hidden], #map-overlay[hidden], #scale-overlay[hidden], #path-overlay[hidden]{ display:none; }
+  #quiz-overlay[hidden], #map-overlay[hidden], #scale-overlay[hidden], #path-overlay[hidden], #dv-overlay[hidden]{ display:none; }
   #quiz-panel{
     background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
     width:min(720px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
@@ -138,6 +138,51 @@
     margin:2px 14px 16px; padding:11px 14px; border-radius:9px; background:var(--code);
     border-left:3px solid var(--accent); min-height:2.6em;
   }
+
+  /* ---------- derivations ---------- */
+  #dv-panel{
+    background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
+    width:min(880px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #dv-picker{
+    display:flex; flex-wrap:wrap; gap:6px; padding:12px 20px 4px; flex:none;
+    border-bottom:1px solid var(--line);
+  }
+  .dv-chip{
+    border:1px solid var(--line); border-radius:999px; background:#fff; cursor:pointer;
+    font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub); padding:5px 12px;
+    margin-bottom:8px;
+  }
+  .dv-chip:hover{ border-color:var(--accent2); color:var(--accent2); }
+  .dv-chip.on{ border-color:var(--accent2); background:var(--accent2); color:#fff; }
+  #dv-body{ overflow:auto; padding:14px 20px 22px; }
+  .dv-intro{ font-family:var(--sans); font-size:.8rem; color:var(--sub); line-height:1.55; margin:0 0 10px; }
+  .dv-target{
+    font-family:var(--sans); font-size:.75rem; color:var(--accent); margin:0 0 14px;
+    padding:7px 12px; border-radius:8px; background:var(--code); display:inline-block;
+  }
+  .dv-step{ margin-bottom:14px; }
+  .dv-eq{
+    font-family:var(--serif); font-size:1.02rem; color:var(--ink);
+    background:var(--code); border-radius:9px; padding:11px 14px; line-height:1.6;
+    overflow-x:auto; white-space:nowrap;   /* a long line scrolls rather than wrapping mid-formula */
+  }
+  .dv-why{
+    font-family:var(--sans); font-size:.79rem; color:var(--body); line-height:1.55;
+    padding:7px 4px 0 14px; border-left:2px solid var(--line); margin:5px 0 0 10px;
+  }
+  .dv-step.fresh .dv-why{ border-left-color:var(--accent2); }
+  .dv-n{
+    display:inline-block; min-width:16px; font-weight:700; color:var(--accent2); font-size:.72rem;
+  }
+  .dv-acts{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .dv-btn{
+    border:1px solid var(--accent2); border-radius:999px; background:var(--accent2); color:#fff;
+    cursor:pointer; font-family:var(--sans); font-size:.76rem; font-weight:700; padding:7px 16px;
+  }
+  .dv-btn.ghost{ background:#fff; color:var(--body); border-color:var(--line); font-weight:600; }
+  .dv-btn.ghost:hover{ border-color:var(--accent2); color:var(--accent2); }
+  .dv-btn:disabled{ opacity:.4; cursor:default; }
 
   /* ---------- routes ---------- */
   #path-panel{
@@ -239,10 +284,10 @@
     padding:16px 20px; border-bottom:1px solid var(--line); flex:none;
   }
   .panel-head h3{ margin:0; font-size:1.05rem; color:var(--ink); }
-  #sheet-close, #quiz-close, #map-close, #scale-close, #path-close{
+  #sheet-close, #quiz-close, #map-close, #scale-close, #path-close, #dv-close{
     border:none; background:none; font-size:1.5rem; line-height:1; color:var(--sub); cursor:pointer; padding:0 4px;
   }
-  #sheet-close:hover, #quiz-close:hover, #map-close:hover, #scale-close:hover, #path-close:hover{ color:var(--accent); }
+  #sheet-close:hover, #quiz-close:hover, #map-close:hover, #scale-close:hover, #path-close:hover, #dv-close:hover{ color:var(--accent); }
   #sheet-body{ overflow:auto; padding:6px 20px 22px; }
   #sheet-body h4{
     font-family:var(--sans); font-size:.64rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
@@ -430,6 +475,7 @@
     <button type="button" id="quiz-open">check yourself on this chapter</button>
     <button type="button" id="map-open">how the book fits together</button>
     <button type="button" id="path-open">routes through the book</button>
+    <button type="button" id="dv-open">six derivations, a line at a time</button>
     <button type="button" id="scale-open">the whole book, to scale</button>
     <button type="button" id="sheet-open">every equation in the book</button>
   </aside>
@@ -455,6 +501,18 @@
       </div>
       <p id="map-hint">Each box is a module. An arrow means the idea it points at rests on the one it comes from. Hover to light up everything a topic depends on and everything that depends on it; click to go there.</p>
       <canvas id="map-canvas" height="620"></canvas>
+    </div>
+  </div>
+
+  <!-- where six of the formulas come from, revealed a line at a time -->
+  <div id="dv-overlay" hidden>
+    <div id="dv-panel" role="dialog" aria-modal="true" aria-labelledby="dv-title">
+      <div class="panel-head">
+        <h3 id="dv-title">Six derivations, a line at a time</h3>
+        <button type="button" id="dv-close" aria-label="close">&times;</button>
+      </div>
+      <div id="dv-picker"></div>
+      <div id="dv-body"></div>
     </div>
   </div>
 
@@ -3888,5 +3946,6 @@
 <script src="conceptmap.js"></script>
 <script src="scales.js"></script>
 <script src="paths.js"></script>
+<script src="derive.js"></script>
 </body>
 </html>

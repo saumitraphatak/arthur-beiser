@@ -453,7 +453,7 @@ function initExtras(){
       e.preventDefault();
       if(search){ search.focus(); search.select(); }
     }
-    if(e.key==='Escape'){ closeSheet(); closeQuiz(); closeMap(); closeScale(); closePaths(); }
+    if(e.key==='Escape'){ closeSheet(); closeQuiz(); closeMap(); closeScale(); closePaths(); closeDerive(); }
   });
   const open=document.getElementById('sheet-open'), close=document.getElementById('sheet-close'),
         ov=document.getElementById('sheet-overlay');
@@ -480,6 +480,7 @@ function initExtras(){
   if(sOv) sOv.addEventListener('click', e=>{ if(e.target===sOv) closeScale(); });
 
   initPaths();
+  initDerive();
 }
 
 function initProgressTracking(){

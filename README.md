@@ -8,7 +8,7 @@ Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.s
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
-Seven things make ninety-two modules navigable:
+Eight things make ninety-two modules navigable:
 
 - **Search** in the sidebar, across every module's title, equation and prose at once, from
   whichever chapter you happen to be in. `/` focuses it, Enter jumps to the first hit.
@@ -43,6 +43,13 @@ Seven things make ninety-two modules navigable:
   page that keeps your place while you read, with back and next; it remembers where you were
   across reloads, and steps you have already marked understood are flagged in the list. Steps
   store only a card id, so the titles are read off the cards at open time and cannot go stale.
+- **Six derivations, a line at a time** — where the formulas come from, revealed one line per
+  click with a reason for every line: time dilation from a bouncing light pulse, E = γmc² from the
+  work done on a particle, the Compton shift, Bohr's radii and energies from a standing wave, the
+  particle in a box, and the decay law with its half-life and mean life. Nothing is skipped and no
+  step is left as "it can be shown that". Revealing them one at a time is the point: you can try to
+  write the next line yourself before it appears, which is the only way reading a derivation
+  teaches anything.
 - A **concept map** of 47 ideas and the 60 dependencies between them, laid out chapter by chapter.
   Hovering an idea lights up everything it rests on, in one colour, and everything that rests on it
   in another — and says so in words ("rests on 10 earlier ideas, and 2 later ones rest on it").
@@ -204,6 +211,7 @@ from Beiser's own particle-physics tables.
     conceptmap.js the 45-idea dependency graph and its renderer
     scales.js     the energy/size/time rulers, and the ħc/E tie between them
     paths.js      the six curated routes and the bar that keeps your place in one
+    derive.js     six derivations, one line and one reason at a time
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
