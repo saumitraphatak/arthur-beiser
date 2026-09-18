@@ -17,12 +17,15 @@ Eight things make ninety-two modules navigable:
 - A **link** button on each module that copies a URL carrying that module's current control
   settings, so a particular configuration can be shared or bookmarked and comes back exactly.
   The hash looks like `#ch5|ch5-m4|tn_E=3.5&tn_U=10&tn_L=1.23`.
-- **Check yourself** — a quiz on the chapter you're reading, 35 questions across the thirteen
-  chapters. The numbers in each question are redrawn every time and the answer is computed from
-  the same constants and functions the modules use, so a question cannot go stale or disagree with
-  the page it came from. Every wrong option is a specific named mistake — dividing by γ instead of
-  multiplying, counting `2n` states where the closed shell holds `n²` — and picking it says which
-  mistake it was rather than just "incorrect".
+- **Check yourself** — a quiz on the chapter you're reading, in two modes. *Multiple choice* has
+  35 questions; the numbers are redrawn every time and the answer is computed from the same
+  constants and functions the modules use, so a question cannot go stale or disagree with the page
+  it came from, and every wrong option is a specific named mistake — dividing by γ instead of
+  multiplying, counting `2n` states where the closed shell holds `n²` — so picking it says which
+  mistake it was rather than just "incorrect". *Work it out* has 26 problems, two per chapter,
+  where you type the number instead of recognising it: it accepts anything within a couple of
+  percent, says how far out you were, names the mistake a wrong answer usually is, and then shows
+  the working line by line whether you got it or not.
 - **The whole book, to scale** — three logarithmic rulers, energy, size and time, carrying 37 real
   quantities from the book, every one computed here from the same constants and tables the modules
   use. The reason they are on the same page is the tie between them: an energy fixes a length and a
@@ -212,6 +215,7 @@ from Beiser's own particle-physics tables.
     scales.js     the energy/size/time rulers, and the ħc/E tie between them
     paths.js      the six curated routes and the bar that keeps your place in one
     derive.js     six derivations, one line and one reason at a time
+    problems.js   26 numeric problems, with their working
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`

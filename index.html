@@ -108,7 +108,8 @@
     background:#fff; font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub);
     cursor:pointer; letter-spacing:.2px;
   }
-  #quiz-open{ margin-top:14px; }
+  #quiz-open{ margin-top:16px; }
+  .side-kicker{ margin:20px 0 4px !important; }
   #sheet-open:hover, #quiz-open:hover, #map-open:hover, #scale-open:hover, #path-open:hover, #dv-open:hover{ border-color:var(--accent2); color:var(--accent2); }
 
   /* ---------- quiz ---------- */
@@ -266,6 +267,37 @@
     margin-top:6px; padding:9px 18px; border:1px solid var(--accent2); border-radius:999px;
     background:var(--accent2); color:#fff; font-family:var(--sans); font-size:.8rem;
     font-weight:700; cursor:pointer;
+  }
+  .qz-modes{ display:flex; gap:6px; margin:0 0 16px; }
+  .qz-mode{
+    border:1px solid var(--line); border-radius:999px; background:#fff; cursor:pointer;
+    font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub); padding:5px 13px;
+  }
+  .qz-mode:hover{ border-color:var(--accent2); color:var(--accent2); }
+  .qz-mode.on{ border-color:var(--accent2); background:var(--accent2); color:#fff; }
+  .qz-numrow{ display:flex; flex-wrap:wrap; align-items:center; gap:9px; margin-bottom:8px; }
+  #qz-input{
+    width:180px; padding:9px 12px; border:1px solid var(--line); border-radius:9px; background:#fff;
+    font-family:var(--sans); font-size:.9rem; color:var(--ink); -webkit-appearance:none;
+  }
+  #qz-input:focus{ outline:none; border-color:var(--accent2); box-shadow:0 0 0 3px rgba(31,111,120,.10); }
+  #qz-input:disabled{ background:var(--code); color:var(--sub); }
+  .qz-unit{ font-family:var(--sans); font-size:.82rem; font-weight:600; color:var(--sub); min-width:1px; }
+  .qz-check, .qz-reveal{
+    border:1px solid var(--accent2); border-radius:999px; background:var(--accent2); color:#fff;
+    cursor:pointer; font-family:var(--sans); font-size:.78rem; font-weight:700; padding:8px 18px;
+  }
+  .qz-reveal{ background:#fff; color:var(--body); border-color:var(--line); font-weight:600; }
+  .qz-reveal:hover:not(:disabled){ border-color:var(--accent2); color:var(--accent2); }
+  .qz-check:disabled, .qz-reveal:disabled{ opacity:.4; cursor:default; }
+  .qz-sol{ margin:10px 0 0; }
+  .qz-sol-eq{
+    font-family:var(--serif); font-size:.95rem; color:var(--ink); background:var(--code);
+    border-radius:8px; padding:9px 12px; line-height:1.55; overflow-x:auto; white-space:nowrap;
+  }
+  .qz-sol-why{
+    font-family:var(--sans); font-size:.78rem; color:var(--body); line-height:1.5;
+    padding:6px 4px 0 12px; border-left:2px solid var(--line); margin:4px 0 0 10px;
   }
   .qz-none{ font-family:var(--sans); font-size:.85rem; color:var(--sub); }
 
@@ -473,6 +505,7 @@
     <input type="search" id="module-search" placeholder="Search all 92 modules…" autocomplete="off" spellcheck="false">
     <nav id="module-index"></nav>
     <button type="button" id="quiz-open">check yourself on this chapter</button>
+    <h4 class="side-kicker">across the whole book</h4>
     <button type="button" id="map-open">how the book fits together</button>
     <button type="button" id="path-open">routes through the book</button>
     <button type="button" id="dv-open">six derivations, a line at a time</button>
@@ -3947,5 +3980,6 @@
 <script src="scales.js"></script>
 <script src="paths.js"></script>
 <script src="derive.js"></script>
+<script src="problems.js"></script>
 </body>
 </html>

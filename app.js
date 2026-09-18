@@ -365,8 +365,38 @@ function applyStateFromHash(){
   return true;
 }
 
+/* ---- numeric problems: same panel, a box to type a number into ---- */
+const PROBLEMS = {};
+function registerProblem(chapterId, fn){
+  (PROBLEMS[chapterId] = PROBLEMS[chapterId] || []).push(fn);
+}
+// answers span 10⁻²⁴ to 10²⁰, so no single fixed format will do
+function pFmt(x){
+  const a = Math.abs(x);
+  if(a===0) return '0';
+  if(a>=1e5 || a<1e-3) return fmtSci(x,3);
+  return fmt(x, a>=100?1: a>=10?2:3);
+}
+
 /* ---- quiz UI ---- */
-let quizRight = 0, quizAsked = 0, quizLastIdx = -1;
+let quizRight = 0, quizAsked = 0, quizLastIdx = -1, quizPlastIdx = -1;
+let quizMode = 'mc';
+function quizModeBar(hasProblems){
+  if(!hasProblems) return '';
+  return `<div class="qz-modes">
+    <button type="button" class="qz-mode${quizMode==='mc'?' on':''}" data-mode="mc">multiple choice</button>
+    <button type="button" class="qz-mode${quizMode==='num'?' on':''}" data-mode="num">work it out</button>
+  </div>`;
+}
+function wireQuizModes(body){
+  body.querySelectorAll('.qz-mode').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(quizMode===b.dataset.mode) return;
+      quizMode = b.dataset.mode;
+      drawQuizQuestion();
+    });
+  });
+}
 function drawQuizQuestion(){
   const body = document.getElementById('quiz-body');
   const active = document.querySelector('.chapter.active');
@@ -377,8 +407,12 @@ function drawQuizQuestion(){
   if(titleEl) titleEl.textContent = 'Check yourself — ' + (btn ? btn.textContent.replace(/^\d+/,'').trim() : active.id);
   const scoreEl = document.getElementById('quiz-score');
   if(scoreEl) scoreEl.textContent = quizAsked ? `${quizRight} / ${quizAsked}` : '';
+  const ppool = PROBLEMS[active.id] || [];
+  if(quizMode==='num' && !ppool.length) quizMode = 'mc';
+  if(quizMode==='num'){ drawNumericProblem(body, ppool, ppool.length>0); return; }
   if(!pool.length){
-    body.innerHTML = '<p class="qz-none">No questions for this chapter yet.</p>';
+    body.innerHTML = quizModeBar(ppool.length>0) + '<p class="qz-none">No questions for this chapter yet.</p>';
+    wireQuizModes(body);
     return;
   }
   // a question may decline to be asked (its random draw came out degenerate)
@@ -392,9 +426,11 @@ function drawQuizQuestion(){
   if(!item){ body.innerHTML = '<p class="qz-none">No questions for this chapter yet.</p>'; return; }
 
   const opts = qShuffle(item.opts);
-  body.innerHTML = `<p class="qz-q">${item.q}</p>` +
+  body.innerHTML = quizModeBar(ppool.length>0) +
+    `<p class="qz-q">${item.q}</p>` +
     opts.map((o,i)=>`<button type="button" class="qz-opt" data-i="${i}">${o.t}</button>`).join('') +
     `<div id="qz-feedback"></div>`;
+  wireQuizModes(body);
   let answered = false;
   body.querySelectorAll('.qz-opt').forEach(b=>{
     b.addEventListener('click', ()=>{
@@ -420,6 +456,81 @@ function drawQuizQuestion(){
     });
   });
 }
+function drawNumericProblem(body, pool, hasProblems){
+  let item = null, guard = 0;
+  while(!item && guard++ < 30){
+    let i = Math.floor(Math.random()*pool.length);
+    if(pool.length > 1 && i === quizPlastIdx) i = (i+1) % pool.length;
+    try{ item = pool[i](); }catch(err){ console.error('[arthur-beiser] a problem threw:', err); item = null; }
+    if(item) quizPlastIdx = i;
+  }
+  if(!item){
+    body.innerHTML = quizModeBar(hasProblems) + '<p class="qz-none">No problems for this chapter yet.</p>';
+    wireQuizModes(body);
+    return;
+  }
+  body.innerHTML = quizModeBar(hasProblems) +
+    `<p class="qz-q">${item.q}</p>
+     <div class="qz-numrow">
+       <input type="text" id="qz-input" inputmode="decimal" autocomplete="off" spellcheck="false"
+              placeholder="your answer" aria-label="your answer">
+       <span class="qz-unit">${item.unit||''}</span>
+       <button type="button" class="qz-check" id="qz-check">check</button>
+       <button type="button" class="qz-reveal" id="qz-reveal">show me</button>
+     </div>
+     <div id="qz-feedback"></div>`;
+  wireQuizModes(body);
+  const input = document.getElementById('qz-input');
+  const fb = document.getElementById('qz-feedback');
+  const tol = item.tol==null ? 0.02 : item.tol;
+  let done = false;
+
+  // with no unit (a bare probability, a count) there must be no dangling space
+  const withUnit = v => pFmt(v) + (item.unit ? ' ' + item.unit : '');
+  function solutionHtml(){
+    return (item.solution||[]).map(s=>
+      `<div class="qz-sol"><div class="qz-sol-eq">${s.eq}</div><div class="qz-sol-why">${s.why}</div></div>`).join('');
+  }
+  function finish(html){
+    done = true;
+    input.disabled = true;
+    document.getElementById('qz-check').disabled = true;
+    document.getElementById('qz-reveal').disabled = true;
+    fb.innerHTML = html + solutionHtml() +
+      `<button type="button" class="qz-next">Next problem</button>`;
+    fb.querySelector('.qz-next').addEventListener('click', drawQuizQuestion);
+  }
+  function check(){
+    if(done) return;
+    // accept 1.2e-3, 1.2E-3, 1,2 as a decimal comma, and a stray unit typed in
+    const raw = (input.value||'').trim().replace(',', '.').replace(/[^0-9eE.+\-]/g,'');
+    const v = parseFloat(raw);
+    if(!isFinite(v)){
+      fb.innerHTML = `<div class="qz-why no">That is not a number I can read. Type a plain value such as <b>13.6</b> or <b>2.4e-12</b>.</div>`;
+      return;
+    }
+    quizAsked++;
+    const err = Math.abs(v - item.answer) / (Math.abs(item.answer)||1);
+    const ok = err <= tol;
+    if(ok) quizRight++;
+    const sc = document.getElementById('quiz-score');
+    if(sc) sc.textContent = `${quizRight} / ${quizAsked}`;
+    finish(ok
+      ? `<div class="qz-why"><b>Right.</b> ${withUnit(item.answer)}${err>0.002?` — you were within ${fmt(err*100,1)}%.`:'.'}</div>`
+      : `<div class="qz-why no"><b>Not quite.</b> The answer is <b>${withUnit(item.answer)}</b>; you were out by ${err>=10?'more than a factor of ten':fmt(err*100,0)+'%'}.${item.trap?' '+item.trap:''}</div>`);
+  }
+  document.getElementById('qz-check').addEventListener('click', check);
+  document.getElementById('qz-reveal').addEventListener('click', ()=>{
+    if(done) return;
+    quizAsked++;
+    const sc = document.getElementById('quiz-score');
+    if(sc) sc.textContent = `${quizRight} / ${quizAsked}`;
+    finish(`<div class="qz-why"><b>${withUnit(item.answer)}.</b> Here is how it goes.</div>`);
+  });
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); check(); } });
+  input.focus();
+}
+
 function openQuiz(){
   const ov = document.getElementById('quiz-overlay');
   if(!ov) return;
