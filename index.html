@@ -103,20 +103,20 @@
   #module-index .mi-ch{ font-size:.6rem; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
     color:var(--accent2); opacity:.75; flex:none; }
   #module-index .mi-none{ padding:8px 11px; font-family:var(--sans); font-size:.76rem; color:var(--sub); }
-  #sheet-open, #quiz-open, #map-open, #scale-open{
+  #sheet-open, #quiz-open, #map-open, #scale-open, #path-open{
     margin-top:8px; width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
     background:#fff; font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--sub);
     cursor:pointer; letter-spacing:.2px;
   }
   #quiz-open{ margin-top:14px; }
-  #sheet-open:hover, #quiz-open:hover, #map-open:hover, #scale-open:hover{ border-color:var(--accent2); color:var(--accent2); }
+  #sheet-open:hover, #quiz-open:hover, #map-open:hover, #scale-open:hover, #path-open:hover{ border-color:var(--accent2); color:var(--accent2); }
 
   /* ---------- quiz ---------- */
-  #quiz-overlay, #map-overlay, #scale-overlay{
+  #quiz-overlay, #map-overlay, #scale-overlay, #path-overlay{
     position:fixed; inset:0; z-index:200; background:rgba(20,22,26,.42);
     display:flex; align-items:flex-start; justify-content:center; padding:38px 18px;
   }
-  #quiz-overlay[hidden], #map-overlay[hidden], #scale-overlay[hidden]{ display:none; }
+  #quiz-overlay[hidden], #map-overlay[hidden], #scale-overlay[hidden], #path-overlay[hidden]{ display:none; }
   #quiz-panel{
     background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
     width:min(720px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
@@ -137,6 +137,67 @@
     font-family:var(--sans); font-size:.78rem; line-height:1.55; color:var(--body);
     margin:2px 14px 16px; padding:11px 14px; border-radius:9px; background:var(--code);
     border-left:3px solid var(--accent); min-height:2.6em;
+  }
+
+  /* ---------- routes ---------- */
+  #path-panel{
+    background:var(--panel); border-radius:15px; box-shadow:var(--shadow-md);
+    width:min(820px,100%); max-height:100%; display:flex; flex-direction:column; overflow:hidden;
+  }
+  #path-body{ overflow:auto; padding:8px 20px 22px; }
+  .path-card{ margin-top:18px; }
+  .path-card h4{
+    font-family:var(--sans); font-size:.9rem; margin:0 0 3px; color:var(--ink);
+  }
+  .path-count{ font-weight:400; font-size:.72rem; color:var(--sub); }
+  .path-blurb{ font-family:var(--sans); font-size:.78rem; color:var(--sub); margin:0 0 9px; line-height:1.5; }
+  .path-acts{ display:flex; gap:8px; margin-bottom:8px; }
+  .path-start, .path-toggle{
+    border:1px solid var(--line); border-radius:999px; background:#fff; cursor:pointer;
+    font-family:var(--sans); font-size:.74rem; font-weight:600; color:var(--body); padding:5px 14px;
+  }
+  .path-start{ border-color:var(--accent2); background:var(--accent2); color:#fff; }
+  .path-toggle:hover{ border-color:var(--accent2); color:var(--accent2); }
+  .path-steps[hidden]{ display:none; }
+  .path-step{
+    display:grid; grid-template-columns:22px 1fr; gap:2px 9px; width:100%; text-align:left;
+    border:1px solid var(--line); border-left:3px solid var(--line); border-radius:9px;
+    background:#fff; cursor:pointer; padding:8px 12px; margin-bottom:6px; font-family:var(--sans);
+  }
+  .path-step:hover{ border-color:var(--accent2); border-left-color:var(--accent2); }
+  .path-step.done{ border-left-color:#1e7a3d; }
+  .ps-n{ grid-row:span 2; font-size:.7rem; font-weight:700; color:var(--accent2); padding-top:2px; }
+  .ps-t{ font-size:.83rem; font-weight:600; color:var(--ink); }
+  .ps-w{ font-size:.76rem; color:var(--sub); line-height:1.45; }
+
+  #path-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:180; background:var(--panel);
+    border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(20,22,26,.07);
+    display:flex; align-items:center; gap:14px; padding:9px 18px; font-family:var(--sans);
+  }
+  #path-bar[hidden]{ display:none; }
+  #path-bar::before{
+    content:''; position:absolute; left:0; top:-1px; height:2px;
+    width:var(--path-frac,0%); background:var(--accent2);
+  }
+  #path-bar-title{
+    border:none; background:none; padding:0; cursor:pointer;
+    font-family:var(--sans); font-size:.76rem; font-weight:700; color:var(--accent2); flex:none;
+  }
+  #path-bar-title:hover{ text-decoration:underline; }
+  #path-bar-why{ font-size:.76rem; color:var(--sub); flex:1; line-height:1.4; }
+  #path-bar button.pb{
+    border:1px solid var(--line); border-radius:999px; background:#fff; cursor:pointer;
+    font-family:var(--sans); font-size:.74rem; font-weight:600; color:var(--body); padding:5px 13px;
+  }
+  #path-bar button.pb:hover:not(:disabled){ border-color:var(--accent2); color:var(--accent2); }
+  #path-bar button.pb:disabled{ opacity:.4; cursor:default; }
+  body.has-path{ padding-bottom:64px; }   /* the bar is fixed: keep it off the last card */
+  #path-quit{ border:none; background:none; color:var(--sub); cursor:pointer; font-size:1.25rem; line-height:1; padding:0 2px; }
+  #path-quit:hover{ color:var(--accent); }
+  @media (max-width:700px){
+    #path-bar{ flex-wrap:wrap; gap:8px 10px; padding:8px 12px; }
+    #path-bar-why{ order:3; flex-basis:100%; }
   }
   #quiz-score{ font-family:var(--sans); font-size:.75rem; font-weight:700; color:var(--accent2); }
   #quiz-body{ overflow:auto; padding:20px; }
@@ -178,10 +239,10 @@
     padding:16px 20px; border-bottom:1px solid var(--line); flex:none;
   }
   .panel-head h3{ margin:0; font-size:1.05rem; color:var(--ink); }
-  #sheet-close, #quiz-close, #map-close, #scale-close{
+  #sheet-close, #quiz-close, #map-close, #scale-close, #path-close{
     border:none; background:none; font-size:1.5rem; line-height:1; color:var(--sub); cursor:pointer; padding:0 4px;
   }
-  #sheet-close:hover, #quiz-close:hover, #map-close:hover, #scale-close:hover{ color:var(--accent); }
+  #sheet-close:hover, #quiz-close:hover, #map-close:hover, #scale-close:hover, #path-close:hover{ color:var(--accent); }
   #sheet-body{ overflow:auto; padding:6px 20px 22px; }
   #sheet-body h4{
     font-family:var(--sans); font-size:.64rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
@@ -326,7 +387,7 @@
     main{ padding-bottom:60px; }
   }
   @media print{
-    .masthead,.sidebar{ display:none; }
+    .masthead,.sidebar,#path-bar{ display:none; }
     .chapter{ display:block!important; }
     .card{ break-inside:avoid; box-shadow:none; }
   }
@@ -368,6 +429,7 @@
     <nav id="module-index"></nav>
     <button type="button" id="quiz-open">check yourself on this chapter</button>
     <button type="button" id="map-open">how the book fits together</button>
+    <button type="button" id="path-open">routes through the book</button>
     <button type="button" id="scale-open">the whole book, to scale</button>
     <button type="button" id="sheet-open">every equation in the book</button>
   </aside>
@@ -393,6 +455,17 @@
       </div>
       <p id="map-hint">Each box is a module. An arrow means the idea it points at rests on the one it comes from. Hover to light up everything a topic depends on and everything that depends on it; click to go there.</p>
       <canvas id="map-canvas" height="620"></canvas>
+    </div>
+  </div>
+
+  <!-- curated routes: short sequences of modules that answer one question -->
+  <div id="path-overlay" hidden>
+    <div id="path-panel" role="dialog" aria-modal="true" aria-labelledby="path-title">
+      <div class="panel-head">
+        <h3 id="path-title">Routes through the book</h3>
+        <button type="button" id="path-close" aria-label="close">&times;</button>
+      </div>
+      <div id="path-body"></div>
     </div>
   </div>
 
@@ -3788,6 +3861,14 @@
 
 <footer>All thirteen chapters of Beiser, <em>Concepts of Modern Physics</em>, 6th ed. &mdash; 92 interactive modules. Every plot and every number is computed live from the equations shown; the only stored data are measured quantities the equations are checked against (ionization energies, atomic masses and half-lives, particle properties), and those are the book’s own tables. Verified at devicePixelRatio 1, 2 and 3.</footer>
 
+<div id="path-bar" hidden>
+  <button type="button" id="path-bar-title"></button>
+  <span id="path-bar-why"></span>
+  <button type="button" class="pb" id="path-prev">&larr; back</button>
+  <button type="button" class="pb" id="path-next">next &rarr;</button>
+  <button type="button" id="path-quit" aria-label="leave this route">&times;</button>
+</div>
+
 <script src="app.js"></script>
 <script src="nuclides.js"></script>
 <script src="ch01.js"></script>
@@ -3806,5 +3887,6 @@
 <script src="quiz.js"></script>
 <script src="conceptmap.js"></script>
 <script src="scales.js"></script>
+<script src="paths.js"></script>
 </body>
 </html>

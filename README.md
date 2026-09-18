@@ -8,7 +8,7 @@ Open `index.html` in a browser (or serve the folder with e.g. `python3 -m http.s
 
 Every module carries an explanation beneath it in the same four-part shape: how to read the visualization, a **Try this** box with specific settings reproducing one of Beiser's worked examples, the conceptual payoff, and a closing **The catch** note on whatever subtlety usually causes trouble.
 
-Six things make ninety-two modules navigable:
+Seven things make ninety-two modules navigable:
 
 - **Search** in the sidebar, across every module's title, equation and prose at once, from
   whichever chapter you happen to be in. `/` focuses it, Enter jumps to the first hit.
@@ -32,6 +32,17 @@ Six things make ninety-two modules navigable:
   and that is exactly the argument by which Yukawa predicted a particle nobody had seen. Sometimes
   the miss is the physics: hydrogen's 13.6 eV gives 14.5 nm, 270 times the size of the atom, and
   that factor is 2/α — a bound state sits at ħc/E only when it is relativistic.
+- **Routes through the book** — six curated sequences that answer one question each, because the
+  chapter order is the order Beiser wrote in and not always the order an argument runs in. *The
+  road to the atom* goes Rutherford → the classical collapse → quantisation → the photon → de
+  Broglie → Bohr's standing waves, which is how the argument was actually made and crosses three
+  chapters to do it. There is also *why quantum mechanics had to happen*, *one hour before the
+  exam*, tunnelling followed into four places where it is the whole explanation, mass–energy
+  followed from Chapter 1 to why a star shines, and what the exclusion principle holds up. Every
+  step carries a line saying why it comes next. Starting a route puts a bar at the foot of the
+  page that keeps your place while you read, with back and next; it remembers where you were
+  across reloads, and steps you have already marked understood are flagged in the list. Steps
+  store only a card id, so the titles are read off the cards at open time and cannot go stale.
 - A **concept map** of 47 ideas and the 60 dependencies between them, laid out chapter by chapter.
   Hovering an idea lights up everything it rests on, in one colour, and everything that rests on it
   in another — and says so in words ("rests on 10 earlier ideas, and 2 later ones rest on it").
@@ -192,6 +203,7 @@ from Beiser's own particle-physics tables.
     quiz.js       per-chapter question banks, each generated fresh from live constants
     conceptmap.js the 45-idea dependency graph and its renderer
     scales.js     the energy/size/time rulers, and the ħc/E tie between them
+    paths.js      the six curated routes and the bar that keeps your place in one
 
 Adding a chapter is additive: write `chNN.js`, add its `<section class="chapter" id="chNN">`,
 add a `<script>` tag, and promote its pill in the nav from `.soon` to a button. `app.js`
